@@ -1,7 +1,9 @@
 package org.jetlinks.sdk.server.device;
 
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetlinks.core.metadata.Jsonable;
 import org.jetlinks.core.utils.SerializeUtils;
 
 import java.io.*;
@@ -10,7 +12,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-public class DeviceInfo implements Externalizable {
+public class DeviceInfo implements Externalizable, Jsonable {
     private static final long serialVersionUID = 1L;
 
     private String id;
@@ -30,6 +32,15 @@ public class DeviceInfo implements Externalizable {
     private Long createTime;
 
     private DeviceState state;
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject jsonObject = Jsonable.super.toJson();
+        if (state != null) {
+            jsonObject.put("state", state.name());
+        }
+        return jsonObject;
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
