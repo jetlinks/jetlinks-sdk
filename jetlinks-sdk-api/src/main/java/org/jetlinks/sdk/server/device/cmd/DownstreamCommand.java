@@ -11,7 +11,7 @@ import java.util.Map;
  * 发送消息给设备
  * @see org.jetlinks.core.message.DeviceMessage
  */
-public class SendMessageCommand extends AbstractCommand<Flux<DeviceMessage>, SendMessageCommand> {
+public class DownstreamCommand extends AbstractCommand<Flux<DeviceMessage>, DownstreamCommand> {
 
     @SuppressWarnings("all")
     public DeviceMessage getMessage() {
@@ -27,12 +27,12 @@ public class SendMessageCommand extends AbstractCommand<Flux<DeviceMessage>, Sen
         return null;
     }
 
-    public SendMessageCommand withMessage(Map<String, Object> message) {
+    public DownstreamCommand withMessage(Map<String, Object> message) {
         writable().put("message", message);
         return castSelf();
     }
 
-    public SendMessageCommand withMessage(DeviceMessage message) {
+    public DownstreamCommand withMessage(DeviceMessage message) {
         writable().put("message", message);
         return castSelf();
     }
