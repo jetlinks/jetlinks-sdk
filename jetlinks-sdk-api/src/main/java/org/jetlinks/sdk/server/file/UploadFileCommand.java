@@ -10,18 +10,15 @@ import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandSupport;
 import org.jetlinks.core.utils.ConverterUtils;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.core.io.buffer.DefaultDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
-import org.springframework.util.unit.DataSize;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.InputStream;
-import java.util.Base64;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -63,16 +60,17 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
         return with("offset", offset);
     }
 
-    public boolean isChunk() {
-        Object isChunk = readable().getOrDefault("chunk", false);
+    public boolean isSharding() {
+        Object isChunk = readable().getOrDefault("sharding", false);
 
         return Boolean.TRUE.equals(isChunk) ||
             "true".equals(isChunk) ||
             "1".equals(isChunk);
     }
 
-    public UploadFileCommand withChunk(boolean chunk) {
-        return with("chunk", chunk);
+    public UploadFileCommand withSharding(long offset) {
+        return with("sharding", true)
+            .withOffset(offset);
     }
 
 
@@ -170,14 +168,12 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
                 UploadFileCommand command = new UploadFileCommand();
                 consumer.accept(command);
                 ByteBuf wrap = Unpooled.unreleasableBuffer(bytes);
-
-                command.withSessionId(sessionId);
-                command.withChunk(true);
-                command.withOffset(offset.getAndAdd(bytes.readableBytes()));
-                command.withContent(wrap);
-                command.withContentLength(fileLength);
                 return cmd
-                    .execute(command)
+                    .execute(command
+                                 .withSessionId(sessionId)
+                                 .withSharding(offset.getAndAdd(bytes.readableBytes()))
+                                 .withContent(wrap)
+                                 .withContentLength(fileLength))
                     .doFinally(ignore -> {
                         ReferenceCountUtil.safeRelease(bytes);
                     });
