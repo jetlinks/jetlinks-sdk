@@ -104,6 +104,7 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
             return Flux.just(data);
         }
         return Flux.create(sink -> {
+            sink.onDispose(() -> ReferenceCountUtil.safeRelease(data));
 
             int chunk = length / maxChunkSize;
             int remainder = length % maxChunkSize;
@@ -114,7 +115,6 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
             if (remainder > 0) {
                 sink.next(data.retainedSlice(length - remainder, remainder));
             }
-            sink.onDispose(() -> ReferenceCountUtil.safeRelease(data));
             sink.complete();
 
         });
