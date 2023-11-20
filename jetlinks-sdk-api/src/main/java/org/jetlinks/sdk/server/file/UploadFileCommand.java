@@ -133,7 +133,7 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
                                          Consumer<UploadFileCommand> consumer) {
 
         return Mono
-            .defer(() -> execute(cmd, data, bufferSize, consumer))
+            .defer(() -> execute0(cmd, data, bufferSize, consumer))
             .subscribeOn(Schedulers.boundedElastic());
     }
 
