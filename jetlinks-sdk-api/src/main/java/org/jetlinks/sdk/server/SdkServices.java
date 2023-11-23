@@ -9,6 +9,11 @@ public interface SdkServices {
      */
     String fileService = "fileService";
 
+    /**
+     * @see org.jetlinks.sdk.server.media.ProxyMediaStreamCommand
+     * @see org.jetlinks.sdk.server.media.StopProxyMediaStreamCommand
+     *
+     */
     String mediaService = "mediaService";
 
 }
