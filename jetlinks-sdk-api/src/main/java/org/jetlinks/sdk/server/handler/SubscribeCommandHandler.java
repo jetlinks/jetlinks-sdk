@@ -6,6 +6,7 @@ package org.jetlinks.sdk.server.handler;
  */
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.sdk.server.commons.cmd.SubscribeCommand;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -26,18 +27,23 @@ public abstract class SubscribeCommandHandler {
                                                                             CMD cmd,
                                                                             Function<T, Mono<T>> callback) {
         Function<Object, Mono<Void>> function = obj -> callback.apply(eventClass.cast(obj)).then();
-        callbacks.compute(eventClass, (k, list) -> {
-            if (list == null) {
-                list = new CopyOnWriteArrayList<>();
-            }
 
-            list.add(function);
-            return list;
-        });
-        return () -> callbacks.computeIfPresent(eventClass, (k, list) -> {
-            list.remove(function);
-            return list;
-        });
+        callbacks
+                .computeIfAbsent(eventClass, ignore -> new CopyOnWriteArrayList<>())
+                .add(function);
+
+        return () -> callbacks
+                .compute(eventClass, (k, list) -> {
+                    if (CollectionUtils.isEmpty(list)) {
+                        return null;
+                    }
+                    list.remove(function);
+                    if (list.isEmpty()) {
+                        return null;
+                    }
+                    return list;
+                });
+
     }
 
     protected Mono<Void> handle(Object event) {
@@ -45,14 +51,17 @@ public abstract class SubscribeCommandHandler {
     }
 
     protected static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
+        if (CollectionUtils.isEmpty(functions)) {
+            return Mono.empty();
+        }
         return Flux
-            .fromIterable(functions)
-            .flatMap(callback -> callback
-                .apply(event)
-                .onErrorResume(err -> {
-                    log.error("error.handle_event_fail", err);
-                    return Mono.empty();
-                }))
-            .then();
+                .fromIterable(functions)
+                .flatMap(callback -> callback
+                        .apply(event)
+                        .onErrorResume(err -> {
+                            log.error("error.handle_event_fail", err);
+                            return Mono.empty();
+                        }))
+                .then();
     }
 }
