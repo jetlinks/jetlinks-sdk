@@ -11,6 +11,7 @@ import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +38,10 @@ public abstract class SubscribeCommandHandler {
             list.remove(function);
             return list;
         });
+    }
+
+    protected Mono<Void> handle(Object event) {
+        return handle(event, callbacks.getOrDefault(event.getClass(), Collections.emptyList()));
     }
 
     protected static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
