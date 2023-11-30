@@ -50,7 +50,7 @@ public class SubscribeCommandHandler {
         return handle(event, callbacks.getOrDefault(event.getClass(), Collections.emptyList()));
     }
 
-    public static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
+    private static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
         if (CollectionUtils.isEmpty(functions)) {
             return Mono.empty();
         }
