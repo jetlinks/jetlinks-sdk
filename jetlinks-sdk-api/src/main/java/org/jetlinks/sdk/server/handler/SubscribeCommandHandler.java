@@ -56,12 +56,7 @@ public abstract class SubscribeCommandHandler {
         }
         return Flux
                 .fromIterable(functions)
-                .flatMap(callback -> callback
-                        .apply(event)
-                        .onErrorResume(err -> {
-                            log.error("error.handle_event_fail", err);
-                            return Mono.empty();
-                        }))
+                .flatMap(callback -> callback.apply(event))
                 .then();
     }
 }
