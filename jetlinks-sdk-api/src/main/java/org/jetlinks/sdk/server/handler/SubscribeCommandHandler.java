@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 @Slf4j
-public abstract class SubscribeCommandHandler {
+public class SubscribeCommandHandler {
     protected final Map<Class<?>, List<Function<Object, Mono<Void>>>> callbacks = new ConcurrentHashMap<>();
 
     public <T, CMD extends SubscribeCommand<T, CMD>> Disposable addCallback(Class<T> eventClass,
@@ -46,11 +46,11 @@ public abstract class SubscribeCommandHandler {
 
     }
 
-    protected Mono<Void> handle(Object event) {
+    public Mono<Void> handle(Object event) {
         return handle(event, callbacks.getOrDefault(event.getClass(), Collections.emptyList()));
     }
 
-    protected static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
+    public static Mono<Void> handle(Object event, List<Function<Object, Mono<Void>>> functions) {
         if (CollectionUtils.isEmpty(functions)) {
             return Mono.empty();
         }
