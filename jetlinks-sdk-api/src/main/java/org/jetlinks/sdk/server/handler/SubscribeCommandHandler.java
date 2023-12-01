@@ -6,8 +6,8 @@ package org.jetlinks.sdk.server.handler;
  */
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.sdk.server.commons.cmd.SubscribeCommand;
+import org.springframework.util.CollectionUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
