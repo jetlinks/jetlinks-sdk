@@ -20,8 +20,13 @@ import java.util.function.Function;
 public class EntitySubscribeCommandRegisterHandler extends SubscribeCommandHandler {
 
     public void register(BiConsumer<String, CommandHandler<EntityEventSubscribeCommand, Flux<Object>>> support,
+                         DataType entityDataType) {
+        register(support, entityDataType, callback -> obj -> callback.apply(obj).then());
+    }
+
+    public void register(BiConsumer<String, CommandHandler<EntityEventSubscribeCommand, Flux<Object>>> support,
                          DataType entityDataType,
-                         Function<Function<Object, Mono<Object>>, Function<Object, Mono<Void>>> handler) {
+                         Function<Function<Object, Mono<Object>>, Function<Object, Mono<Void>>> handleCallback) {
         for (EntitySubscribeType type : EntitySubscribeType.values()) {
             support
                 .accept(type.getId(),
@@ -36,7 +41,7 @@ public class EntitySubscribeCommandRegisterHandler extends SubscribeCommandHandl
                             },
                             (cmd, callback) -> this
                                 .addCallback0(type.getEventClass(),
-                                              obj -> handler.apply(callback).apply(obj)),
+                                              obj -> handleCallback.apply(callback).apply(obj)),
                             () -> new EntityEventSubscribeCommand().withCommandId(type.getId()))
                 );
         }
