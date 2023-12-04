@@ -6,8 +6,8 @@ package org.jetlinks.sdk.server.handler;
  */
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.sdk.server.commons.cmd.SubscribeCommand;
+import org.springframework.util.CollectionUtils;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -26,18 +26,21 @@ public class SubscribeCommandHandler {
     public <T, CMD extends SubscribeCommand<T, CMD>> Disposable addCallback(Class<T> eventClass,
                                                                             CMD cmd,
                                                                             Function<T, Mono<T>> callback) {
-        Function<Object, Mono<Void>> function = obj -> callback.apply(eventClass.cast(obj)).then();
+        return addCallback0(eventClass, obj -> callback.apply(eventClass.cast(obj)).then());
+    }
 
+    public <T> Disposable addCallback0(Class<T> eventClass,
+                                       Function<Object, Mono<Void>> callback) {
         callbacks
                 .computeIfAbsent(eventClass, ignore -> new CopyOnWriteArrayList<>())
-                .add(function);
+                .add(callback);
 
         return () -> callbacks
                 .compute(eventClass, (k, list) -> {
                     if (CollectionUtils.isEmpty(list)) {
                         return null;
                     }
-                    list.remove(function);
+                    list.remove(callback);
                     if (list.isEmpty()) {
                         return null;
                     }
