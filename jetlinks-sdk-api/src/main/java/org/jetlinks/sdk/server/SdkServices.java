@@ -16,4 +16,11 @@ public interface SdkServices {
      */
     String mediaService = "mediaService";
 
+    /**
+     * 认证服务
+     * @see org.jetlinks.sdk.server.auth.cmd.GetDimensionUserBindCommand
+     * @see org.jetlinks.sdk.server.auth.cmd.GetUserDimensionsCommand
+     */
+    String authService = "authService";
+
 }

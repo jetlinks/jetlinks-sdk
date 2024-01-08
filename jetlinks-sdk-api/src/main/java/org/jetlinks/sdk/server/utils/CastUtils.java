@@ -1,5 +1,8 @@
 package org.jetlinks.sdk.server.utils;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class CastUtils {
 
     public static boolean castBoolean(Object value) {
@@ -13,5 +16,16 @@ public class CastUtils {
                 "ok".equalsIgnoreCase(strVal) ||
                 "yes".equalsIgnoreCase(strVal) ||
                 "1".equalsIgnoreCase(strVal);
+    }
+
+    @SuppressWarnings("all")
+    public static <T> Collection<T> castCollection(Object collection){
+        if (collection == null) {
+            return Collections.emptyList();
+        }
+        if (collection instanceof Collection) {
+            return ((Collection<T>) collection);
+        }
+        return Collections.singleton((T)collection);
     }
 }
