@@ -12,6 +12,7 @@
     <modules>
         <module>jetlinks-sdk-api</module>
         <module>jetlinks-sdk-restful</module>
+        <module>jetlinks-sdk-generator</module>
     </modules>
 
     <name>JetLinks SDK</name>
@@ -56,6 +57,7 @@
         <jetlinks.core.version>1.2.2-SNAPSHOT</jetlinks.core.version>
         <hsweb.framework.version>4.0.16</hsweb.framework.version>
         <reactor.ql.version>1.0.16</reactor.ql.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
     </properties>
 
     <profiles>
@@ -140,7 +142,6 @@
             <version>1.18.20</version>
             <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -169,6 +170,21 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.jetlinks.sdk</groupId>
+                <artifactId>jetlinks-sdk-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -179,6 +195,13 @@
                 <groupId>org.jetlinks</groupId>
                 <artifactId>jetlinks-core</artifactId>
                 <version>${jetlinks.core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>5.10.0</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
