@@ -13,7 +13,4 @@ public interface DeviceCommandSupportTypes {
     // 设备
     String device = "device";
 
-    // 设备属性
-    String property = "property";
-
 }

@@ -10,6 +10,7 @@ import org.jetlinks.core.metadata.types.IntType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
+import org.jetlinks.sdk.server.device.DevicePropertyAggRequest;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
@@ -28,21 +29,21 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     private static final long serialVersionUID = 1L;
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> getColumns() {
-        return (List<Map<String, Object>>) readable().get("columns");
+    public List<DevicePropertyAggRequest.DevicePropertyAggregation> getColumns() {
+        return (List<DevicePropertyAggRequest.DevicePropertyAggregation>) readable().get("columns");
     }
 
-    public QueryPropertyAggCommand withColumns(List<Map<String, Object>> columns) {
+    public QueryPropertyAggCommand withColumns(List<DevicePropertyAggRequest.DevicePropertyAggregation> columns) {
         writable().put("columns", columns);
         return this;
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> getQuery() {
-        return (Map<String, Object>) readable().get("query");
+    public DevicePropertyAggRequest.AggregationRequest getQuery() {
+        return (DevicePropertyAggRequest.AggregationRequest) readable().get("query");
     }
 
-    public QueryPropertyAggCommand withQuery(Map<String, Object> query) {
+    public QueryPropertyAggCommand withQuery(DevicePropertyAggRequest.AggregationRequest query) {
         writable().put("query", query);
         return this;
     }

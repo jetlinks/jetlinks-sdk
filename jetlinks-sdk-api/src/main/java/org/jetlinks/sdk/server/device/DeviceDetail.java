@@ -1,17 +1,10 @@
 package org.jetlinks.sdk.server.device;
 
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.core.metadata.Jsonable;
-import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.LinkedHashMap;
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -21,7 +14,7 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class DeviceDetail implements Externalizable, Jsonable {
+public class DeviceDetail implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "设备ID")
@@ -117,92 +110,4 @@ public class DeviceDetail implements Externalizable, Jsonable {
     @Schema(description = "产品所属分类名称")
     private String classifiedName;
 
-    @Override
-    public JSONObject toJson() {
-        JSONObject jsonObject = Jsonable.super.toJson();
-        if (state != null) {
-            jsonObject.put("state", state.name());
-        }
-        if (deviceType != null) {
-            jsonObject.put("deviceType", deviceType.name());
-        }
-        return jsonObject;
-    }
-
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(id, out);
-        SerializeUtils.writeNullableUTF(name, out);
-        SerializeUtils.writeNullableUTF(productPhotoUrl, out);
-        SerializeUtils.writeNullableUTF(devicePhotoUrl, out);
-        SerializeUtils.writeNullableUTF(protocol, out);
-        SerializeUtils.writeNullableUTF(protocolName, out);
-        SerializeUtils.writeNullableUTF(transport, out);
-        SerializeUtils.writeNullableUTF(productId, out);
-        SerializeUtils.writeNullableUTF(productName, out);
-        SerializeUtils.writeNullableUTF(address, out);
-        SerializeUtils.writeObject(onlineTime, out);
-        SerializeUtils.writeObject(offlineTime, out);
-        SerializeUtils.writeObject(createTime, out);
-        SerializeUtils.writeObject(registerTime, out);
-        SerializeUtils.writeNullableUTF(metadata, out);
-        SerializeUtils.writeNullableUTF(productMetadata, out);
-        SerializeUtils.writeObject(independentMetadata, out);
-        SerializeUtils.writeKeyValue(configuration, out);
-        SerializeUtils.writeKeyValue(deviceConfiguration, out);
-        SerializeUtils.writeKeyValue(cachedConfiguration, out);
-        SerializeUtils.writeObject(aloneConfiguration, out);
-        SerializeUtils.writeNullableUTF(parentId, out);
-        SerializeUtils.writeNullableUTF(connectServerId, out);
-        SerializeUtils.writeNullableUTF(description, out);
-        SerializeUtils.writeNullableUTF(accessId, out);
-        SerializeUtils.writeNullableUTF(accessProvider, out);
-        SerializeUtils.writeNullableUTF(accessName, out);
-        SerializeUtils.writeNullableUTF(classifiedId, out);
-        SerializeUtils.writeNullableUTF(classifiedName, out);
-
-        out.writeByte(state == null ? -1 : state.ordinal());
-        out.writeByte(deviceType == null ? -1 : deviceType.ordinal());
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        id = SerializeUtils.readNullableUTF(in);
-        name = SerializeUtils.readNullableUTF(in);
-        productPhotoUrl = SerializeUtils.readNullableUTF(in);
-        devicePhotoUrl = SerializeUtils.readNullableUTF(in);
-        protocol = SerializeUtils.readNullableUTF(in);
-        protocolName = SerializeUtils.readNullableUTF(in);
-        transport = SerializeUtils.readNullableUTF(in);
-        productId = SerializeUtils.readNullableUTF(in);
-        productName = SerializeUtils.readNullableUTF(in);
-        address = SerializeUtils.readNullableUTF(in);
-        onlineTime = (Long) SerializeUtils.readObject(in);
-        offlineTime = (Long) SerializeUtils.readObject(in);
-        createTime = (Long) SerializeUtils.readObject(in);
-        registerTime = (Long) SerializeUtils.readObject(in);
-        metadata = SerializeUtils.readNullableUTF(in);
-        productMetadata = SerializeUtils.readNullableUTF(in);
-        independentMetadata = (Boolean) SerializeUtils.readObject(in);
-        configuration = SerializeUtils.readMap(in, LinkedHashMap::new);
-        deviceConfiguration = SerializeUtils.readMap(in, LinkedHashMap::new);
-        cachedConfiguration = SerializeUtils.readMap(in, LinkedHashMap::new);
-        aloneConfiguration = (Boolean) SerializeUtils.readObject(in);
-        parentId = SerializeUtils.readNullableUTF(in);
-        connectServerId = SerializeUtils.readNullableUTF(in);
-        description = SerializeUtils.readNullableUTF(in);
-        accessId = SerializeUtils.readNullableUTF(in);
-        accessProvider = SerializeUtils.readNullableUTF(in);
-        accessName = SerializeUtils.readNullableUTF(in);
-        classifiedId = SerializeUtils.readNullableUTF(in);
-        classifiedName = SerializeUtils.readNullableUTF(in);
-        byte state = in.readByte();
-        if (state >= 0) {
-            this.state = DeviceState.values()[state];
-        }
-        byte deviceType = in.readByte();
-        if (deviceType >= 0) {
-            this.deviceType = DeviceType.values()[deviceType];
-        }
-    }
 }
