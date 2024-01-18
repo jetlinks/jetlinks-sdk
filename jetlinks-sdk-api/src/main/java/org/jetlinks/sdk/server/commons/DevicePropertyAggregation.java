@@ -1,4 +1,4 @@
-package org.jetlinks.sdk.server.device;
+package org.jetlinks.sdk.server.commons;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
