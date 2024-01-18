@@ -11,7 +11,7 @@ import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
-import org.jetlinks.sdk.server.commons.DevicePropertyAggregation;
+import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
