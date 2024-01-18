@@ -12,8 +12,10 @@ import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,9 +31,16 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unchecked")
+    static Type columnsType = ResolvableType
+        .forClassWithGenerics(List.class, DevicePropertyAggregation.class)
+        .getType();
+
+    static Type queryType = ResolvableType
+        .forClass(AggregationRequest.class)
+        .getType();
+
     public List<DevicePropertyAggregation> getColumns() {
-        return (List<DevicePropertyAggregation>) readable().get("columns");
+        return getOrNull("columns", columnsType);
     }
 
     public QueryPropertyAggCommand withColumns(List<DevicePropertyAggregation> columns) {
@@ -40,7 +49,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     }
 
     public AggregationRequest getQuery() {
-        return (AggregationRequest) readable().get("query");
+        return getOrNull("query", queryType);
     }
 
     public QueryPropertyAggCommand withQuery(AggregationRequest query) {
