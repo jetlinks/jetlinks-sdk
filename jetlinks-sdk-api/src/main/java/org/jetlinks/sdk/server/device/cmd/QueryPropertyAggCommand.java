@@ -35,10 +35,6 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         .forClassWithGenerics(List.class, DevicePropertyAggregation.class)
         .getType();
 
-    static Type queryType = ResolvableType
-        .forClass(AggregationRequest.class)
-        .getType();
-
     public List<DevicePropertyAggregation> getColumns() {
         return getOrNull("columns", columnsType);
     }
@@ -49,7 +45,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     }
 
     public AggregationRequest getQuery() {
-        return getOrNull("query", queryType);
+        return getOrNull("query", AggregationRequest.class);
     }
 
     public QueryPropertyAggCommand withQuery(AggregationRequest query) {
