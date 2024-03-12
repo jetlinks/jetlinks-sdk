@@ -46,7 +46,7 @@ public class AggregationRequest implements Serializable {
         .toDate();
 
     @Schema(description = "数量限制")
-    int limit = 30;
+    Integer limit;
 
     //过滤条件
     @Schema(description = "过滤条件")
