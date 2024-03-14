@@ -9,6 +9,7 @@ import org.hswebframework.web.id.IDGenerator;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandSupport;
 import org.jetlinks.core.utils.ConverterUtils;
+import org.jetlinks.sdk.server.utils.ByteBufUtils;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
@@ -207,25 +208,7 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
      * @return 切割后的内容
      */
     public static Flux<ByteBuf> splitByteBuf(ByteBuf data, int maxChunkSize) {
-        int length = data.readableBytes();
-        if (length <= maxChunkSize) {
-            return Flux.just(data);
-        }
-        return Flux.create(sink -> {
-            sink.onDispose(() -> ReferenceCountUtil.safeRelease(data));
-
-            int chunk = length / maxChunkSize;
-            int remainder = length % maxChunkSize;
-
-            for (int i = 0; i < chunk; i++) {
-                sink.next(data.retainedSlice(i * maxChunkSize, maxChunkSize));
-            }
-            if (remainder > 0) {
-                sink.next(data.retainedSlice(length - remainder, remainder));
-            }
-            sink.complete();
-
-        });
+        return ByteBufUtils.splitByteBuf(data, maxChunkSize);
     }
 
     /**
@@ -299,6 +282,23 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
             .singleOrEmpty();
     }
 
+    /**
+     * 执行文件上传
+     *
+     * @param cmd        文件服务支持
+     * @param fileLength 文件长度
+     * @param chunk      文件内容
+     * @param bufferSize 缓冲区大小
+     * @param consumer   文件上传配置
+     * @return 文件信息
+     */
+    public static Mono<FileInfo> execute(CommandSupport cmd,
+                                         long fileLength,
+                                         Flux<ByteBuf> chunk,
+                                         int bufferSize,
+                                         Consumer<UploadFileCommand> consumer) {
+        return execute(cmd, fileLength, ByteBufUtils.balanceBuffer(chunk, bufferSize), consumer);
+    }
 
     @SneakyThrows
     @SuppressWarnings("all")
