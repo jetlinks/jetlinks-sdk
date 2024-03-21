@@ -1,6 +1,5 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
-import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
@@ -15,24 +14,23 @@ import java.util.function.Function;
  * @author liusq
  * @date 2024/3/21
  */
-public class StartCommand extends AbstractCommand<Mono<Void>, StartCommand> {
-    public String getId() {
-        return (String) readable().get("id");
-    }
-    public static CommandHandler<StartCommand, Mono<Void>> createHandler(Function<StartCommand, Mono<Void>> handler) {
+public class DisabledCommand extends EnabledCommand {
+
+    public static CommandHandler<EnabledCommand, Mono<Void>> createHandler(Function<EnabledCommand, Mono<Void>> handler) {
+
         return CommandHandler.of(
                 () -> {
                     SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    metadata.setId(CommandUtils.getCommandIdByType(StartCommand.class));
-                    metadata.setName("启用");
-                    metadata.setDescription("启用或激活");
-                    metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL)));
+                    metadata.setId(CommandUtils.getCommandIdByType(DisabledCommand.class));
+                    metadata.setName("禁用");
+                    metadata.setDescription("禁用或注销");
+                    metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("idList", "id数组",
+                                                                                           StringType.GLOBAL)));
+
                     return metadata;
                 },
                 (cmd, ignore) -> handler.apply(cmd),
-                StartCommand::new
+                DisabledCommand::new
         );
-
     }
-
 }
