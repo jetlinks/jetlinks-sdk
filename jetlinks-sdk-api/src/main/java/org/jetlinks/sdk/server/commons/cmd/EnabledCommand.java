@@ -5,6 +5,7 @@ import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
+import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Mono;
@@ -37,7 +38,7 @@ public class EnabledCommand extends AbstractCommand<Mono<Void>, EnabledCommand> 
                     metadata.setName("启用");
                     metadata.setDescription("启用或激活");
                     metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("idList", "id数组",
-                                                                                           StringType.GLOBAL)));
+                                                                                           new ArrayType())));
                     return metadata;
                 },
                 (cmd, ignore) -> handler.apply(cmd),

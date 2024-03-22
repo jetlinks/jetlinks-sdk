@@ -4,6 +4,7 @@ import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
+import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Mono;
 
@@ -25,7 +26,7 @@ public class DisabledCommand extends EnabledCommand {
                     metadata.setName("禁用");
                     metadata.setDescription("禁用或注销");
                     metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("idList", "id数组",
-                                                                                           StringType.GLOBAL)));
+                                                                                           new ArrayType())));
 
                     return metadata;
                 },
