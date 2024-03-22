@@ -6,15 +6,25 @@ import org.springframework.core.ResolvableType;
 
 import java.util.function.Consumer;
 
+/**
+ * Java代码生成器,用于构造java类.
+ *
+ * @author zhouhao
+ * @since 1.0
+ */
 public interface JavaGenerator {
 
-    static JavaGenerator create(String className){
-       return new DefaultJavaGenerator(className);
+    static JavaGenerator create(String className) {
+        return new DefaultJavaGenerator(className);
     }
 
     JavaGenerator extendsClass(ResolvableType clazz);
 
     JavaGenerator extendsClass(String clazz);
+
+    JavaGenerator implement(ResolvableType clazz);
+
+    JavaGenerator implement(String clazz);
 
     String getThis();
 
@@ -29,7 +39,7 @@ public interface JavaGenerator {
 
     JavaGenerator addField(ResolvableType type, String name, Modifier.Keyword... modifiers);
 
-    JavaGenerator addField(String type,String name,Modifier.Keyword... modifiers);
+    JavaGenerator addField(String type, String name, Modifier.Keyword... modifiers);
 
 
     String generate();

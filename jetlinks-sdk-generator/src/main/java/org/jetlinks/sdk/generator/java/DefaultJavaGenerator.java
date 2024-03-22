@@ -1,6 +1,5 @@
 package org.jetlinks.sdk.generator.java;
 
-import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
@@ -11,7 +10,6 @@ import java.util.function.Consumer;
 
 class DefaultJavaGenerator implements JavaGenerator {
 
-    static JavaParser parser = new JavaParser();
     final CompilationUnit cu;
 
     final ClassOrInterfaceDeclaration clazz;
@@ -40,13 +38,19 @@ class DefaultJavaGenerator implements JavaGenerator {
 
     @Override
     public JavaGenerator extendsClass(String clazz) {
-
-        this.clazz.addExtendedType(
-            parser
-                .parseClassOrInterfaceType(clazz)
-                .getResult()
-                .orElseThrow(() -> new IllegalArgumentException("can not parse class:" + clazz)));
+        this.clazz.addExtendedType(clazz);
         return this;
+    }
+
+    @Override
+    public JavaGenerator implement(String clazz) {
+        this.clazz.addImplementedType(clazz);
+        return this;
+    }
+
+    @Override
+    public JavaGenerator implement(ResolvableType clazz) {
+        return implement(clazz.toString());
     }
 
     @Override
