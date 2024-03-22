@@ -23,12 +23,9 @@ import java.util.stream.Collectors;
  */
 public class EnabledCommand extends AbstractCommand<Mono<Void>, EnabledCommand> {
     public static final String PARAMETER_KEY = "idList";
+
     public List<String> getIds() {
-        Object entities = readable().get(PARAMETER_KEY);
-        if (entities instanceof Collection) {
-            return ConverterUtils.convertToList(entities,String::valueOf);
-        }
-        return new ArrayList<>();
+        return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), String::valueOf);
     }
     public static CommandHandler<EnabledCommand, Mono<Void>> createHandler(Function<EnabledCommand, Mono<Void>> handler) {
         return CommandHandler.of(
