@@ -283,21 +283,24 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
     }
 
     /**
-     * 执行文件上传
+     * 指定分片大小,执行文件上传。
      *
-     * @param cmd        文件服务支持
-     * @param fileLength 文件长度
-     * @param chunk      文件内容
-     * @param bufferSize 缓冲区大小
-     * @param consumer   文件上传配置
+     * @param cmd            文件服务支持
+     * @param fileLength     文件长度
+     * @param chunk          文件内容
+     * @param lengthEachPart 每个分片的文件大小.
+     *                       建议设置为1MB以上,因为部分云存储支持的分片大小有限制.
+     * @param consumer       文件上传配置
      * @return 文件信息
      */
     public static Mono<FileInfo> execute(CommandSupport cmd,
                                          long fileLength,
                                          Flux<ByteBuf> chunk,
-                                         int bufferSize,
+                                         int lengthEachPart,
                                          Consumer<UploadFileCommand> consumer) {
-        return execute(cmd, fileLength, ByteBufUtils.balanceBuffer(chunk, bufferSize), consumer);
+
+        lengthEachPart = ByteBufUtils.computeBalanceEachSize(fileLength, lengthEachPart);
+        return execute(cmd, fileLength, ByteBufUtils.balanceBuffer(chunk, lengthEachPart), consumer);
     }
 
     @SneakyThrows

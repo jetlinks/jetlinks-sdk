@@ -40,6 +40,21 @@ public class ByteBufUtils {
         });
     }
 
+    public static int computeBalanceEachSize(long fileLength, int lengthEachPart) {
+        if (fileLength == 0) {
+            return lengthEachPart;
+        }
+        //平均份数
+        long parts = fileLength / lengthEachPart;
+        //每一份的实际数量
+        int eachSize = parts == 0 ? (int)fileLength : (int) (fileLength / parts);
+        //余数平均分配数量
+        long eachRemainder = fileLength % eachSize;
+        if (eachRemainder > 0) {
+            eachSize += (int) Math.ceil((double) eachRemainder / parts);
+        }
+        return eachSize;
+    }
 
     /**
      * 平衡ByteBuf数据流

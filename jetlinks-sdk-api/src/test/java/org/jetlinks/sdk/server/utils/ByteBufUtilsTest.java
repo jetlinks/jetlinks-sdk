@@ -6,6 +6,7 @@ import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.Unpooled;
 import org.jetlinks.sdk.server.file.UploadFileCommand;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -62,6 +63,30 @@ class ByteBufUtilsTest {
             .doOnNext(buf -> System.out.println(buf.readableBytes()))
             .as(StepVerifier::create)
             .expectNextCount(17)
+            .verifyComplete();
+    }
+
+    @Test
+    void testBalanceEach() {
+
+        for (int i = 2; i < 1024; i++) {
+            testBalanceEach(1024 * i, 1024 * i);
+            testBalanceEach(8 * 1024 * 1054 + i, 1024 * i);
+        }
+    }
+
+    void testBalanceEach(int total, int each) {
+        int parts = ByteBufUtils.computeBalanceEachSize(total, each);
+
+        ByteBufUtils
+            .balanceBuffer(Flux.just(Unpooled.wrappedBuffer(new byte[total])),
+                           parts)
+            .map(ByteBuf::readableBytes)
+            .collectList()
+            .doOnNext(e -> System.out.printf("total:%s,each:%s,parts:%s\n", total, each, e))
+            .map(list -> list.stream().mapToInt(Integer::intValue).sum())
+            .as(StepVerifier::create)
+            .expectNext(total)
             .verifyComplete();
     }
 }
