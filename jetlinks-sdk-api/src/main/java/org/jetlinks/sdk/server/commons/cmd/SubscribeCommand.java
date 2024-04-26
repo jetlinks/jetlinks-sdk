@@ -45,7 +45,7 @@ public abstract class SubscribeCommand<T, Self extends SubscribeCommand<T, Self>
                 return Flux
                     .create(sink -> sink
                         .onDispose(
-                            handler.apply(cmd, (val) -> callback.apply(val).doOnNext(sink::next))
+                            handler.apply(cmd, (val) -> callback.apply((T)cmd.createResponseData(val)).doOnNext(sink::next))
                         ));
 
             }, instance);

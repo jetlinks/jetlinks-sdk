@@ -5,14 +5,13 @@ import lombok.Setter;
 import org.hswebframework.web.api.crud.entity.PagerResult;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
-import org.jetlinks.core.metadata.DataType;
-import org.jetlinks.core.metadata.PropertyMetadata;
-import org.jetlinks.core.metadata.SimpleFunctionMetadata;
-import org.jetlinks.core.metadata.SimplePropertyMetadata;
+import org.jetlinks.core.metadata.*;
 import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.IntType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
+import org.springframework.core.ResolvableType;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
@@ -32,23 +31,48 @@ import java.util.function.Function;
 @Setter
 public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, QueryPagerCommand<T>> {
 
+    public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
+        SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+        //QueryPager
+        metadata.setId(CommandUtils.getCommandIdByType(QueryPagerCommand.class));
+        metadata.setName(metadata.getId());
+        metadata.setDescription("可指定查询条件，分页参数，排序规则等");
+        metadata.setInputs(getQueryParamMetadata());
+        custom.accept(metadata);
+        return metadata;
+    }
 
-    public static <T> CommandHandler<QueryPagerCommand<T>, Mono<PagerResult<T>>> createHandler(Consumer<SimpleFunctionMetadata> custom,
-                                                                                               Function<QueryPagerCommand<T>, Mono<PagerResult<T>>> handler) {
+    public static <T> CommandHandler<QueryPagerCommand<T>, Mono<PagerResult<T>>> createHandler(
+        Consumer<SimpleFunctionMetadata> custom,
+        Function<QueryPagerCommand<T>, Mono<PagerResult<T>>> handler,
+        ResolvableType elementType) {
 
+        // PagerResult<T>
+        ResolvableType type = ResolvableType.forClassWithGenerics(
+            PagerResult.class, elementType
+        );
+
+        return createHandler(custom, handler, CommandUtils.createConverter(type));
+    }
+
+    public static <T> CommandHandler<QueryPagerCommand<T>, Mono<PagerResult<T>>> createHandler(
+        Consumer<SimpleFunctionMetadata> custom,
+        Function<QueryPagerCommand<T>, Mono<PagerResult<T>>> handler,
+        Function<Object, PagerResult<T>> resultConverter) {
+        return CommandHandler.of(
+            () -> metadata(custom),
+            (cmd, ignore) -> handler.apply(cmd),
+            () -> new QueryPagerCommand<T>().withConverter(resultConverter)
+        );
+    }
+
+    @Deprecated
+    public static <T> CommandHandler<QueryPagerCommand<T>, Mono<PagerResult<T>>> createHandler(
+        Consumer<SimpleFunctionMetadata> custom,
+        Function<QueryPagerCommand<T>, Mono<PagerResult<T>>> handler) {
 
         return CommandHandler.of(
-            () -> {
-                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                //QueryPager
-                metadata.setId(CommandUtils.getCommandIdByType(QueryPagerCommand.class));
-                metadata.setName(metadata.getId());
-                metadata.setName("分页查询");
-                metadata.setDescription("可指定查询条件，分页参数，排序规则等");
-                metadata.setInputs(getQueryParamMetadata());
-                custom.accept(metadata);
-                return metadata;
-            },
+            () -> metadata(custom),
             (cmd, ignore) -> handler.apply(cmd),
             QueryPagerCommand::new
         );

@@ -4,6 +4,7 @@ import org.hswebframework.ezorm.core.dsl.Query;
 import org.hswebframework.web.api.crud.entity.QueryParamEntity;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.AbstractCommand;
+import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.metadata.DataType;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ArrayType;
@@ -31,7 +32,7 @@ import java.util.function.Consumer;
  * @author zhouhao
  * @since 2.1
  */
-public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extends AbstractCommand<T, Self> {
+public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extends AbstractConvertCommand<T, Self> {
 
     private transient QueryParamEntity queryParam;
 

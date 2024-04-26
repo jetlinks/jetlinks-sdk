@@ -2,12 +2,14 @@ package org.jetlinks.sdk.server.commons.cmd;
 
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.PropertyMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
@@ -26,24 +28,44 @@ import java.util.function.Function;
 public class QueryAsTreeCommand<T> extends QueryCommand<Flux<T>, QueryAsTreeCommand<T>> {
 
 
+    public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
+        SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+        //QueryAsTree
+        metadata.setId(CommandUtils.getCommandIdByType(QueryAsTreeCommand.class));
+        metadata.setName(metadata.getId());
+        metadata.setDescription("条件查询列表,并将返回的数据组装为树结构");
+        metadata.setInputs(getQueryParamMetadata());
+        custom.accept(metadata);
+        return metadata;
+    }
+
+    public static <T> CommandHandler<QueryAsTreeCommand<T>, Flux<T>> createHandler(
+        Consumer<SimpleFunctionMetadata> custom,
+        Function<QueryAsTreeCommand<T>, Flux<T>> handler,
+        ResolvableType elementType) {
+        return createHandler(custom, handler, CommandUtils.createConverter(elementType));
+    }
+
+    public static <T> CommandHandler<QueryAsTreeCommand<T>, Flux<T>> createHandler(
+        Consumer<SimpleFunctionMetadata> custom,
+        Function<QueryAsTreeCommand<T>, Flux<T>> handler,
+        Function<Object, T> resultConverter) {
+        return CommandHandler.of(
+            () -> metadata(custom),
+            (cmd, ignore) -> handler.apply(cmd),
+            () -> new QueryAsTreeCommand<T>().withConverter(resultConverter)
+        );
+    }
+
+    @Deprecated
     public static <T> CommandHandler<QueryAsTreeCommand<T>, Flux<T>> createHandler(Consumer<SimpleFunctionMetadata> custom,
                                                                                    Function<QueryAsTreeCommand<T>, Flux<T>> handler) {
 
 
         return CommandHandler.of(
-                () -> {
-                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                //QueryAsTree
-                metadata.setId(CommandUtils.getCommandIdByType(QueryAsTreeCommand.class));
-                metadata.setName(metadata.getId());
-                metadata.setName("查询列表返回树结构");
-                metadata.setDescription("条件查询列表,并将返回的数据组装为树结构");
-                metadata.setInputs(getQueryParamMetadata());
-                custom.accept(metadata);
-                return metadata;
-            },
-                (cmd, ignore) -> handler.apply(cmd),
-                QueryAsTreeCommand::new
+            () -> metadata(custom),
+            (cmd, ignore) -> handler.apply(cmd),
+            QueryAsTreeCommand::new
         );
 
     }

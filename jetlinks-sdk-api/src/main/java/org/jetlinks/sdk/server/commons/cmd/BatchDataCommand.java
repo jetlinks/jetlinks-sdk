@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.commons.cmd;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.command.AbstractCommand;
+import org.jetlinks.core.command.AbstractConvertCommand;
 import reactor.core.publisher.Flux;
 
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public abstract class BatchDataCommand<T, Self extends BatchDataCommand<T, Self>> extends AbstractCommand<Flux<T>, Self> {
+public abstract class BatchDataCommand<T, Self extends BatchDataCommand<T, Self>> extends AbstractConvertCommand<Flux<T>, Self> {
 
     public static final String PARAMETER_KEY = "data";
 
