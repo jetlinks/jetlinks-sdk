@@ -3,12 +3,15 @@ package org.jetlinks.sdk.server.utils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.reactivestreams.Subscription;
+import reactor.core.CoreSubscriber;
+import reactor.core.publisher.*;
+import reactor.util.context.Context;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 public class ByteBufUtils {
     /**
@@ -24,18 +27,20 @@ public class ByteBufUtils {
             return Flux.just(data);
         }
         return Flux.create(sink -> {
-            sink.onDispose(() -> ReferenceCountUtil.safeRelease(data));
+            try {
+                int chunk = length / maxChunkSize;
+                int remainder = length % maxChunkSize;
 
-            int chunk = length / maxChunkSize;
-            int remainder = length % maxChunkSize;
-
-            for (int i = 0; i < chunk; i++) {
-                sink.next(data.retainedSlice(i * maxChunkSize, maxChunkSize));
+                for (int i = 0; i < chunk; i++) {
+                    sink.next(data.retainedSlice(i * maxChunkSize, maxChunkSize));
+                }
+                if (remainder > 0) {
+                    sink.next(data.retainedSlice(length - remainder, remainder));
+                }
+                sink.complete();
+            } finally {
+                ReferenceCountUtil.safeRelease(data);
             }
-            if (remainder > 0) {
-                sink.next(data.retainedSlice(length - remainder, remainder));
-            }
-            sink.complete();
 
         });
     }
@@ -47,7 +52,7 @@ public class ByteBufUtils {
         //平均份数
         long parts = fileLength / lengthEachPart;
         //每一份的实际数量
-        int eachSize = parts == 0 ? (int)fileLength : (int) (fileLength / parts);
+        int eachSize = parts == 0 ? (int) fileLength : (int) (fileLength / parts);
         //余数平均分配数量
         long eachRemainder = fileLength % eachSize;
         if (eachRemainder > 0) {
@@ -64,38 +69,151 @@ public class ByteBufUtils {
      * @return 新的数据流
      */
     public static Flux<ByteBuf> balanceBuffer(Flux<ByteBuf> buffer, int fixedLength) {
-        AtomicInteger count = new AtomicInteger(fixedLength);
-        List<ByteBuf> temp = new ArrayList<>(16);
 
-        return buffer
-            //先尝试分片
-            .flatMap(buf -> splitByteBuf(buf, fixedLength))
-            .<ByteBuf>flatMap(buf -> {
-                synchronized (count) {
-                    int remainder = count.addAndGet(-buf.readableBytes());
-                    if (remainder >= 0) {
-                        temp.add(buf);
-                        return Mono.empty();
-                    } else {
-                        List<ByteBuf> _temp = new ArrayList<>(temp);
-                        temp.clear();
+        return new ByteBufBalancer(fixedLength, buffer)
+            .onBackpressureBuffer()
+            .doOnDiscard(ByteBuf.class, ReferenceCountUtil::safeRelease);
 
-                        _temp.add(buf.retainedSlice(0, buf.readableBytes() + remainder));
-                        int remainderFrom = buf.readableBytes() + remainder;
+    }
 
-                        ByteBuf remainderBuf = buf.retainedSlice(remainderFrom, buf.readableBytes() - remainderFrom);
-                        temp.add(remainderBuf);
+    static class ByteBufBalancer extends FluxOperator<ByteBuf, ByteBuf> {
+        final int fixedLength;
 
-                        count.set(fixedLength - remainderBuf.readableBytes());
+        protected ByteBufBalancer(int fixedLength, Flux<? extends ByteBuf> source) {
+            super(source);
+            this.fixedLength = fixedLength;
+        }
 
-                        return Mono.justOrEmpty(
-                            Unpooled
-                                .compositeBuffer(_temp.size())
-                                .addComponents(true, _temp));
+        @Override
+        public void subscribe(@Nonnull CoreSubscriber<? super ByteBuf> actual) {
+
+            source.subscribe(
+                new ByteBufBalancerSubscriber(fixedLength, actual)
+            );
+        }
+    }
+
+    static class ByteBufBalancerSubscriber extends BaseSubscriber<ByteBuf> {
+        static final AtomicIntegerFieldUpdater<ByteBufBalancerSubscriber> COUNT = AtomicIntegerFieldUpdater
+            .newUpdater(ByteBufBalancerSubscriber.class, "count");
+
+        private final int fixedLength;
+
+        private volatile int count;
+        private final List<ByteBuf> buffer = new ArrayList<>(16);
+
+        private final CoreSubscriber<? super ByteBuf> actual;
+
+        ByteBufBalancerSubscriber(int fixedLength, CoreSubscriber<? super ByteBuf> actual) {
+            this.actual = actual;
+            this.fixedLength = count = fixedLength;
+        }
+
+        @Override
+        @Nonnull
+        public Context currentContext() {
+            return actual.currentContext();
+        }
+
+        @Override
+        protected void hookOnSubscribe(@Nonnull Subscription subscription) {
+            actual.onSubscribe(this);
+        }
+
+        @Override
+        protected void hookOnNext(@Nonnull ByteBuf buf) {
+            int readableBytes = buf.readableBytes();
+
+            //实际大于预期,则分片
+            if (readableBytes > fixedLength) {
+                try {
+                    int chunk = readableBytes / fixedLength;
+                    int remainder = readableBytes % fixedLength;
+
+                    for (int i = 0; i < chunk; i++) {
+                        hookOnNext0(buf.retainedSlice(i * fixedLength, fixedLength));
                     }
+
+                    if (remainder > 0) {
+                        hookOnNext0(buf.retainedSlice(readableBytes - remainder, remainder));
+                    }
+                } finally {
+                    ReferenceCountUtil.safeRelease(buf);
                 }
-            }).concatWith(Flux.defer(() -> temp.isEmpty()
-                ? Flux.empty()
-                : Flux.just(Unpooled.compositeBuffer(temp.size()).addComponents(true, temp))));
+                return;
+            }
+
+            hookOnNext0(buf);
+            request(1);
+        }
+
+
+        protected void hookOnNext0(ByteBuf buf) {
+
+            int readableBytes = buf.readableBytes();
+
+            int remainder = COUNT.addAndGet(this, -readableBytes);
+            if (remainder > 0) {
+                buffer.add(buf);
+                return;
+            }
+            List<ByteBuf> _temp = new ArrayList<>(buffer);
+            buffer.clear();
+            int sliceBytes = readableBytes + remainder;
+
+            if (sliceBytes > 0) {
+                _temp.add(buf.retainedSlice(0, sliceBytes));
+            }
+
+            int remainderLen = readableBytes - sliceBytes;
+            if (remainderLen > 0) {
+                ByteBuf remainderBuf = buf.retainedSlice(sliceBytes, remainderLen);
+                buffer.add(remainderBuf);
+            }
+
+            COUNT.set(this, fixedLength - remainderLen);
+            try {
+                next(_temp);
+            } finally {
+                buf.release();
+            }
+        }
+
+        protected void next(List<ByteBuf> buffers) {
+            int size = buffers.size();
+            if (size == 1) {
+                actual.onNext(buffers.get(0));
+            } else if (size > 1) {
+                actual.onNext(
+                    Unpooled
+                        .compositeBuffer(buffers.size())
+                        .addComponents(true, buffers)
+                );
+            }
+        }
+
+        @Override
+        protected void hookFinally(@Nonnull SignalType type) {
+            if (!buffer.isEmpty()) {
+                for (ByteBuf byteBuf : buffer) {
+                    ReferenceCountUtil.safeRelease(byteBuf);
+                }
+                buffer.clear();
+            }
+        }
+
+        @Override
+        protected void hookOnComplete() {
+            if (!buffer.isEmpty()) {
+                next(new ArrayList<>(buffer));
+                buffer.clear();
+            }
+            actual.onComplete();
+        }
+
+        @Override
+        protected void hookOnError(@Nonnull Throwable throwable) {
+            actual.onError(throwable);
+        }
     }
 }

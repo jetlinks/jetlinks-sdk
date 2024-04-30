@@ -1,14 +1,18 @@
 package org.jetlinks.sdk.server.utils;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.CompositeByteBuf;
-import io.netty.buffer.Unpooled;
+import io.netty.buffer.*;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.jetlinks.sdk.server.file.UploadFileCommand;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.springframework.util.unit.DataSize;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
+
+import java.security.MessageDigest;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,28 +46,59 @@ class ByteBufUtilsTest {
     @Test
     void testBalance() {
 
-
         ByteBufUtils
             .balanceBuffer(
                 Flux.range(0, 16)
-                    .map(i -> Unpooled.wrappedBuffer(new byte[2048])),
+                    .map(i -> ByteBufAllocator.DEFAULT.buffer().writeBytes(new byte[2048])),
                 2048
             )
-            //  .doOnNext(buf -> System.out.println(buf.readableBytes()))
+            .doOnNext(buf -> System.out.println(buf + " " + buf.refCnt()))
             .as(StepVerifier::create)
             .expectNextCount(16)
             .verifyComplete();
 
+        System.out.println();
+        byte[] bytes = new byte[2050];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) i;
+        }
         ByteBufUtils
             .balanceBuffer(
                 Flux.range(0, 16)
-                    .map(i -> Unpooled.wrappedBuffer(new byte[2050])),
+                    .map(i -> ByteBufAllocator.DEFAULT.buffer().writeBytes(bytes)),
                 2048
             )
-            .doOnNext(buf -> System.out.println(buf.readableBytes()))
+            .doOnNext(buf -> System.out.println(buf + " " + buf.refCnt() + "=> \n" + Arrays.toString(ByteBufUtil.getBytes(buf))))
             .as(StepVerifier::create)
             .expectNextCount(17)
             .verifyComplete();
+    }
+
+    @Test
+    @Disabled
+    void testBigFile() {
+        MessageDigest digest =  DigestUtils.getMd5Digest();
+        MessageDigest digest2 =  DigestUtils.getMd5Digest();
+
+        Flux.range(0, (int) DataSize.ofGigabytes(1).toBytes())
+            .buffer(31*1022)
+            .map(list -> {
+                ByteBuf buf = ByteBufAllocator.DEFAULT.buffer(list.size());
+                for (Integer i : list) {
+                    buf.writeByte(i.byteValue());
+                }
+                digest.update(buf.nioBuffer());
+                return buf;
+            })
+            .as(flux-> ByteBufUtils.balanceBuffer(flux, 8*1024))
+            .doOnNext(buf->{
+                digest2.update(buf.nioBuffer());
+                buf.release();
+            })
+            .blockLast();
+
+        assertArrayEquals(digest.digest(),digest2.digest());
+
     }
 
     @Test
@@ -79,9 +114,12 @@ class ByteBufUtilsTest {
         int parts = ByteBufUtils.computeBalanceEachSize(total, each);
 
         ByteBufUtils
-            .balanceBuffer(Flux.just(Unpooled.wrappedBuffer(new byte[total])),
-                           parts)
-            .map(ByteBuf::readableBytes)
+            .balanceBuffer(Flux.just(ByteBufAllocator.DEFAULT.buffer().writeBytes(new byte[total])), parts)
+            .map(ref -> {
+                int bytes = ref.readableBytes();
+                ref.release();
+                return bytes;
+            })
             .collectList()
             .doOnNext(e -> System.out.printf("total:%s,each:%s,parts:%s\n", total, each, e))
             .map(list -> list.stream().mapToInt(Integer::intValue).sum())
