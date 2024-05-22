@@ -4,6 +4,7 @@ import org.hswebframework.ezorm.core.dsl.Update;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.ezorm.core.param.UpdateParam;
 import org.hswebframework.ezorm.rdb.mapping.DSLUpdate;
+import org.hswebframework.web.api.crud.entity.QueryParamEntity;
 import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
@@ -14,6 +15,7 @@ import org.jetlinks.sdk.server.utils.ConverterUtils;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -57,6 +59,24 @@ public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateComma
 
     }
 
+    public QueryParamEntity toQuery() {
+        List<Term> terms = getTerms();
+        QueryParamEntity param = QueryParamEntity.of();
+        if (terms != null) {
+            terms.forEach(param::addTerm);
+        }
+        return param;
+    }
+
+    public List<Term> getTerms() {
+        Object terms = readable().get(PARAMETER_TERMS);
+        return ConverterUtils.convertTerms(terms);
+    }
+
+    public UpdateCommand<T> setTerms(List<Term> terms) {
+        return with(PARAMETER_TERMS, terms);
+    }
+
     public <E extends T, U extends DSLUpdate<E, ?>> U applyUpdate(U update, Function<Object, E> mapper) {
 
         UpdateParam<E> param = toParameter(mapper);
@@ -66,7 +86,7 @@ public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateComma
             ((Map<?, ?>) data)
                 .forEach((key, value) -> {
                     if (value == null) {
-                        if (key.equals("id")){
+                        if (key.equals("id")) {
                             throw new BusinessException("error.update_id_can_not_be_null");
                         }
                         //更新null值
@@ -107,7 +127,7 @@ public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateComma
                 //Update
                 metadata.setId(CommandUtils.getCommandIdByType(UpdateCommand.class));
                 metadata.setName("更新数据");
-                metadata.setDescription("更新条件不得为空");
+                metadata.setDescription("按条件更新数据,更新条件不得为空");
                 metadata.setOutput(IntType.GLOBAL);
                 custom.accept(metadata);
                 return metadata;

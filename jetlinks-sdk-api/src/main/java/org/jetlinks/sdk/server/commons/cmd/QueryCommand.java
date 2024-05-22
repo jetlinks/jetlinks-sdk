@@ -73,16 +73,15 @@ public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extend
     }
 
     public static SimplePropertyMetadata getTermsMetadata() {
-        return SimplePropertyMetadata.of("terms", "查询条件", new ArrayType().elementType(
-            getTermsDataType()
-        ));
+        return SimplePropertyMetadata.of("terms", "动态条件", new ArrayType()
+            .elementType(getTermsDataType()));
     }
 
     public static DataType getTermsDataType() {
         return new ObjectType()
             .addProperty("column", "列名(属性名)", StringType.GLOBAL)
             .addProperty("termType", "条件类型,如:like,gt,lt", StringType.GLOBAL)
-            .addProperty("value", "条件值", new ObjectType());
+            .addProperty("value", "条件值", StringType.GLOBAL);
     }
 
 }

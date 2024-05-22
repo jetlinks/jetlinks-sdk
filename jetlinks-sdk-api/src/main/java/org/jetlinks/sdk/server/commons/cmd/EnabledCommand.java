@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
@@ -19,27 +20,29 @@ import java.util.stream.Collectors;
 
 /**
  * @author liusq
- * @date 2024/3/21
  */
-public class EnabledCommand extends AbstractCommand<Mono<Void>, EnabledCommand> {
+public class EnabledCommand extends OperationByIdCommand<Mono<Void>, EnabledCommand> {
     public static final String PARAMETER_KEY = "idList";
 
     public List<String> getIds() {
-        return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), String::valueOf);
+        List<String> compatible = ConverterUtils.convertToList(readable().get(PARAMETER_KEY), String::valueOf);
+        return CollectionUtils.isEmpty(compatible) ? getIdList(String::valueOf) : compatible;
     }
+
     public static CommandHandler<EnabledCommand, Mono<Void>> createHandler(Function<EnabledCommand, Mono<Void>> handler) {
         return CommandHandler.of(
-                () -> {
-                    SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    metadata.setId(CommandUtils.getCommandIdByType(EnabledCommand.class));
-                    metadata.setName("启用");
-                    metadata.setDescription("启用或激活");
-                    metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("idList", "id数组",
-                                                                                           new ArrayType())));
-                    return metadata;
-                },
-                (cmd, ignore) -> handler.apply(cmd),
-                EnabledCommand::new
+            () -> {
+                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+                metadata.setId(CommandUtils.getCommandIdByType(EnabledCommand.class));
+                metadata.setName("启用");
+                metadata.setDescription("启用或激活");
+                metadata.setInputs(Collections.singletonList(SimplePropertyMetadata
+                                                                 .of("idList", "id数组",
+                                                                     new ArrayType().elementType(StringType.GLOBAL))));
+                return metadata;
+            },
+            (cmd, ignore) -> handler.apply(cmd),
+            EnabledCommand::new
         );
 
     }

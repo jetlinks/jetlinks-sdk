@@ -13,25 +13,26 @@ import java.util.function.Function;
 
 /**
  * @author liusq
- * @date 2024/3/21
  */
 public class DisabledCommand extends EnabledCommand {
 
     public static CommandHandler<EnabledCommand, Mono<Void>> createHandler(Function<EnabledCommand, Mono<Void>> handler) {
 
         return CommandHandler.of(
-                () -> {
-                    SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    metadata.setId(CommandUtils.getCommandIdByType(DisabledCommand.class));
-                    metadata.setName("禁用");
-                    metadata.setDescription("禁用或注销");
-                    metadata.setInputs(Collections.singletonList(SimplePropertyMetadata.of("idList", "id数组",
-                                                                                           new ArrayType())));
+            () -> {
+                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+                metadata.setId(CommandUtils.getCommandIdByType(DisabledCommand.class));
+                metadata.setName("禁用");
+                metadata.setDescription("禁用或注销");
+                metadata.setInputs(Collections.singletonList(
+                    SimplePropertyMetadata
+                        .of("idList", "id数组",
+                            new ArrayType().elementType(StringType.GLOBAL))));
 
-                    return metadata;
-                },
-                (cmd, ignore) -> handler.apply(cmd),
-                DisabledCommand::new
+                return metadata;
+            },
+            (cmd, ignore) -> handler.apply(cmd),
+            DisabledCommand::new
         );
     }
 }

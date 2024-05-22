@@ -1,12 +1,21 @@
 package org.jetlinks.sdk.server.utils;
 
 import com.fasterxml.jackson.databind.ObjectReader;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.MapUtils;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.web.api.crud.entity.TermExpressionParser;
 import org.hswebframework.web.bean.FastBeanCopier;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.NettyDataBuffer;
+import org.springframework.core.io.buffer.NettyDataBufferFactory;
 
+import java.lang.reflect.Array;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -40,19 +49,36 @@ public class ConverterUtils {
         if (value == null) {
             return Collections.emptyList();
         }
+
         if (value instanceof String) {
-            value = ((String) value).split(",");
+            String[] arr = ((String) value).split(",");
+            if (arr.length == 1) {
+                return Collections.singletonList(converter.apply(arr[0]));
+            }
+            List<T> list = new ArrayList<>(arr.length);
+            for (String s : arr) {
+                list.add(converter.apply(s));
+            }
+            return list;
         }
 
-        if (value instanceof Object[]) {
-            value = Arrays.asList(((Object[]) value));
-        }
         if (value instanceof Collection) {
-            return ((Collection<?>) value)
-                    .stream()
-                    .map(converter)
-                    .collect(Collectors.toList());
+            List<T> list = new ArrayList<>(((Collection<?>) value).size());
+            for (Object o : ((Collection<?>) value)) {
+                list.add(converter.apply(o));
+            }
+            return list;
         }
+
+        if (value.getClass().isArray()) {
+            int len = Array.getLength(value);
+            List<T> list = new ArrayList<>(len);
+            for (int i = 0; i < len; i++) {
+                list.add(converter.apply(Array.get(value, i)));
+            }
+            return list;
+        }
+
         return Collections.singletonList(converter.apply(value));
     }
 
@@ -90,8 +116,8 @@ public class ConverterUtils {
                 continue;
             }
             String strValue = value instanceof String
-                    ? String.valueOf(value)
-                    : ObjectMappers.JSON_MAPPER.writeValueAsString(value);
+                ? String.valueOf(value)
+                : ObjectMappers.JSON_MAPPER.writeValueAsString(value);
 
             tags[index++] = key;
             tags[index++] = strValue;
@@ -133,14 +159,61 @@ public class ConverterUtils {
         }
         if (value instanceof List) {
             return ((List<?>) value)
-                    .stream()
-                    .map(obj -> obj instanceof Term ? ((Term) obj) : FastBeanCopier.copy(obj, new Term()))
-                    .collect(Collectors.toList());
+                .stream()
+                .map(obj -> obj instanceof Term ? ((Term) obj) : FastBeanCopier.copy(obj, new Term()))
+                .collect(Collectors.toList());
         } else if (value instanceof Map) {
             return TermExpressionParser.parse(((Map<String, Object>) value));
         } else {
             throw new UnsupportedOperationException("unsupported term value:" + value);
         }
+    }
+
+    private static final NettyDataBufferFactory factory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
+
+    public static DataBuffer convertDataBuffer(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof DataBuffer) {
+            return ((DataBuffer) obj);
+        }
+        return factory.wrap(convertNettyBuffer(obj));
+    }
+
+    public static ByteBuf convertNettyBuffer(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof ByteBuf) {
+            return ((ByteBuf) obj);
+        }
+
+        if (obj instanceof byte[]) {
+            return Unpooled.wrappedBuffer(((byte[]) obj));
+        }
+
+        if (obj instanceof NettyDataBuffer) {
+            return ((NettyDataBuffer) obj).getNativeBuffer();
+        }
+
+        if (obj instanceof DataBuffer) {
+            return Unpooled.wrappedBuffer(((DataBuffer) obj).asByteBuffer());
+        }
+
+        if (obj instanceof ByteBuffer) {
+            return Unpooled.wrappedBuffer(((ByteBuffer) obj));
+        }
+
+        if (obj instanceof String) {
+            String str = String.valueOf(obj);
+            if (str.startsWith("0x")) {
+                return Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(str, 2, str.length() - 2));
+            }
+            return Unpooled.wrappedBuffer(str.getBytes());
+        }
+
+        return Unpooled.wrappedBuffer(String.valueOf(obj).getBytes());
     }
 
 

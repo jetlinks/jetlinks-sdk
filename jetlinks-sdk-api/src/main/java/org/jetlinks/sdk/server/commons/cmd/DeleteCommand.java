@@ -4,6 +4,7 @@ import org.hswebframework.ezorm.core.dsl.Delete;
 import org.hswebframework.ezorm.core.param.Param;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.ezorm.rdb.mapping.DSLDelete;
+import org.hswebframework.web.api.crud.entity.QueryParamEntity;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
@@ -12,6 +13,7 @@ import org.jetlinks.sdk.server.utils.ConverterUtils;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -55,6 +57,24 @@ public class DeleteCommand extends AbstractCommand<Mono<Integer>, DeleteCommand>
 
         return delete;
 
+    }
+
+    public QueryParamEntity toQuery() {
+        List<Term> terms = getTerms();
+        QueryParamEntity param = QueryParamEntity.of();
+        if (terms != null) {
+            terms.forEach(param::addTerm);
+        }
+        return param;
+    }
+
+    public List<Term> getTerms() {
+        Object terms = readable().get(PARAMETER_TERMS);
+        return ConverterUtils.convertTerms(terms);
+    }
+
+    public DeleteCommand setTerms(List<Term> terms) {
+        return with(PARAMETER_TERMS, terms);
     }
 
     public Param toParameter() {
