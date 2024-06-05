@@ -207,10 +207,22 @@ public class ConverterUtils {
 
         if (obj instanceof String) {
             String str = String.valueOf(obj);
+            // hex
             if (str.startsWith("0x")) {
                 return Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(str, 2, str.length() - 2));
             }
-            return Unpooled.wrappedBuffer(str.getBytes());
+            // base64
+            byte[] strBytes = str.getBytes();
+            if (org.apache.commons.codec.binary.Base64.isBase64(strBytes)) {
+                try {
+                    return Unpooled.wrappedBuffer(
+                        Base64
+                            .getDecoder()
+                            .decode(strBytes));
+                } catch (Throwable ignore) {
+                }
+            }
+            return Unpooled.wrappedBuffer(strBytes);
         }
 
         return Unpooled.wrappedBuffer(String.valueOf(obj).getBytes());
