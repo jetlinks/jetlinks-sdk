@@ -7,7 +7,7 @@ import org.jetlinks.sdk.server.commons.cmd.QueryListCommand;
 import org.springframework.core.ResolvableType;
 
 /**
- * 输入描述.
+ * 查询通道.
  *
  * @author zhangji 2024/6/16
  */
