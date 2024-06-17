@@ -23,6 +23,16 @@ public class QueryPresetListCommand extends QueryListCommand<MediaPreset> {
         return this;
     }
 
+    @Schema(description = "通道ID")
+    public String getChannelId() {
+        return getOrNull("channelId", String.class);
+    }
+
+    public QueryPresetListCommand setChannelId(String channelId) {
+        writable().put("channelId", channelId);
+        return this;
+    }
+
     public static FunctionMetadata metadata() {
         return CommandMetadataResolver.resolve(ResolvableType.forType(QueryPresetListCommand.class));
     }

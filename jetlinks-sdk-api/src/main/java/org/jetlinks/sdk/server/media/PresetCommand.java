@@ -38,21 +38,21 @@ public class PresetCommand extends AbstractCommand<Mono<Void>, PresetCommand> {
     }
 
     @Schema(defaultValue = "预置位ID")
-    public Integer getPresetIndex() {
-        return getOrNull("presetIndex", Integer.class);
+    public Integer getIndex() {
+        return getOrNull("index", Integer.class);
     }
 
-    public PresetCommand setPresetIndex(Integer presetIndex) {
-        return with("presetIndex", presetIndex);
+    public PresetCommand setIndex(Integer index) {
+        return with("index", index);
     }
 
     @Schema(defaultValue = "预置位操作")
-    public PresetOperation getPresetOperation() {
-        return getOrNull("presetOperation", PresetOperation.class);
+    public Operation getOperation() {
+        return getOrNull("operation", Operation.class);
     }
 
-    public PresetCommand setPresetOperation(PresetOperation presetOperation) {
-        return with("presetOperation", presetOperation);
+    public PresetCommand setOperation(Operation operation) {
+        return with("operation", operation);
     }
 
     public static FunctionMetadata metadata() {
@@ -61,7 +61,7 @@ public class PresetCommand extends AbstractCommand<Mono<Void>, PresetCommand> {
 
     @AllArgsConstructor
     @Getter
-    public enum PresetOperation {
+    public enum Operation {
         //设置预置位
         SET(0x81),
         //调用预置位
@@ -71,8 +71,8 @@ public class PresetCommand extends AbstractCommand<Mono<Void>, PresetCommand> {
 
         private final int code;
 
-        public static PresetOperation of(Object operation) {
-            for (PresetOperation value : values()) {
+        public static Operation of(Object operation) {
+            for (Operation value : values()) {
                 if (value.name().equalsIgnoreCase(String.valueOf(operation)) ||
                     operation.equals(value.code)
                 ) {
@@ -82,8 +82,8 @@ public class PresetCommand extends AbstractCommand<Mono<Void>, PresetCommand> {
             throw new UnsupportedOperationException("不支持的预置位操作:" + operation);
         }
 
-        public static Optional<PresetOperation> of(int code) {
-            for (PresetOperation value : values()) {
+        public static Optional<Operation> of(int code) {
+            for (Operation value : values()) {
                 if (value.code == code) {
                     return Optional.of(value);
                 }
