@@ -27,6 +27,16 @@ import java.util.function.Function;
  */
 public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<T>> {
 
+    /**
+     * visible for reflection
+     *
+     * @see QueryListCommand#of(Class)
+     * @see QueryListCommand#of(Function)
+     */
+    @Deprecated
+    public QueryListCommand() {
+
+    }
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
@@ -53,7 +63,7 @@ public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<
         return CommandHandler.of(
             () -> metadata(custom),
             (cmd, ignore) -> handler.apply(cmd),
-            () -> new QueryListCommand<T>().withConverter(resultConverter)
+            () -> of(resultConverter)
         );
     }
 
@@ -67,6 +77,15 @@ public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<
         );
 
     }
+
+    public static <T> QueryListCommand<T> of(Function<Object, T> converter) {
+        return new QueryListCommand<T>().withConverter(converter);
+    }
+
+    public static <T> QueryListCommand<T> of(Class<T> type) {
+        return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
 
     public static List<PropertyMetadata> getQueryParamMetadata() {
         return Arrays.asList(
