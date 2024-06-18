@@ -50,9 +50,7 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
     }
 
     public boolean isLocalPlayer() {
-        Object localPlayer = readable().get("localPlayer");
-        return Boolean.TRUE.equals(localPlayer)
-            || "true".equals(localPlayer);
+        return CastUtils.castBoolean(readable().get("localPlayer"));
     }
 
     public StartPushStreamingCommand setLocalPlayer(boolean localPlayer) {
