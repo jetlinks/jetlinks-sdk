@@ -38,11 +38,11 @@ public class PresetCommand extends AbstractCommand<Mono<Void>, PresetCommand> {
     }
 
     @Schema(defaultValue = "预置位ID")
-    public Integer getId() {
-        return getOrNull("id", Integer.class);
+    public String getId() {
+        return getOrNull("id", String.class);
     }
 
-    public PresetCommand setId(Integer id) {
+    public PresetCommand setId(String id) {
         return with("id", id);
     }
 
