@@ -7,6 +7,7 @@ import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.utils.CastUtils;
 import reactor.core.publisher.Mono;
 
+@Schema(title = "开始推流")
 public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamInfo>, StartPushStreamingCommand> {
 
     @Schema(description = "设备ID")
