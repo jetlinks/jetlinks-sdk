@@ -7,6 +7,7 @@ import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.utils.CastUtils;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -33,9 +34,7 @@ public class ProxyMediaStreamCommand extends AbstractCommand<Mono<MediaInfo>, Pr
     }
 
     public boolean isLocalPlayer() {
-        Object localPlayer = readable().get("localPlayer");
-        return Boolean.TRUE.equals(localPlayer)
-            || "true".equals(localPlayer);
+        return CastUtils.castBoolean(readable().get("localPlayer"));
     }
 
     public ProxyMediaStreamCommand withStreamId(String streamId) {

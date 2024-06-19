@@ -1,7 +1,10 @@
 package org.jetlinks.sdk.server.media;
 
 import org.jetlinks.core.command.AbstractCommand;
+import org.jetlinks.core.command.CommandMetadataResolver;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.utils.CastUtils;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
 
 public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamInfo>, StartPushStreamingCommand> {
@@ -46,6 +49,15 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
         return with("sdp", sdp);
     }
 
+    public boolean isLocalPlayer() {
+        return CastUtils.castBoolean(readable().get("localPlayer"));
+    }
+
+    public StartPushStreamingCommand setLocalPlayer(boolean localPlayer) {
+        with("localPlayer", localPlayer);
+        return this;
+    }
+
     // 录像相关参数
 
     public boolean isForRecord() {
@@ -78,6 +90,14 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
 
     public StartPushStreamingCommand setDownloadSpeed(Integer downloadSpeed) {
         return with("downloadSpeed", downloadSpeed);
+    }
+
+    public boolean isLive() {
+        return getStartWith() == null || getEndWith() == null;
+    }
+
+    public static FunctionMetadata metadata(){
+        return CommandMetadataResolver.resolve(ResolvableType.forType(StartPushStreamingCommand.class));
     }
 
 }
