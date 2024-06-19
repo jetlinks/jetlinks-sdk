@@ -55,6 +55,16 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
         return with("sdp", sdp);
     }
 
+    @Schema(description = "是否本地播放,true表示返回本地播放地址.")
+    public boolean isLocalPlayer() {
+        return CastUtils.castBoolean(readable().get("localPlayer"));
+    }
+
+    public StartPushStreamingCommand setLocalPlayer(boolean localPlayer) {
+        with("localPlayer", localPlayer);
+        return this;
+    }
+
     // 录像相关参数
     @Schema(description = "推送录像视频流")
     public boolean isForRecord() {
@@ -90,6 +100,10 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
 
     public StartPushStreamingCommand setDownloadSpeed(Integer downloadSpeed) {
         return with("downloadSpeed", downloadSpeed);
+    }
+
+    public boolean isLive() {
+        return getStartWith() == null || getEndWith() == null;
     }
 
     public static FunctionMetadata metadata() {
