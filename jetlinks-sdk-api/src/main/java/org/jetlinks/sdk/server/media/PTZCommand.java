@@ -17,6 +17,7 @@ import java.util.Map;
  * @author zhouhao
  * @since 1.0
  */
+@Schema(title = "云台控制")
 public class PTZCommand extends AbstractCommand<Mono<Void>, PTZCommand> {
 
     @Schema(description = "设备ID")

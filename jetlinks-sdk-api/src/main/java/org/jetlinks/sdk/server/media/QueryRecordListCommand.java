@@ -1,17 +1,19 @@
 package org.jetlinks.sdk.server.media;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.sdk.server.commons.cmd.QueryListCommand;
+import org.jetlinks.sdk.server.utils.CastUtils;
 import org.springframework.core.ResolvableType;
+import reactor.core.publisher.Flux;
 
 /**
  * 查询录像.
  *
  * @author zhangji 2024/6/16
  */
-public class QueryRecordListCommand extends QueryListCommand<MediaRecord> {
+public class QueryRecordListCommand extends AbstractCommand<Flux<MediaRecord>, QueryRecordListCommand> {
 
     @Schema(description = "设备ID")
     public String getDeviceId() {
@@ -61,6 +63,16 @@ public class QueryRecordListCommand extends QueryListCommand<MediaRecord> {
 
     public QueryRecordListCommand setType(String type) {
         writable().put("type", type);
+        return this;
+    }
+
+    @Schema(description = "是否为摄像头本地的录像信息")
+    public boolean isLocal() {
+        return CastUtils.castBoolean(readable().get("local"));
+    }
+
+    public QueryRecordListCommand setLocal(boolean local) {
+        writable().put("local", local);
         return this;
     }
 
