@@ -23,4 +23,9 @@ public interface SdkServices {
      */
     String authService = "authService";
 
+    String ruleService = "ruleService";
+
+    String alarmHandler = "alarmHandler";
+
+    String alarmConfigService = "alarmConfigService";
 }
