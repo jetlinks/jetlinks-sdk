@@ -211,6 +211,13 @@ public class ConverterUtils {
             if (str.startsWith("0x")) {
                 return Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(str, 2, str.length() - 2));
             }
+            //data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA
+            if (str.startsWith("data:")) {
+                return Unpooled.wrappedBuffer(
+                    Base64
+                        .getDecoder()
+                        .decode(str.substring(str.indexOf(",") + 1)));
+            }
             // base64
             byte[] strBytes = str.getBytes();
             if (org.apache.commons.codec.binary.Base64.isBase64(strBytes)) {

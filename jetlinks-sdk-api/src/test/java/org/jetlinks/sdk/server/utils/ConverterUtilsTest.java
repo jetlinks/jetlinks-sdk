@@ -22,4 +22,15 @@ class ConverterUtilsTest {
 
     }
 
+    @Test
+    void testDataBase64(){
+        byte[] data = new byte[1024];
+        String base64  = Base64.getEncoder().encodeToString(data);
+
+        ByteBuf buf =  ConverterUtils.convertNettyBuffer("data:image/png;base64,"+base64);
+
+        assertArrayEquals(data, buf.array());
+
+    }
+
 }
