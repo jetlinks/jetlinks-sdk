@@ -17,6 +17,7 @@
 
     <name>JetLinks SDK</name>
     <url>https://github.com/jetlinks</url>
+    <description>JetLinks Server Side Develop SDK</description>
     <inceptionYear>2022</inceptionYear>
 
     <licenses>
