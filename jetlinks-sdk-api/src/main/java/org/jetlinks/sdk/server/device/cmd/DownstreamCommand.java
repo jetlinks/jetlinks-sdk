@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * 发送消息给设备
+ *
  * @see org.jetlinks.core.message.DeviceMessage
  */
 public class DownstreamCommand extends AbstractCommand<Flux<DeviceMessage>, DownstreamCommand> {
@@ -20,11 +21,15 @@ public class DownstreamCommand extends AbstractCommand<Flux<DeviceMessage>, Down
             return (DeviceMessage) msg;
         }
         if (msg instanceof Map) {
-            return (DeviceMessage) MessageType
-                    .convertMessage(((Map) msg))
-                    .orElse(null);
+            return convertMessage((Map<String, Object>) msg);
         }
-        return null;
+        return convertMessage(readable());
+    }
+
+    protected DeviceMessage convertMessage(Map<String, Object> message) {
+        return (DeviceMessage) MessageType
+            .convertMessage(message)
+            .orElse(null);
     }
 
     public DownstreamCommand withMessage(Map<String, Object> message) {
