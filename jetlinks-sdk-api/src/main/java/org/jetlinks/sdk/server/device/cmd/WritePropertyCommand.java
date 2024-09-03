@@ -1,6 +1,5 @@
 package org.jetlinks.sdk.server.device.cmd;
 
-import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.message.property.WritePropertyMessage;
@@ -13,7 +12,6 @@ import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class WritePropertyCommand extends DownstreamCommand<WritePropertyMessage, WritePropertyMessageReply> {
@@ -45,15 +43,5 @@ public class WritePropertyCommand extends DownstreamCommand<WritePropertyMessage
                         (cmd, ignore) -> handler.apply(cmd),
                         WritePropertyCommand::new
                 );
-    }
-
-
-    @Override
-    public WritePropertyMessage getMessage() {
-        WritePropertyMessage message = super.getMessage();
-        if (Objects.isNull(message)) {
-            throw new BusinessException("error.unsupported_property_format");
-        }
-        return message;
     }
 }

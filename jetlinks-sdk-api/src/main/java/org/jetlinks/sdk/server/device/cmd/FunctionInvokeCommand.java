@@ -1,6 +1,5 @@
 package org.jetlinks.sdk.server.device.cmd;
 
-import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.message.function.FunctionInvokeMessage;
@@ -14,7 +13,6 @@ import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessage, FunctionInvokeMessageReply> {
@@ -50,13 +48,4 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
                 );
     }
 
-
-    @Override
-    public FunctionInvokeMessage getMessage() {
-        FunctionInvokeMessage message = super.getMessage();
-        if (Objects.isNull(message)) {
-            throw new BusinessException("error.unsupported_property_format");
-        }
-        return message;
-    }
 }
