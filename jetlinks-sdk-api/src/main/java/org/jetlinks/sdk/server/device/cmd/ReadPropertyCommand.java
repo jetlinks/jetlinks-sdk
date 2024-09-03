@@ -8,7 +8,6 @@ import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ArrayType;
-import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
 
@@ -25,12 +24,11 @@ public class ReadPropertyCommand extends DownstreamCommand<ReadPropertyMessage, 
 
         SimplePropertyMetadata simplePropertyMetadata = SimplePropertyMetadata
                 .of("message", "消息",
-                    new ObjectType()
-                            .addProperty("deviceId", "设备id", StringType.GLOBAL)
-                            .addProperty("messageType", "消息类型", StringType.GLOBAL)
-                            .addProperty("properties", "要读取的属性列表",
+                    getCommonHeadersMetadata()
+                            .addProperty("properties", "需要读取的属性列表",
                                          new ArrayType()
                                                  .elementType(new StringType())));
+
 
         metadata.setInputs(Collections.singletonList(simplePropertyMetadata));
         return metadata;

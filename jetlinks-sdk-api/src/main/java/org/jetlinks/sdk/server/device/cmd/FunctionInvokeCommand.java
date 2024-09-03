@@ -25,15 +25,14 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
 
         SimplePropertyMetadata simplePropertyMetadata = SimplePropertyMetadata
                 .of("message", "消息",
-                    new ObjectType()
-                            .addProperty("deviceId", "设备id", StringType.GLOBAL)
-                            .addProperty("messageType", "消息类型", StringType.GLOBAL)
+                    getCommonHeadersMetadata()
                             .addProperty("functionId", "功能id", StringType.GLOBAL)
                             .addProperty("inputs", "参数",
                                          new ArrayType()
                                                  .elementType(new ObjectType()
                                                                       .addProperty("name", "参数名称", new StringType())
                                                                       .addProperty("value", "参数值", new StringType()))));
+
         metadata.setInputs(Collections.singletonList(simplePropertyMetadata));
         return metadata;
     }
