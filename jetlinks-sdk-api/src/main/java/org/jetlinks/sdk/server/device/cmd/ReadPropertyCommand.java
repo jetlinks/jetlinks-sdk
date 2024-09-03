@@ -3,8 +3,8 @@ package org.jetlinks.sdk.server.device.cmd;
 import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
-import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.property.ReadPropertyMessage;
+import org.jetlinks.core.message.property.ReadPropertyMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
@@ -12,12 +12,12 @@ import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.function.Function;
 
-public class ReadPropertyCommand extends DownstreamCommand {
+public class ReadPropertyCommand extends DownstreamCommand<ReadPropertyMessage, ReadPropertyMessageReply> {
 
     public static FunctionMetadata metadata() {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
@@ -38,7 +38,7 @@ public class ReadPropertyCommand extends DownstreamCommand {
         return metadata;
     }
 
-    public static CommandHandler<ReadPropertyCommand, Flux<DeviceMessage>> createHandler(Function<ReadPropertyCommand, Flux<DeviceMessage>> handler) {
+    public static CommandHandler<ReadPropertyCommand, Flux<ReadPropertyMessageReply>> createHandler(Function<ReadPropertyCommand, Flux<ReadPropertyMessageReply>> handler) {
 
         return CommandHandler
                 .of(
@@ -48,10 +48,13 @@ public class ReadPropertyCommand extends DownstreamCommand {
                 );
     }
 
-    public Mono<ReadPropertyMessage> getReadPropertyMessage() {
-        return Mono
-                .justOrEmpty(getMessage())
-                .cast(ReadPropertyMessage.class)
-                .onErrorMap(error -> new BusinessException("error.unsupported_property_format", error));
+
+    @Override
+    public ReadPropertyMessage getMessage() {
+        ReadPropertyMessage message = super.getMessage();
+        if (Objects.isNull(message)) {
+            throw new BusinessException("error.unsupported_property_format");
+        }
+        return message;
     }
 }

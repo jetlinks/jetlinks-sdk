@@ -3,9 +3,8 @@ package org.jetlinks.sdk.server.device.cmd;
 import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
-import org.jetlinks.core.message.DeviceMessage;
-import org.jetlinks.core.message.MessageType;
 import org.jetlinks.core.message.function.FunctionInvokeMessage;
+import org.jetlinks.core.message.function.FunctionInvokeMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
@@ -13,20 +12,12 @@ import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
-public class FunctionInvokeCommand extends DownstreamCommand {
-
-    @Override
-    protected DeviceMessage convertMessage(Map<String, Object> message) {
-        return MessageType
-                .<DeviceMessage>convertMessage(message)
-                .orElse(null);
-    }
+public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessage, FunctionInvokeMessageReply> {
 
     public static FunctionMetadata metadata() {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
@@ -49,7 +40,7 @@ public class FunctionInvokeCommand extends DownstreamCommand {
         return metadata;
     }
 
-    public static CommandHandler<FunctionInvokeCommand, Flux<DeviceMessage>> createHandler(Function<FunctionInvokeCommand, Flux<DeviceMessage>> handler) {
+    public static CommandHandler<FunctionInvokeCommand, Flux<FunctionInvokeMessageReply>> createHandler(Function<FunctionInvokeCommand, Flux<FunctionInvokeMessageReply>> handler) {
 
         return CommandHandler
                 .of(
@@ -59,10 +50,13 @@ public class FunctionInvokeCommand extends DownstreamCommand {
                 );
     }
 
-    public Mono<FunctionInvokeMessage> getFunctionInvokeMessage() {
-        return Mono
-                .justOrEmpty(getMessage())
-                .cast(FunctionInvokeMessage.class)
-                .onErrorMap(error -> new BusinessException("error.unsupported_property_format", error));
+
+    @Override
+    public FunctionInvokeMessage getMessage() {
+        FunctionInvokeMessage message = super.getMessage();
+        if (Objects.isNull(message)) {
+            throw new BusinessException("error.unsupported_property_format");
+        }
+        return message;
     }
 }
