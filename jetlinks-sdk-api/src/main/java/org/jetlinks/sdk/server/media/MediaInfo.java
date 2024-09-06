@@ -9,6 +9,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,6 +33,28 @@ public class MediaInfo implements Externalizable {
 
     @Schema(description = "rtc地址")
     private String rtc;
+
+
+    public List<URI> toUriList() {
+        List<URI> list = new ArrayList<>(5);
+        if (rtsp != null) {
+            list.add(URI.create(rtsp));
+        }
+        if (rtmp != null) {
+            list.add(URI.create(rtmp));
+        }
+        if (flv != null) {
+            list.add(URI.create(flv));
+        }
+        if (mp4 != null) {
+            list.add(URI.create(mp4));
+        }
+        if (rtc != null) {
+            list.add(URI.create(rtc));
+        }
+        return list;
+
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {

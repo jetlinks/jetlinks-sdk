@@ -29,6 +29,14 @@ public class StartBroadcastCommand extends AbstractCommand<Mono<Void>, StartBroa
         return with("channelId", channelId);
     }
 
+    public MediaStreamInfo getStreamInfo() {
+        return getOrNull("stream", MediaStreamInfo.class);
+    }
+
+    public StartBroadcastCommand setStreamInfo(MediaStreamInfo streamInfo) {
+        return with("stream", streamInfo);
+    }
+
     public static FunctionMetadata metadata() {
         return CommandMetadataResolver.resolve(StartBroadcastCommand.class);
     }
