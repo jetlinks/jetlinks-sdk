@@ -7,9 +7,11 @@ import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.StringType;
 import org.springframework.core.ResolvableType;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -51,9 +53,9 @@ public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdComman
     public static <T> CommandHandler<QueryByIdCommand<T>, T> createHandler(Consumer<SimpleFunctionMetadata> custom,
                                                                            Function<QueryByIdCommand<T>, T> handler) {
         return CommandHandler.of(
-                () -> metadata(custom),
-                (cmd, ignore) -> handler.apply(cmd),
-                QueryByIdCommand::new
+            () -> metadata(custom),
+            (cmd, ignore) -> handler.apply(cmd),
+            QueryByIdCommand::new
         );
 
     }
