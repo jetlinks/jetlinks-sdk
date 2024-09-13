@@ -1,6 +1,7 @@
 package org.jetlinks.sdk.server.ai.model;
 
 import com.google.common.collect.Maps;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
@@ -17,11 +18,17 @@ import java.util.Map;
 @Setter
 public class AiModelInfo implements Externalizable {
 
+    @Schema(description = "模型id")
     private String id;
 
+    @Schema(description = "模型名称")
     private String name;
 
+    @Schema(description = "模型名称")
     private String fileUrl;
+
+    @Schema(description = "文件md5值")
+    private String md5;
 
     private EnumInfo<String> target;
 
@@ -36,6 +43,7 @@ public class AiModelInfo implements Externalizable {
         SerializeUtils.writeNullableUTF(id, out);
         SerializeUtils.writeNullableUTF(name, out);
         SerializeUtils.writeNullableUTF(fileUrl, out);
+        SerializeUtils.writeNullableUTF(md5, out);
 
         out.writeBoolean(target != null);
         if (target != null) {
@@ -54,6 +62,7 @@ public class AiModelInfo implements Externalizable {
         id = SerializeUtils.readNullableUTF(in);
         name = SerializeUtils.readNullableUTF(in);
         fileUrl = SerializeUtils.readNullableUTF(in);
+        md5 = SerializeUtils.readNullableUTF(in);
 
         if (in.readBoolean()) {
             target = new EnumInfo<>();
