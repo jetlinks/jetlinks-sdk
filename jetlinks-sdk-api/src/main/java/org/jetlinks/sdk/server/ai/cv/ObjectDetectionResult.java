@@ -17,13 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Schema(title = "目标检测结果")
-public class ObjectDetectionResult implements Externalizable {
-
-    @Schema(title = "任务ID")
-    private String taskId;
-
-    @Schema(title = "时间戳")
-    private long timestamp;
+public class ObjectDetectionResult extends AiTaskCommandResult<ObjectDetectionResult> {
 
     @Schema(title = "图像数据")
     private ByteBuf image;
@@ -94,9 +88,7 @@ public class ObjectDetectionResult implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(taskId, out);
-        out.writeLong(timestamp);
-
+        super.writeExternal(out);
         SerializeUtils.writeObject(image, out);
         if (CollectionUtils.isEmpty(objects)) {
             out.writeInt(0);
@@ -112,8 +104,7 @@ public class ObjectDetectionResult implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        taskId = SerializeUtils.readNullableUTF(in);
-        timestamp = in.readLong();
+        super.readExternal(in);
         image = (ByteBuf) SerializeUtils.readObject(in);
         int size = in.readInt();
         if (size > 0) {
