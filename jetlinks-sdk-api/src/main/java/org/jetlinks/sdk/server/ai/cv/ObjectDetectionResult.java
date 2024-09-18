@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Schema(title = "目标检测结果")
-public class ObjectDetectionResult extends AiTaskCommandResult<ObjectDetectionResult> {
+public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(title = "图像数据")
     private ByteBuf image;
