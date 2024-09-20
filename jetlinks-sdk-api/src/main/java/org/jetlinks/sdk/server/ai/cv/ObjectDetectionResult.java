@@ -16,11 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Setter
+@Getter
 @Schema(title = "目标检测结果")
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(title = "图像数据")
-    private ByteBuf image;
+    private List<ByteBuf> image;
 
     @Schema(title = "检测到的对象")
     private List<DetectedObject> objects;
@@ -105,7 +107,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-        image = (ByteBuf) SerializeUtils.readObject(in);
+        image = (List<ByteBuf>) SerializeUtils.readObject(in);
         int size = in.readInt();
         if (size > 0) {
             objects = new ArrayList<>(size);
