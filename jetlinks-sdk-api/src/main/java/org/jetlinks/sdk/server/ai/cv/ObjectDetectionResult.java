@@ -21,7 +21,7 @@ import java.util.Map;
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(title = "图像数据")
-    private List<ImageData> image;
+    private List<ImageData> images;
 
     @Schema(title = "检测到的对象")
     private List<DetectedObject> objects;
@@ -91,11 +91,11 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
 
-        if (CollectionUtils.isEmpty(image)) {
+        if (CollectionUtils.isEmpty(images)) {
             out.writeInt(0);
         } else {
-            out.writeInt(image.size());
-            for (ImageData img : image) {
+            out.writeInt(images.size());
+            for (ImageData img : images) {
                 img.writeExternal(out);
             }
         }
@@ -117,14 +117,14 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         super.readExternal(in);
         int sizeImg = in.readInt();
         if (sizeImg > 0) {
-            image = new ArrayList<>(sizeImg);
+            images = new ArrayList<>(sizeImg);
             for (int i = 0; i < sizeImg; i++) {
                 ImageData img = new ImageData();
                 img.readExternal(in);
-                image.add(img);
+                images.add(img);
             }
         } else {
-            image = new ArrayList<>(0);
+            images = new ArrayList<>(0);
         }
 
         int size = in.readInt();
