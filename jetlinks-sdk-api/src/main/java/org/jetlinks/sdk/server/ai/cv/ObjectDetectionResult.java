@@ -1,7 +1,6 @@
 package org.jetlinks.sdk.server.ai.cv;
 
 import com.google.common.collect.Maps;
-import io.netty.buffer.ByteBuf;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,11 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Setter
+@Getter
 @Schema(title = "目标检测结果")
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(title = "图像数据")
-    private ByteBuf image;
+    private List<ImageData> images;
 
     @Schema(title = "检测到的对象")
     private List<DetectedObject> objects;
@@ -89,7 +90,16 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        SerializeUtils.writeObject(image, out);
+
+        if (CollectionUtils.isEmpty(images)) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(images.size());
+            for (ImageData img : images) {
+                img.writeExternal(out);
+            }
+        }
+
         if (CollectionUtils.isEmpty(objects)) {
             out.writeInt(0);
         } else {
@@ -105,7 +115,18 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-        image = (ByteBuf) SerializeUtils.readObject(in);
+        int sizeImg = in.readInt();
+        if (sizeImg > 0) {
+            images = new ArrayList<>(sizeImg);
+            for (int i = 0; i < sizeImg; i++) {
+                ImageData img = new ImageData();
+                img.readExternal(in);
+                images.add(img);
+            }
+        } else {
+            images = new ArrayList<>(0);
+        }
+
         int size = in.readInt();
         if (size > 0) {
             objects = new ArrayList<>(size);
