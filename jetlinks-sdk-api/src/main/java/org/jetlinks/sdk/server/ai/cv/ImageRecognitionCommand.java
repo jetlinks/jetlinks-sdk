@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.ai.cv;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.jetlinks.core.command.CommandMetadataResolver;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import reactor.core.publisher.Flux;
 
 /**
@@ -12,5 +14,7 @@ import reactor.core.publisher.Flux;
 public class ImageRecognitionCommand
     extends ComputerVisionCommand<Flux<ObjectDetectionResult>, ImageRecognitionCommand> {
 
-
+    public static FunctionMetadata metadata() {
+        return CommandMetadataResolver.resolve(ImageRecognitionCommand.class);
+    }
 }
