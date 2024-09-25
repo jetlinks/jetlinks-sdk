@@ -56,10 +56,10 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
      * 获取文件id,有值时按照已预存文件信息做上传处理
      *
      * @return 文件id
-     * @see PrepareUploadFileInfoCommand
+     * @see PrepareUploadCommand
      */
     public String getFileId() {
-        return (String) readable().get("id");
+        return getOrNull("id", String.class);
     }
 
     /**
@@ -67,7 +67,7 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
      *
      * @param id 文件id
      * @return this
-     * @see PrepareUploadFileInfoCommand
+     * @see PrepareUploadCommand
      */
     public UploadFileCommand withFileId(String id) {
         return with("id", id);
