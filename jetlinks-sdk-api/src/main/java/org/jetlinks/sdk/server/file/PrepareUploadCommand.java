@@ -1,6 +1,9 @@
 package org.jetlinks.sdk.server.file;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractCommand;
+import org.jetlinks.core.command.CommandMetadataResolver;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import reactor.core.publisher.Mono;
 
 /**
@@ -9,38 +12,30 @@ import reactor.core.publisher.Mono;
  * @see org.jetlinks.sdk.server.SdkServices#fileService
  * @since 1.0.1
  */
+@Schema(title = "预存储文件")
 public class PrepareUploadCommand extends AbstractCommand<Mono<FileInfo>, PrepareUploadCommand> {
-    /**
-     * 获取文件名称
-     */
+
+    @Schema(title = "文件名称")
     public String getName() {
         return (String) readable().get("name");
     }
 
-    /**
-     * 获取文件长度
-     */
+    @Schema(title = "文件长度")
     public long getLength() {
         return (long) readable().get("length");
     }
 
-    /**
-     * 获取文件md5校验码
-     */
+    @Schema(title = "md5校验码")
     public String getMd5() {
         return getOrNull("md5", String.class);
     }
 
-    /**
-     * 获取文件sha256校验码
-     */
+    @Schema(title = "sha256校验码")
     public String getSha256() {
         return getOrNull("sha256", String.class);
     }
 
-    /**
-     * 获取文件上传时间
-     */
+    @Schema(title = "上传时间")
     public long getCreateTime() {
         return (long) readable().get("createTime");
     }
@@ -53,6 +48,10 @@ public class PrepareUploadCommand extends AbstractCommand<Mono<FileInfo>, Prepar
      */
     public PrepareUploadCommand withRequest(PrepareUploadRequest request) {
         return with(request.toMap());
+    }
+
+    public static FunctionMetadata metadata() {
+        return CommandMetadataResolver.resolve(PrepareUploadCommand.class);
     }
 
 }
