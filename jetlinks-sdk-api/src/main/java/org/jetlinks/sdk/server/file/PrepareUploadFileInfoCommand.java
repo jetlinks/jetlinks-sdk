@@ -17,7 +17,7 @@ public class PrepareUploadFileInfoCommand extends AbstractCommand<Mono<FileInfo>
      * @return 文件信息
      */
     public PrepareUploadRequest getRequest() {
-        return FastBeanCopier.copy(readable().get("request"), new PrepareUploadRequest());
+        return getOrNull("request",PrepareUploadRequest.class);
     }
 
     /**
