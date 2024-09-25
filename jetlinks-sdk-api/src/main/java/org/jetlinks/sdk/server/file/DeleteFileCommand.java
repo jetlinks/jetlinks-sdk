@@ -1,86 +1,31 @@
 package org.jetlinks.sdk.server.file;
 
+import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.jetlinks.core.command.AbstractCommand;
-import org.jetlinks.core.command.CommandMetadataResolver;
+import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.springframework.core.ResolvableType;
+import org.jetlinks.core.metadata.SimpleFunctionMetadata;
+import org.jetlinks.core.metadata.SimplePropertyMetadata;
+import org.jetlinks.core.metadata.types.ArrayType;
+import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
 
 /**
  * 删除文件命令
- * <pre>
- * 根据删除方式,填充对应参数.
- * type=[ids]时,参数ids不得为空
- * type=[beforeTime]时,参数beforeTime不得为空
- * </pre>
  */
 @Schema(title = "删除文件")
-public class DeleteFileCommand extends AbstractCommand<Mono<Void>, DeleteFileCommand> {
-
-    @Schema(title = "删除方式")
-    public Type getType() {
-        String type = (String) readable().get("type");
-        return Type.valueOf(type);
-    }
-
-    /**
-     * type=[ids]时不为空
-     */
-    @Schema(title = "待删除文件id")
-    public Set<String> getIds() {
-        return getOrNull("ids", ResolvableType
-            .forClassWithGenerics(Set.class, String.class)
-            .getType());
-    }
-
-    /**
-     * type=[beforeTime]时不为空
-     */
-    @Schema(title = "待删除文件小于的创建时间")
-    public long getBeforeTime() {
-        Long beforeTime = getOrNull("beforeTime", Long.class);
-        return beforeTime == null ? 0 : beforeTime;
-    }
-
-
-    @Schema(title = "是否仅删除临时文件")
-    public boolean getOnlyDelTempFile() {
-        return (boolean) readable().get("onlyDelTempFile");
-    }
-
-    public DeleteFileCommand setType(Type type) {
-        return with("type", type.name());
-    }
-
-    public DeleteFileCommand setIds(Set<String> ids) {
-        return with("ids", ids);
-    }
-
-    public DeleteFileCommand setBeforeTime(long beforeTime) {
-        return with("beforeTime", beforeTime);
-    }
-
-    public DeleteFileCommand setOnlyDelTempFile(boolean onlyDelTempFile) {
-        return with("onlyDelTempFile", onlyDelTempFile);
-    }
-
+public class DeleteFileCommand extends OperationByIdCommand<Mono<Void>, DeleteFileCommand> {
 
     public static FunctionMetadata metadata() {
-        return CommandMetadataResolver.resolve(DeleteFileCommand.class);
+        SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+        metadata.setId(CommandUtils.getCommandIdByType(DeleteFileCommand.class));
+        metadata.setName("删除文件");
+        metadata.setInputs(Lists.newArrayList(
+            SimplePropertyMetadata.of("id", "Id", new ArrayType().elementType(StringType.GLOBAL))
+        ));
+        return metadata;
     }
 
-    public enum Type {
-        /**
-         * @see DeleteFileCommand#setIds(Set)
-         */
-        ids,
-        /**
-         * @see DeleteFileCommand#setBeforeTime(long)
-         */
-        beforeTime
-    }
 
 }
