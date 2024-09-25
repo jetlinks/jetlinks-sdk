@@ -53,6 +53,27 @@ import java.util.function.Consumer;
 public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFileCommand> {
 
     /**
+     * 获取文件id,有值时按照已预存文件信息做上传处理
+     *
+     * @return 文件id
+     * @see PrepareUploadCommand
+     */
+    public String getFileId() {
+        return getOrNull("id", String.class);
+    }
+
+    /**
+     * 设置文件id,此时可不传其余文件基础信息
+     *
+     * @param id 文件id
+     * @return this
+     * @see PrepareUploadCommand
+     */
+    public UploadFileCommand withFileId(String id) {
+        return with("id", id);
+    }
+
+    /**
      * @return 文件上传会话ID
      */
     public String getSessionId() {
