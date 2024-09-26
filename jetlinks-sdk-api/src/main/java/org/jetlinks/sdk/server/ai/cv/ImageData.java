@@ -35,7 +35,7 @@ public class ImageData implements Externalizable {
         SerializeUtils.writeNullableUTF(id, out);
         SerializeUtils.writeKeyValue(others, out);
         SerializeUtils.writeObject(data, out);
-        out.writeUTF(type.name());
+        out.writeByte(type.ordinal());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ImageData implements Externalizable {
         id = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         data = (ByteBuf) SerializeUtils.readObject(in);
-        type = Type.valueOf(in.readUTF());
+        type = Type.values()[in.readByte()];
     }
 
     @Getter
