@@ -43,7 +43,7 @@ public class ImageData implements Externalizable {
         id = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         data = (ByteBuf) SerializeUtils.readObject(in);
-        type = Type.values()[in.readByte()];
+        type = Type.ALL[in.readByte()];
     }
 
     @Getter
@@ -54,6 +54,9 @@ public class ImageData implements Externalizable {
         segmented("语义分割"),
         instance("实例分割"),
         keypoint("关键点标记");
+
+
+        public static final Type[] ALL = values();
 
         private final String name;
 
