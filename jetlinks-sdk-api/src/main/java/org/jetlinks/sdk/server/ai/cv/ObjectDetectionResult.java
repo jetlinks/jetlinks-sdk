@@ -6,17 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
-import org.jetlinks.core.metadata.PropertyMetadata;
 import org.jetlinks.core.utils.SerializeUtils;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Setter
 @Getter
@@ -24,6 +21,7 @@ import java.util.Map;
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(description = "目标检测源id,例如视频源id")
+    @NotBlank
     private String sourceId;
 
     @Schema(title = "图像数据")
@@ -37,16 +35,31 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
 
     @Override
+    public Map<String, Object> toLightWeighMap() {
+        Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), "images");
+        if (CollectionUtils.isNotEmpty(images)) {
+            //移除图片的原始数据
+            List<Map<String, Object>> _images = new ArrayList<>(images.size());
+            for (ImageData image : images) {
+                _images.add(FastBeanCopier.copy(image, new HashMap<>(), "data"));
+            }
+            map.put("images", _images);
+        }
+        return map;
+    }
+
+    @Override
     public List<Map<String, Object>> flat() {
-        List<Map<String, Object>> maps = new ArrayList<>();
+        List<Map<String, Object>> maps;
         if (CollectionUtils.isNotEmpty(objects)) {
+            maps = new ArrayList<>(objects.size());
             for (DetectedObject object : objects) {
                 RuleData from = RuleData.from(this, object);
                 maps.add(FastBeanCopier.copy(from, new HashMap<>()));
             }
         } else {
             Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), "images", "objects");
-            maps.add(copy);
+            maps = Collections.singletonList(copy);
         }
         return maps;
     }
@@ -112,7 +125,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-
+        out.writeUTF(sourceId);
         if (CollectionUtils.isEmpty(images)) {
             out.writeInt(0);
         } else {
@@ -137,6 +150,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        sourceId = in.readUTF();
         int sizeImg = in.readInt();
         if (sizeImg > 0) {
             images = new ArrayList<>(sizeImg);

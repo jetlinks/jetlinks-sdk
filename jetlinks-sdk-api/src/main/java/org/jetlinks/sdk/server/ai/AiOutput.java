@@ -22,16 +22,26 @@ public interface AiOutput extends Externalizable, Jsonable {
 
     long getTimestamp();
 
-    default List<Map<String, Object>> toLightWeighMap() {
-        Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>());
-        return Collections.singletonList(copy);
+    /**
+     * 获取为轻量数据，作用于统一存储等
+     */
+    default Map<String, Object> toLightWeighMap() {
+        return FastBeanCopier.copy(this, new HashMap<>());
     }
 
+    /**
+     * 获取为平铺数据，作用于规则订阅等
+     */
     default List<Map<String, Object>> flat() {
-        return toLightWeighMap();
+        return Collections.singletonList(toLightWeighMap());
     }
 
-
+    /**
+     * 获取为轻量平铺数据，作用于业务存储等
+     */
+    default List<Map<String, Object>> lightWeighFlat() {
+        return flat();
+    }
 
 
 }

@@ -3,7 +3,6 @@ package org.jetlinks.sdk.server.ai.cv;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.hswebframework.web.id.IDGenerator;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ai.AiOutput;
@@ -21,7 +20,7 @@ import java.io.ObjectOutput;
 public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput {
 
     @Schema(title = "数据id")
-    private String id = IDGenerator.RANDOM.generate();
+    private String id;
 
     @Schema(title = "是否成功响应")
     private boolean success;
@@ -37,7 +36,7 @@ public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends Generic
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        out.writeUTF(id);
+        SerializeUtils.writeNullableUTF(id, out);
         out.writeBoolean(success);
         SerializeUtils.writeNullableUTF(errorMessage, out);
         SerializeUtils.writeNullableUTF(errorCode, out);
@@ -47,7 +46,7 @@ public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends Generic
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        id = in.readUTF();
+        id = SerializeUtils.readNullableUTF(in);
         success = in.readBoolean();
         errorMessage = SerializeUtils.readNullableUTF(in);
         errorCode = SerializeUtils.readNullableUTF(in);
