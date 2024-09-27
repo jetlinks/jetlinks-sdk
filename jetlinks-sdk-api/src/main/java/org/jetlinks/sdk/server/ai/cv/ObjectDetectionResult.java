@@ -37,7 +37,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
 
     @Override
-    public List<Map<String, Object>> getRuleMap() {
+    public List<Map<String, Object>> flat() {
         List<Map<String, Object>> maps = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(objects)) {
             for (DetectedObject object : objects) {
@@ -49,11 +49,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
             maps.add(copy);
         }
         return maps;
-    }
-
-    @Override
-    public List<PropertyMetadata> getRuleMapMetadata() {
-        return getPropertyMetadata(RuleData.class);
     }
 
 
@@ -171,7 +166,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Getter
     @Setter
-    private static class RuleData {
+    public static class RuleData {
         @Schema(title = "数据id")
         private boolean outputId;
 

@@ -1,8 +1,11 @@
 package org.jetlinks.sdk.server.ai;
 
-import org.jetlinks.core.metadata.PropertyMetadata;
+import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.metadata.Jsonable;
 
 import java.io.Externalizable;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,37 +13,25 @@ import java.util.Map;
  * @author gyl
  * @since 2.3
  */
-public interface AiOutput extends Externalizable {
+public interface AiOutput extends Externalizable, Jsonable {
 
     /**
      * 获取数据ID
      */
-    String getOutputId();
+    String getId();
 
-    /**
-     * 提供数据格式
-     */
-    List<PropertyMetadata> getMetadata();
+    long getTimestamp();
 
-    /**
-     * 提供持久化数据
-     */
-    List<Map<String, Object>> getDataMap();
+    default List<Map<String, Object>> toLightWeighMap() {
+        Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>());
+        return Collections.singletonList(copy);
+    }
 
-    /**
-     * 提供持久化数据格式
-     */
-    List<PropertyMetadata> getDataMapMetadata();
+    default List<Map<String, Object>> flat() {
+        return toLightWeighMap();
+    }
 
-    /**
-     * 提供规则处理格式
-     */
-    List<Map<String, Object>> getRuleMap();
 
-    /**
-     * 提供规则处理数据格式
-     */
-    List<PropertyMetadata> getRuleMapMetadata();
 
 
 }
