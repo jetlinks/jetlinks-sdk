@@ -30,7 +30,7 @@ public interface AiCommand<R extends AiOutput> extends Command<Flux<R>> {
     }
 
     /**
-     * 获取持久化数据map的模型描述
+     * 获取轻量数据map的模型描述
      */
     default List<PropertyMetadata> getLightWeighMapMetadata() {
         return getMetadata();
@@ -42,6 +42,13 @@ public interface AiCommand<R extends AiOutput> extends Command<Flux<R>> {
      */
     default List<PropertyMetadata> getFlatMapMetadata() {
         return getMetadata();
+    }
+
+    /**
+     * 获取轻量平铺数据map的模型描述
+     */
+    default List<PropertyMetadata> getLightWeighFlatMapMetadata() {
+        return getFlatMapMetadata();
     }
 
 
