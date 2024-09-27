@@ -22,10 +22,6 @@ import java.util.Map;
  */
 public abstract class AbstractAiOutput<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput {
 
-
-    @Getter
-    private String outputId = IDGenerator.RANDOM.generate();
-
     /**
      * 自动获取注解定义的属性信息
      * <pre>{@code @Schema(title = "属性名")}</pre>
