@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
  */
 @Schema(title = "图像识别")
 public class ImageRecognitionCommand
-    extends ComputerVisionCommand<Flux<ObjectDetectionResult>, ImageRecognitionCommand> {
+    extends ComputerVisionCommand<ObjectDetectionResult, ImageRecognitionCommand> {
 
     public static FunctionMetadata metadata() {
         return CommandMetadataResolver.resolve(ImageRecognitionCommand.class);

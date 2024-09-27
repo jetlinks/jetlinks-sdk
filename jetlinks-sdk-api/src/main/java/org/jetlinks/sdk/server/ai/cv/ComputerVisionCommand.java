@@ -4,8 +4,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.sdk.server.ai.AiCommand;
+import org.jetlinks.sdk.server.ai.AiOutput;
 import org.jetlinks.sdk.server.ai.model.AiModelInfo;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -19,8 +22,8 @@ import java.util.List;
  * @see org.jetlinks.sdk.server.ai.InternalTaskTarget#ImageRecognition
  * @since 1.0.1
  */
-public abstract class ComputerVisionCommand<R, Self extends ComputerVisionCommand<R, Self>>
-    extends AbstractCommand<R, Self> implements AiCommand<R> {
+public abstract class ComputerVisionCommand<R extends AiOutput, Self extends ComputerVisionCommand<R, Self>>
+    extends AbstractCommand<Flux<R>, Self> implements AiCommand<R> {
 
     @Schema(title = "任务ID")
     public String getTaskId() {

@@ -3,10 +3,9 @@ package org.jetlinks.sdk.server.ai.cv;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.AbstractAiOutput;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -17,7 +16,7 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements Externalizable {
+public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends AbstractAiOutput<SELF>  {
 
     @Schema(title = "是否成功响应")
     private boolean success;
