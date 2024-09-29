@@ -54,7 +54,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         if (CollectionUtils.isNotEmpty(objects)) {
             maps = new ArrayList<>(objects.size());
             for (DetectedObject object : objects) {
-                RuleData from = RuleData.from(this, object);
+                FlatData from = FlatData.from(this, object);
                 maps.add(FastBeanCopier.copy(from, new HashMap<>()));
             }
         } else {
@@ -180,9 +180,9 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Getter
     @Setter
-    public static class RuleData {
+    public static class FlatData {
         @Schema(title = "数据id")
-        private boolean outputId;
+        private String outputId;
 
         @Schema(title = "是否成功响应")
         private boolean success;
@@ -221,9 +221,9 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         private Map<String, Object> others;
 
 
-        public static RuleData from(ObjectDetectionResult result, DetectedObject object) {
-            RuleData copy = FastBeanCopier.copy(result, new RuleData(), "images", "objects");
-            RuleData data = FastBeanCopier.copy(object, copy, "others");
+        public static FlatData from(ObjectDetectionResult result, DetectedObject object) {
+            FlatData copy = FastBeanCopier.copy(result, new FlatData(), "images", "objects");
+            FlatData data = FastBeanCopier.copy(object, copy, "others");
             data.setObjectOthers(object.getOthers());
             return data;
         }
