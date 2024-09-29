@@ -3,10 +3,6 @@ package org.jetlinks.sdk.server.ai.cv;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.core.metadata.PropertyMetadata;
-import org.springframework.core.ResolvableType;
-
-import java.util.List;
 
 /**
  * 执行目标检测命令,并获取实时输出. 当输出被dispose,则认为任务停止.
@@ -19,11 +15,5 @@ public class ObjectDetectionCommand extends ComputerVisionCommand<ObjectDetectio
 
     public static FunctionMetadata metadata() {
         return CommandMetadataResolver.resolve(ObjectDetectionCommand.class);
-    }
-
-
-    @Override
-    public List<PropertyMetadata> getFlatMapMetadata() {
-        return getClassMetadata(ResolvableType.forClass(ObjectDetectionResult.RuleData.class));
     }
 }

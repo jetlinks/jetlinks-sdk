@@ -24,7 +24,6 @@ public interface AiOutput extends Externalizable, Jsonable {
 
     /**
      * 获取为轻量数据，作用于统一存储等
-     * @see AiCommand#getLightWeighMapMetadata()
      */
     default Map<String, Object> toLightWeighMap() {
         return FastBeanCopier.copy(this, new HashMap<>());
@@ -32,7 +31,6 @@ public interface AiOutput extends Externalizable, Jsonable {
 
     /**
      * 获取为平铺数据，作用于规则订阅等
-     * @see AiCommand#getFlatMapMetadata()
      */
     default List<Map<String, Object>> flat() {
         return Collections.singletonList(toLightWeighMap());
@@ -40,7 +38,6 @@ public interface AiOutput extends Externalizable, Jsonable {
 
     /**
      * 获取为轻量平铺数据，作用于业务存储等
-     * @see AiCommand#getLightWeighFlatMapMetadata()
      */
     default List<Map<String, Object>> lightWeighFlat() {
         return flat();
