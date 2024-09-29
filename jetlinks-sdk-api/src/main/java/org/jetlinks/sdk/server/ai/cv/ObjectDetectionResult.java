@@ -5,20 +5,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.utils.SerializeUtils;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Setter
 @Getter
 @Schema(title = "目标检测结果")
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
+
+    @Schema(description = "目标检测源id,例如视频源id")
+    private String sourceId;
 
     @Schema(title = "图像数据")
     private List<ImageData> images;
@@ -28,6 +30,37 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Schema(title = "其他信息")
     private Map<String, Object> others;
+
+
+    @Override
+    public Map<String, Object> toLightWeighMap() {
+        Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), "images");
+        if (CollectionUtils.isNotEmpty(images)) {
+            //移除图片的原始数据
+            List<Map<String, Object>> _images = new ArrayList<>(images.size());
+            for (ImageData image : images) {
+                _images.add(FastBeanCopier.copy(image, new HashMap<>(), "data"));
+            }
+            map.put("images", _images);
+        }
+        return map;
+    }
+
+    @Override
+    public List<Map<String, Object>> flat() {
+        List<Map<String, Object>> maps;
+        if (CollectionUtils.isNotEmpty(objects)) {
+            maps = new ArrayList<>(objects.size());
+            for (DetectedObject object : objects) {
+                FlatData from = FlatData.from(this, object);
+                maps.add(FastBeanCopier.copy(from, new HashMap<>()));
+            }
+        } else {
+            Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), "images", "objects");
+            maps = Collections.singletonList(copy);
+        }
+        return maps;
+    }
 
 
     @Getter
@@ -90,7 +123,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-
+        SerializeUtils.writeNullableUTF(sourceId, out);
         if (CollectionUtils.isEmpty(images)) {
             out.writeInt(0);
         } else {
@@ -115,6 +148,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
+        sourceId = SerializeUtils.readNullableUTF(in);
         int sizeImg = in.readInt();
         if (sizeImg > 0) {
             images = new ArrayList<>(sizeImg);
@@ -140,4 +174,58 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         }
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
     }
+
+
+    @Getter
+    @Setter
+    public static class FlatData {
+        @Schema(title = "数据id")
+        private String outputId;
+
+        @Schema(title = "是否成功响应")
+        private boolean success;
+
+        @Schema(title = "错误信息")
+        private String errorMessage;
+
+        @Schema(title = "错误码")
+        private String errorCode;
+
+        @Schema(title = "时间戳")
+        private long timestamp;
+
+        @Schema(description = "目标检测源id,例如视频源id")
+        private String sourceId;
+
+        @Schema(title = "对象ID")
+        private String objectId;
+
+        @Schema(title = "标签")
+        private String label;
+
+        @Schema(title = "置信度")
+        private float score;
+
+        @Schema(title = "边框")
+        private float[] box;
+
+        @Schema(title = "标注信息")
+        private Map<String, Object> annotations;
+
+        @Schema(title = "对象其他信息")
+        private Map<String, Object> objectOthers;
+
+        @Schema(title = "其他信息")
+        private Map<String, Object> others;
+
+
+        public static FlatData from(ObjectDetectionResult result, DetectedObject object) {
+            FlatData copy = FastBeanCopier.copy(result, new FlatData(), "images", "objects");
+            FlatData data = FastBeanCopier.copy(object, copy, "others");
+            data.setObjectOthers(object.getOthers());
+            return data;
+        }
+
+    }
+
 }

@@ -5,8 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.AiOutput;
 
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -17,7 +17,10 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements Externalizable {
+public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput {
+
+    @Schema(title = "数据id")
+    private String id;
 
     @Schema(title = "是否成功响应")
     private boolean success;
@@ -33,6 +36,7 @@ public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends Generic
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        SerializeUtils.writeNullableUTF(id, out);
         out.writeBoolean(success);
         SerializeUtils.writeNullableUTF(errorMessage, out);
         SerializeUtils.writeNullableUTF(errorCode, out);
@@ -42,6 +46,7 @@ public class AiCommandResult<SELF extends AiCommandResult<SELF>> extends Generic
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = SerializeUtils.readNullableUTF(in);
         success = in.readBoolean();
         errorMessage = SerializeUtils.readNullableUTF(in);
         errorCode = SerializeUtils.readNullableUTF(in);
