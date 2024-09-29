@@ -8,7 +8,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import javax.validation.constraints.NotBlank;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -21,7 +20,6 @@ import java.util.*;
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     @Schema(description = "目标检测源id,例如视频源id")
-    @NotBlank
     private String sourceId;
 
     @Schema(title = "图像数据")
@@ -125,7 +123,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        out.writeUTF(sourceId);
+        SerializeUtils.writeNullableUTF(sourceId, out);
         if (CollectionUtils.isEmpty(images)) {
             out.writeInt(0);
         } else {
@@ -150,7 +148,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-        sourceId = in.readUTF();
+        sourceId = SerializeUtils.readNullableUTF(in);
         int sizeImg = in.readInt();
         if (sizeImg > 0) {
             images = new ArrayList<>(sizeImg);
