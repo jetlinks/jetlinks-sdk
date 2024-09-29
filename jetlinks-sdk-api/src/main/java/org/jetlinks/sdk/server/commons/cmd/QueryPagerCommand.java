@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 分页查询数据指令
@@ -88,12 +89,28 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
                 .elementType(type));
     }
 
-    public static <T> QueryPagerCommand<T> of(Function<Object, T> converter) {
+    public static <T> QueryPagerCommand<T> of(Function<Object, PagerResult<T>> converter) {
         return new QueryPagerCommand<T>().withConverter(converter);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> QueryPagerCommand<T> of(Class<T> type) {
-        return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
+        Function<Object, PagerResult<T>> converter;
+        if (type.isAssignableFrom(Void.class)) {
+            converter = val -> (PagerResult<T>) val;
+        } else {
+            converter = value -> {
+                PagerResult<T> pagerResult = (PagerResult<T>) value;
+                List<T> data = pagerResult
+                    .getData()
+                    .stream()
+                    .map(d -> (T) CommandUtils.convertData(ResolvableType.forClass(type), d))
+                    .collect(Collectors.toList());
+                pagerResult.setData(data);
+                return pagerResult;
+            };
+        }
+        return of(converter);
     }
 
     public static List<PropertyMetadata> getQueryParamMetadata() {
