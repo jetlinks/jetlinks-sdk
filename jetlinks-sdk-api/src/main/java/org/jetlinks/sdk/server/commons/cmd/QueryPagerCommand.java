@@ -88,6 +88,14 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
                 .elementType(type));
     }
 
+    public static <T> QueryPagerCommand<T> of(Function<Object, T> converter) {
+        return new QueryPagerCommand<T>().withConverter(converter);
+    }
+
+    public static <T> QueryPagerCommand<T> of(Class<T> type) {
+        return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
     public static List<PropertyMetadata> getQueryParamMetadata() {
         return Arrays.asList(
             SimplePropertyMetadata.of("pageIndex", "页码,从0开始.", IntType.GLOBAL),
