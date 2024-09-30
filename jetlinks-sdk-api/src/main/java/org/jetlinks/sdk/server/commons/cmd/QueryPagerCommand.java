@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.commons.cmd;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.web.api.crud.entity.PagerResult;
+import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.*;
@@ -18,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 分页查询数据指令
@@ -86,6 +88,36 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
             .addProperty("total", "总数", IntType.GLOBAL)
             .addProperty("data", "数据", new ArrayType()
                 .elementType(type));
+    }
+
+    public static <T> QueryPagerCommand<T> of(Function<Object, PagerResult<T>> converter) {
+        return new QueryPagerCommand<T>().withConverter(converter);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> QueryPagerCommand<T> of(Class<T> type) {
+        Function<Object, PagerResult<T>> converter;
+        if (type.isAssignableFrom(Void.class)) {
+            converter = val -> val instanceof PagerResult
+                ? (PagerResult<T>) val
+                : FastBeanCopier.copy(val, new PagerResult<T>());
+        } else {
+            converter = value -> {
+                PagerResult<Object> pagerResult = value instanceof PagerResult
+                    ? (PagerResult<Object>) value
+                    : FastBeanCopier.copy(value, new PagerResult<>());
+                List<T> data = pagerResult
+                    .getData()
+                    .stream()
+                    .map(d -> (T) CommandUtils.convertData(ResolvableType.forClass(type), d))
+                    .collect(Collectors.toList());
+                PagerResult<T> result = new PagerResult<T>(pagerResult.getTotal(), data);
+                result.setPageIndex(pagerResult.getPageIndex());
+                result.setPageSize(pagerResult.getPageSize());
+                return result;
+            };
+        }
+        return of(converter);
     }
 
     public static List<PropertyMetadata> getQueryParamMetadata() {
