@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 /**
  * 固件升级记录.
@@ -18,7 +15,7 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class FirmwareUpgradeHistoryInfo implements Externalizable {
+public class FirmwareUpgradeHistoryInfo implements Serializable {
 
     private static final long serialVersionUID = -2316792031470364965L;
 
@@ -83,51 +80,4 @@ public class FirmwareUpgradeHistoryInfo implements Externalizable {
     @Schema(description = "失败原因")
     private String errorReason;
 
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(id, out);
-        SerializeUtils.writeNullableUTF(deviceId, out);
-        SerializeUtils.writeNullableUTF(deviceName, out);
-        SerializeUtils.writeNullableUTF(productId, out);
-        SerializeUtils.writeNullableUTF(productName, out);
-        SerializeUtils.writeNullableUTF(firmwareId, out);
-        SerializeUtils.writeNullableUTF(version, out);
-        SerializeUtils.writeObject(versionOrder, out);
-        SerializeUtils.writeNullableUTF(taskId, out);
-        SerializeUtils.writeNullableUTF(taskName, out);
-        SerializeUtils.writeObject(mode, out);
-        SerializeUtils.writeNullableUTF(serverId, out);
-        SerializeUtils.writeObject(createTime, out);
-        SerializeUtils.writeObject(upgradeTime, out);
-        SerializeUtils.writeObject(completeTime, out);
-        SerializeUtils.writeObject(timeoutSeconds, out);
-        SerializeUtils.writeObject(responseTimeoutSeconds, out);
-        SerializeUtils.writeObject(progress, out);
-        SerializeUtils.writeObject(state, out);
-        SerializeUtils.writeNullableUTF(errorReason, out);
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        id = SerializeUtils.readNullableUTF(in);
-        deviceId = SerializeUtils.readNullableUTF(in);
-        deviceName = SerializeUtils.readNullableUTF(in);
-        productId = SerializeUtils.readNullableUTF(in);
-        productName = SerializeUtils.readNullableUTF(in);
-        firmwareId = SerializeUtils.readNullableUTF(in);
-        version = SerializeUtils.readNullableUTF(in);
-        versionOrder = (Integer) SerializeUtils.readObject(in);
-        taskId = SerializeUtils.readNullableUTF(in);
-        taskName = SerializeUtils.readNullableUTF(in);
-        mode = (FirmwareUpgradeMode) SerializeUtils.readObject(in);
-        serverId = SerializeUtils.readNullableUTF(in);
-        createTime = (Long) SerializeUtils.readObject(in);
-        upgradeTime = (Long) SerializeUtils.readObject(in);
-        completeTime = (Long) SerializeUtils.readObject(in);
-        timeoutSeconds = (Long) SerializeUtils.readObject(in);
-        responseTimeoutSeconds = (Long) SerializeUtils.readObject(in);
-        progress = (Integer) SerializeUtils.readObject(in);
-        state = (FirmwareUpgradeState) SerializeUtils.readObject(in);
-        errorReason = SerializeUtils.readNullableUTF(in);
-    }
 }
