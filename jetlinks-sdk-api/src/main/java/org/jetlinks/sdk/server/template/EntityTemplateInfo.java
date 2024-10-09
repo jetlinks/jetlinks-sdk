@@ -37,8 +37,6 @@ public class EntityTemplateInfo implements Externalizable {
     @Schema(description = "额外信息")
     private Map<String, Object> properties;
 
-    @Schema(description = "文件数据")
-    private ByteBuf file;
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -47,7 +45,6 @@ public class EntityTemplateInfo implements Externalizable {
         out.writeUTF(targetType);
         out.writeUTF(metadata);
         SerializeUtils.writeKeyValue(properties, out);
-        SerializeUtils.writeObject(file, out);
     }
 
     @Override
@@ -57,6 +54,5 @@ public class EntityTemplateInfo implements Externalizable {
         targetType = in.readUTF();
         metadata = in.readUTF();
         properties = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
-        file = (ByteBuf) SerializeUtils.readObject(in);
     }
 }
