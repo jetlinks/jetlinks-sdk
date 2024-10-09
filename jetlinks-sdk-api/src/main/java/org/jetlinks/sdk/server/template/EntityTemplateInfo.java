@@ -1,16 +1,22 @@
 package org.jetlinks.sdk.server.template;
 
 import com.google.common.collect.Maps;
-import io.netty.buffer.ByteBuf;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.metadata.PropertyMetadata;
+import org.jetlinks.core.metadata.types.ObjectType;
+import org.jetlinks.core.utils.ConverterUtils;
+import org.jetlinks.core.utils.MetadataUtils;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.springframework.core.ResolvableType;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,10 +44,26 @@ public class EntityTemplateInfo implements Externalizable {
     private Map<String, Object> properties;
 
 
+    public static EntityTemplateInfo of(Object object) {
+        if (object instanceof EntityTemplateInfo) {
+            return ((EntityTemplateInfo) object);
+        }
+        return FastBeanCopier.copy(object, new EntityTemplateInfo());
+    }
+
+    public <T> T metadataTo(Class<T> clazz) {
+        return ConverterUtils.convert(metadata, clazz);
+    }
+
+    public static List<PropertyMetadata> parseMetadata() {
+        ObjectType objectType = (ObjectType) MetadataUtils.parseType(ResolvableType.forClass(EntityTemplateInfo.class));
+        return objectType.getProperties();
+    }
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         SerializeUtils.writeNullableUTF(category, out);
-        out.writeUTF(targetId);
+        SerializeUtils.writeNullableUTF(targetId, out);
         out.writeUTF(targetType);
         out.writeUTF(metadata);
         SerializeUtils.writeKeyValue(properties, out);
@@ -50,7 +72,7 @@ public class EntityTemplateInfo implements Externalizable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         category = SerializeUtils.readNullableUTF(in);
-        targetId = in.readUTF();
+        targetId = SerializeUtils.readNullableUTF(in);
         targetType = in.readUTF();
         metadata = in.readUTF();
         properties = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
