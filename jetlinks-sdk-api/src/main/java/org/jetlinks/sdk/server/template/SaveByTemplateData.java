@@ -31,7 +31,7 @@ public class SaveByTemplateData implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(id);
-        SerializeUtils.writeObject(date, out);
+        SerializeUtils.writeObject(SerializeUtils.convertToSafelySerializable(date), out);
     }
 
     @Override
