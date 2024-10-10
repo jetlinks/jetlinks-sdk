@@ -18,8 +18,12 @@ import java.io.ObjectOutput;
 @Getter
 @Setter
 public class SaveByTemplateData implements Externalizable {
-    @Schema(title = "id")
+    @Schema(title = "资源id")
     private String id;
+    @Schema(description = "实体ID")
+    private String targetId;
+    @Schema(description = "实体类别")
+    private String targetType;
     @Schema(title = "是否成功")
     private boolean success;
     @Schema(title = "数据")
@@ -27,21 +31,27 @@ public class SaveByTemplateData implements Externalizable {
     @Schema(title = "错误信息")
     private String errorMessage;
 
-
-    public static SaveByTemplateData success(String id, Object date) {
-        SaveByTemplateData data = new SaveByTemplateData();
+    public static SaveByTemplateData success(EntityTemplateInfo info, Object date) {
+        SaveByTemplateData data = of(info);
         data.setSuccess(true);
-        data.setId(id);
         data.setDate(date);
         return data;
     }
 
 
-    public static SaveByTemplateData error(String id, String errorMessage) {
-        SaveByTemplateData data = new SaveByTemplateData();
+    public static SaveByTemplateData error(EntityTemplateInfo info, String errorMessage) {
+        SaveByTemplateData data = of(info);
         data.setSuccess(false);
-        data.setId(id);
         data.setErrorMessage(errorMessage);
+        return data;
+    }
+
+
+    public static SaveByTemplateData of(EntityTemplateInfo info) {
+        SaveByTemplateData data = new SaveByTemplateData();
+        data.setId(info.getId());
+        data.setTargetId(info.getTargetId());
+        data.setTargetType(info.getTargetType());
         return data;
     }
 
@@ -53,6 +63,8 @@ public class SaveByTemplateData implements Externalizable {
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeUTF(id);
+        SerializeUtils.writeNullableUTF(targetId, out);
+        out.writeUTF(targetType);
         out.writeBoolean(success);
         SerializeUtils.writeNullableUTF(errorMessage, out);
         SerializeUtils.writeObject(SerializeUtils.convertToSafelySerializable(date), out);
@@ -61,6 +73,8 @@ public class SaveByTemplateData implements Externalizable {
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         id = in.readUTF();
+        targetId = SerializeUtils.readNullableUTF(in);
+        targetType = in.readUTF();
         success = in.readBoolean();
         errorMessage = SerializeUtils.readNullableUTF(in);
         date = SerializeUtils.readObject(in);

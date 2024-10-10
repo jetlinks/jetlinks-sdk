@@ -28,6 +28,9 @@ import java.util.Map;
 @Schema(title = "资源模板信息")
 public class EntityTemplateInfo implements Externalizable {
 
+    @Schema(description = "资源id")
+    private String id;
+
     @Schema(description = "模板分类")
     private String category;
 
@@ -62,6 +65,7 @@ public class EntityTemplateInfo implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(id);
         SerializeUtils.writeNullableUTF(category, out);
         SerializeUtils.writeNullableUTF(targetId, out);
         out.writeUTF(targetType);
@@ -71,6 +75,7 @@ public class EntityTemplateInfo implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = in.readUTF();
         category = SerializeUtils.readNullableUTF(in);
         targetId = SerializeUtils.readNullableUTF(in);
         targetType = in.readUTF();
