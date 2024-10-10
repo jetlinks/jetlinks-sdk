@@ -7,9 +7,9 @@ import lombok.Setter;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.metadata.PropertyMetadata;
 import org.jetlinks.core.metadata.types.ObjectType;
-import org.jetlinks.core.utils.ConverterUtils;
 import org.jetlinks.core.utils.MetadataUtils;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.utils.ObjectMappers;
 import org.springframework.core.ResolvableType;
 
 import java.io.Externalizable;
@@ -52,7 +52,7 @@ public class EntityTemplateInfo implements Externalizable {
     }
 
     public <T> T metadataTo(Class<T> clazz) {
-        return ConverterUtils.convert(metadata, clazz);
+        return ObjectMappers.parseJson(metadata, clazz);
     }
 
     public static List<PropertyMetadata> parseMetadata() {
