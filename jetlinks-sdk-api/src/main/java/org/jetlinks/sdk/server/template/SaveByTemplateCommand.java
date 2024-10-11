@@ -4,6 +4,7 @@ import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
+import org.jetlinks.core.metadata.types.BooleanType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
@@ -48,6 +49,8 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                 metadata.setInputs(EntityTemplateInfo.parseMetadata());
                 metadata.setOutput(new ObjectType()
                                        .addProperty("id", "id", StringType.GLOBAL)
+                                       .addProperty("success", "是否成功", BooleanType.GLOBAL)
+                                       .addProperty("errorMessage", "错误信息", StringType.GLOBAL)
                                        .addProperty("data", "data", new ObjectType()));
                 return metadata;
             },

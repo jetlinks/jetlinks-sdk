@@ -7,9 +7,9 @@ import lombok.Setter;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.metadata.PropertyMetadata;
 import org.jetlinks.core.metadata.types.ObjectType;
-import org.jetlinks.core.utils.ConverterUtils;
 import org.jetlinks.core.utils.MetadataUtils;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.utils.ObjectMappers;
 import org.springframework.core.ResolvableType;
 
 import java.io.Externalizable;
@@ -27,6 +27,9 @@ import java.util.Map;
 @Setter
 @Schema(title = "资源模板信息")
 public class EntityTemplateInfo implements Externalizable {
+
+    @Schema(description = "资源id")
+    private String id;
 
     @Schema(description = "模板分类")
     private String category;
@@ -52,7 +55,7 @@ public class EntityTemplateInfo implements Externalizable {
     }
 
     public <T> T metadataTo(Class<T> clazz) {
-        return ConverterUtils.convert(metadata, clazz);
+        return ObjectMappers.parseJson(metadata, clazz);
     }
 
     public static List<PropertyMetadata> parseMetadata() {
@@ -62,6 +65,7 @@ public class EntityTemplateInfo implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(id);
         SerializeUtils.writeNullableUTF(category, out);
         SerializeUtils.writeNullableUTF(targetId, out);
         out.writeUTF(targetType);
@@ -71,6 +75,7 @@ public class EntityTemplateInfo implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = in.readUTF();
         category = SerializeUtils.readNullableUTF(in);
         targetId = SerializeUtils.readNullableUTF(in);
         targetType = in.readUTF();
