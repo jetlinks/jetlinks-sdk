@@ -1,5 +1,8 @@
 package org.jetlinks.sdk.server.template;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
@@ -9,7 +12,10 @@ import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.concurrent.Queues;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
@@ -19,6 +25,7 @@ import java.util.function.Function;
  * @author gyl
  * @since 1.0.1
  */
+@Slf4j
 public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTemplateData>, SaveByTemplateCommand> {
 
 
@@ -58,5 +65,115 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
             SaveByTemplateCommand::new
         );
     }
+
+
+    public <T> Flux<SaveByTemplateData> execute(Function<EntityTemplateInfo, Mono<T>> converter,
+                                                Function<Flux<DataContext<T>>, Mono<Void>> handler) {
+        return execute(converter, handler, Queues.SMALL_BUFFER_SIZE);
+    }
+
+
+    /**
+     * 执行模板转换并处理对应数据,此方法会自动填充返回处理结果。
+     *
+     * @param converter         转换模板为数据
+     * @param handler           处理转化成功的数据
+     * @param converterParallel 并行度
+     * @param <T>               数据
+     * @return
+     */
+    public <T> Flux<SaveByTemplateData> execute(Function<EntityTemplateInfo, Mono<T>> converter,
+                                                Function<Flux<DataContext<T>>, Mono<Void>> handler,
+                                                int converterParallel) {
+        return Flux
+            .fromIterable(templateList())
+            .flatMap(info -> converter
+                .apply(info)
+                .map(data -> DataContext.simple(info, data))
+                .onErrorResume(error -> {
+                    //报错转换结果
+                    DataContext<T> errContext = DataContext.simple(info, null);
+                    errContext.error(error);
+                    log.warn("converter data by template fail", error);
+                    return Mono.just(errContext);
+                }), converterParallel)
+            .as(flux -> {
+                Flux<DataContext<T>> cache = flux.cache();
+                return handler
+                    //仅处理有数据的
+                    .apply(cache.filter(c -> c.getData() != null))
+                    //报错转换结果
+                    .onErrorResume(err -> cache
+                        .doOnNext(d -> d.error(err))
+                        .then(Mono.empty()))
+                    .thenMany(cache.map(DataContext::toResponse));
+            });
+    }
+
+    @Getter
+    @Setter
+    static class SimpleDataContext<T> implements DataContext<T> {
+        @Nullable
+        private T data;
+        private EntityTemplateInfo info;
+        private boolean success = true;
+        private String errorMessage;
+
+        public SimpleDataContext(EntityTemplateInfo info, @Nullable T data) {
+            this.info = info;
+            this.data = data;
+        }
+
+        @Override
+        public void success() {
+            success = true;
+        }
+
+        @Override
+        public void error(Throwable error) {
+            success = false;
+            errorMessage = error.getLocalizedMessage();
+        }
+
+        @Override
+        public void error(String message) {
+            success = false;
+            errorMessage = message;
+        }
+
+        @Override
+        public SaveByTemplateData toResponse() {
+            SaveByTemplateData response = SaveByTemplateData.of(info);
+            response.setDate(data);
+            response.setSuccess(success);
+            response.setErrorMessage(errorMessage);
+            return response;
+        }
+    }
+
+
+    public interface DataContext<T> {
+        T getData();
+
+        /**
+         * 标记此数据处理成功
+         */
+        void success();
+
+        /**
+         * 标记此数据处理失败
+         */
+        void error(Throwable error);
+
+        void error(String message);
+
+        SaveByTemplateData toResponse();
+
+        static <D> DataContext<D> simple(EntityTemplateInfo info, D data) {
+            return new SimpleDataContext<>(info, data);
+        }
+
+    }
+
 
 }
