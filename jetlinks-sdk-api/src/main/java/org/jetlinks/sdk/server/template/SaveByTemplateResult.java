@@ -17,7 +17,7 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class SaveByTemplateData implements Externalizable {
+public class SaveByTemplateResult implements Externalizable {
     @Schema(title = "资源id")
     private String id;
     @Schema(description = "实体ID")
@@ -31,24 +31,24 @@ public class SaveByTemplateData implements Externalizable {
     @Schema(title = "错误信息")
     private String errorMessage;
 
-    public static SaveByTemplateData success(EntityTemplateInfo info, Object date) {
-        SaveByTemplateData data = of(info);
+    public static SaveByTemplateResult success(EntityTemplateInfo info, Object date) {
+        SaveByTemplateResult data = of(info);
         data.setSuccess(true);
         data.setDate(date);
         return data;
     }
 
 
-    public static SaveByTemplateData error(EntityTemplateInfo info, String errorMessage) {
-        SaveByTemplateData data = of(info);
+    public static SaveByTemplateResult error(EntityTemplateInfo info, String errorMessage) {
+        SaveByTemplateResult data = of(info);
         data.setSuccess(false);
         data.setErrorMessage(errorMessage);
         return data;
     }
 
 
-    public static SaveByTemplateData of(EntityTemplateInfo info) {
-        SaveByTemplateData data = new SaveByTemplateData();
+    public static SaveByTemplateResult of(EntityTemplateInfo info) {
+        SaveByTemplateResult data = new SaveByTemplateResult();
         data.setId(info.getId());
         data.setTargetId(info.getTargetId());
         data.setTargetType(info.getTargetType());
