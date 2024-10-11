@@ -26,7 +26,7 @@ import java.util.function.Function;
  * @since 1.0.1
  */
 @Slf4j
-public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTemplateData>, SaveByTemplateCommand> {
+public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTemplateResult>, SaveByTemplateCommand> {
 
 
     public static final String PARAMETER_KEY = "data";
@@ -46,8 +46,8 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), f -> converter.apply(EntityTemplateInfo.of(f)));
     }
 
-    public static CommandHandler<SaveByTemplateCommand, Flux<SaveByTemplateData>> createHandler(
-        Function<SaveByTemplateCommand, Flux<SaveByTemplateData>> handler) {
+    public static CommandHandler<SaveByTemplateCommand, Flux<SaveByTemplateResult>> createHandler(
+        Function<SaveByTemplateCommand, Flux<SaveByTemplateResult>> handler) {
         return CommandHandler.of(
             () -> {
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
@@ -67,8 +67,8 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
     }
 
 
-    public <T> Flux<SaveByTemplateData> execute(Function<EntityTemplateInfo, Mono<T>> converter,
-                                                Function<Flux<DataContext<T>>, Mono<Void>> handler) {
+    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, Mono<T>> converter,
+                                                  Function<Flux<DataContext<T>>, Mono<Void>> handler) {
         return execute(converter, handler, Queues.SMALL_BUFFER_SIZE);
     }
 
@@ -82,9 +82,9 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
      * @param <T>               数据
      * @return
      */
-    public <T> Flux<SaveByTemplateData> execute(Function<EntityTemplateInfo, Mono<T>> converter,
-                                                Function<Flux<DataContext<T>>, Mono<Void>> handler,
-                                                int converterParallel) {
+    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, Mono<T>> converter,
+                                                  Function<Flux<DataContext<T>>, Mono<Void>> handler,
+                                                  int converterParallel) {
         return Flux
             .fromIterable(templateList())
             .flatMap(info -> converter
@@ -106,7 +106,7 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                     .onErrorResume(err -> cache
                         .doOnNext(d -> d.error(err))
                         .then(Mono.empty()))
-                    .thenMany(cache.map(DataContext::toResponse));
+                    .thenMany(cache.map(DataContext::toResult));
             });
     }
 
@@ -142,8 +142,8 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
         }
 
         @Override
-        public SaveByTemplateData toResponse() {
-            SaveByTemplateData response = SaveByTemplateData.of(info);
+        public SaveByTemplateResult toResult() {
+            SaveByTemplateResult response = SaveByTemplateResult.of(info);
             response.setDate(data);
             response.setSuccess(success);
             response.setErrorMessage(errorMessage);
@@ -167,7 +167,7 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
 
         void error(String message);
 
-        SaveByTemplateData toResponse();
+        SaveByTemplateResult toResult();
 
         static <D> DataContext<D> simple(EntityTemplateInfo info, D data) {
             return new SimpleDataContext<>(info, data);
