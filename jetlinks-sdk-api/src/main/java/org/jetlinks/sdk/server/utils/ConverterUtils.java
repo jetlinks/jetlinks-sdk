@@ -16,6 +16,7 @@ import org.springframework.core.io.buffer.NettyDataBufferFactory;
 
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -230,6 +231,11 @@ public class ConverterUtils {
                 }
             }
             return Unpooled.wrappedBuffer(strBytes);
+        }
+
+        if (obj instanceof Map) {
+            String jsonStr = ObjectMappers.toJsonString(obj);
+            return Unpooled.wrappedBuffer(jsonStr.getBytes(StandardCharsets.UTF_8));
         }
 
         return Unpooled.wrappedBuffer(String.valueOf(obj).getBytes());
