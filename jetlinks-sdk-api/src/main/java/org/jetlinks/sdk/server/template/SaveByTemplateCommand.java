@@ -7,15 +7,18 @@ import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
+import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.BooleanType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.utils.CastUtils;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.concurrent.Queues;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -46,6 +49,14 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), f -> converter.apply(EntityTemplateInfo.of(f)));
     }
 
+    public boolean isThrowError() {
+        return CastUtils.castBoolean(readable().getOrDefault("throwError", true));
+    }
+
+    public SaveByTemplateCommand setThrowError(boolean throwError) {
+        return with("throwError", throwError);
+    }
+
     public static CommandHandler<SaveByTemplateCommand, Flux<SaveByTemplateResult>> createHandler(
         Function<SaveByTemplateCommand, Flux<SaveByTemplateResult>> handler) {
         return CommandHandler.of(
@@ -53,7 +64,10 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
                 metadata.setId(CommandUtils.getCommandIdByType(SaveByTemplateCommand.class));
                 metadata.setName("根据模板保存数据");
-                metadata.setInputs(EntityTemplateInfo.parseMetadata());
+                metadata.setInputs(Arrays.asList(
+                    SimplePropertyMetadata.of("data", "模板数据", EntityTemplateInfo.parseMetadata()),
+                    SimplePropertyMetadata.of("throwError", "抛出错误", BooleanType.GLOBAL)
+                ));
                 metadata.setOutput(new ObjectType()
                                        .addProperty("id", "id", StringType.GLOBAL)
                                        .addProperty("success", "是否成功", BooleanType.GLOBAL)
@@ -91,6 +105,9 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                 .apply(info)
                 .map(data -> DataContext.simple(info, data))
                 .onErrorResume(error -> {
+                    if (isThrowError()) {
+                        return Mono.error(error);
+                    }
                     //报错转换结果
                     DataContext<T> errContext = DataContext.simple(info, null);
                     errContext.error(error);
@@ -103,9 +120,14 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                     //仅处理有数据的
                     .apply(cache.filter(c -> c.getData() != null))
                     //报错转换结果
-                    .onErrorResume(err -> cache
-                        .doOnNext(d -> d.error(err))
-                        .then(Mono.empty()))
+                    .onErrorResume(err -> {
+                        if (isThrowError()) {
+                            return Mono.error(err);
+                        }
+                        return cache
+                            .doOnNext(d -> d.error(err))
+                            .then(Mono.empty());
+                    })
                     .thenMany(cache.map(DataContext::toResult));
             });
     }

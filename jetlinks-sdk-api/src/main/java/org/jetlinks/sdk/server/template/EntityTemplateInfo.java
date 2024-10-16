@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.metadata.DataType;
 import org.jetlinks.core.metadata.PropertyMetadata;
-import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.utils.MetadataUtils;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.utils.ObjectMappers;
@@ -58,9 +58,8 @@ public class EntityTemplateInfo implements Externalizable {
         return ObjectMappers.parseJson(metadata, clazz);
     }
 
-    public static List<PropertyMetadata> parseMetadata() {
-        ObjectType objectType = (ObjectType) MetadataUtils.parseType(ResolvableType.forClass(EntityTemplateInfo.class));
-        return objectType.getProperties();
+    public static DataType parseMetadata() {
+        return MetadataUtils.parseType(ResolvableType.forClass(EntityTemplateInfo.class));
     }
 
     @Override
