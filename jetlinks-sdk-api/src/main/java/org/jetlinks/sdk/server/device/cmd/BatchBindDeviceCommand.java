@@ -1,4 +1,4 @@
-package org.jetlinks.sdk.server.commons.cmd;
+package org.jetlinks.sdk.server.device.cmd;
 
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.AbstractCommand;
