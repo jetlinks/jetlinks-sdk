@@ -4,13 +4,14 @@ import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
+import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.QueryCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -30,12 +31,12 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
 
     public List<String> getProperties() {
         return ConverterUtils
-                .convertToList(readable().get("property"),
+                .convertToList(readable().get("properties"),
                                String::valueOf);
     }
 
-    public QueryPropertyEachCommand withProperty(String property) {
-        writable().put("property", property);
+    public QueryPropertyEachCommand withProperties(List<String> properties) {
+        writable().put("properties", properties);
         return this;
     }
 
@@ -49,7 +50,12 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
                     metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyEachCommand.class));
                     metadata.setName("按条件查询指定ID设备的指定属性");
                     metadata.setInputs(
-                            Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL))
+                            Arrays.asList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL),
+                                          SimplePropertyMetadata.of("properties",
+                                                                    "属性值",
+                                                                    new ArrayType()
+                                                                            .elementType(StringType.GLOBAL)),
+                                          getTermsMetadata())
                     );
                     return metadata;
                 },
