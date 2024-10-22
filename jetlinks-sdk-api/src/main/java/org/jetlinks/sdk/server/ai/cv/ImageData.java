@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.file.FileData;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 @Setter
 @Getter
-public class ImageData implements Externalizable {
+public class ImageData implements FileData, Externalizable {
 
     @Schema(description = "图片源id,例如视频源id")
     private String id;
@@ -29,6 +30,25 @@ public class ImageData implements Externalizable {
 
     @Schema(description = "其他信息")
     private Map<String, Object> others;
+
+    @Override
+    public String name() {
+        return (String) others.getOrDefault("name", "image.jpg");
+    }
+
+    public ImageData withName(String key, String value) {
+        withOther("name", value);
+        return this;
+    }
+
+    public ImageData withOther(String key, Object value) {
+        othersWriter().put(key, value);
+        return this;
+    }
+
+    private synchronized Map<String, Object> othersWriter() {
+        return others == null ? others = Maps.newConcurrentMap() : others;
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -44,6 +64,21 @@ public class ImageData implements Externalizable {
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         data = (ByteBuf) SerializeUtils.readObject(in);
         type = Type.ALL[in.readByte()];
+    }
+
+    @Override
+    public ByteBuf body() {
+        return data;
+    }
+
+    @Override
+    public void setUrl(String url) {
+        withOther("url", url);
+    }
+
+    @Override
+    public String getUrl() {
+        return others == null ? null : (String) others.get("url");
     }
 
     @Getter

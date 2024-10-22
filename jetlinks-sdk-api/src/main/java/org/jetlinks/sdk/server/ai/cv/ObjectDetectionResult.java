@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.file.FileData;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -31,6 +32,10 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Schema(title = "其他信息")
     private Map<String, Object> others;
 
+    @Override
+    public List<? extends FileData> files() {
+        return images;
+    }
 
     @Override
     public Map<String, Object> toLightWeighMap() {
