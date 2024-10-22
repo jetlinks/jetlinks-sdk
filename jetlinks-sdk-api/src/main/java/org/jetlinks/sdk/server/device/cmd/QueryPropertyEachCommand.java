@@ -7,9 +7,11 @@ import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.QueryCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -26,8 +28,10 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
         return this;
     }
 
-    public String getProperty() {
-        return (String) readable().get("property");
+    public List<String> getProperties() {
+        return ConverterUtils
+                .convertToList(readable().get("property"),
+                               String::valueOf);
     }
 
     public QueryPropertyEachCommand withProperty(String property) {
@@ -43,8 +47,7 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
                 () -> {
                     SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
                     metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyEachCommand.class));
-                    metadata.setName("按条件查询指定ID设备的属性");
-                    metadata.setDescription("属性可以指定，多个属性逗号隔开，不指定则查询全部属性");
+                    metadata.setName("按条件查询指定ID设备的指定属性");
                     metadata.setInputs(
                             Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL))
                     );
