@@ -53,7 +53,7 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
                     metadata.setInputs(
                             Arrays.asList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL),
                                           SimplePropertyMetadata.of("properties",
-                                                                    "属性值",
+                                                                    "物模型属性ID",
                                                                     new ArrayType()
                                                                             .elementType(StringType.GLOBAL)),
                                           getTermsMetadata())
