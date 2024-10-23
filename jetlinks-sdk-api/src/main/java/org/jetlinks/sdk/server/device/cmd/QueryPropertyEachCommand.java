@@ -49,6 +49,7 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
                     SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
                     metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyEachCommand.class));
                     metadata.setName("按条件查询指定ID设备的指定属性");
+                    metadata.setDescription("若未指定属性，则查询设备全部属性");
                     metadata.setInputs(
                             Arrays.asList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL),
                                           SimplePropertyMetadata.of("properties",
