@@ -40,31 +40,41 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public Map<String, Object> toLightWeighMap() {
         Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), "images");
-        if (CollectionUtils.isNotEmpty(images)) {
-            //移除图片的原始数据
-            List<Map<String, Object>> _images = new ArrayList<>(images.size());
-            for (ImageData image : images) {
-                _images.add(FastBeanCopier.copy(image, new HashMap<>(), "data"));
-            }
-            map.put("images", _images);
-        }
+        map.put("images", imagesToSimpleMap());
         return map;
     }
 
     @Override
     public List<Map<String, Object>> flat() {
         List<Map<String, Object>> maps;
+        List<Map<String, Object>> _images = imagesToSimpleMap();
         if (CollectionUtils.isNotEmpty(objects)) {
             maps = new ArrayList<>(objects.size());
             for (DetectedObject object : objects) {
                 FlatData from = FlatData.from(this, object);
-                maps.add(FastBeanCopier.copy(from, new HashMap<>()));
+                Map<String, Object> data = FastBeanCopier.copy(from, new HashMap<>());
+                data.put("images", _images);
+                maps.add(data);
             }
         } else {
             Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), "images", "objects");
+            copy.put("images", _images);
             maps = Collections.singletonList(copy);
         }
         return maps;
+    }
+
+
+    private List<Map<String, Object>> imagesToSimpleMap() {
+        if (CollectionUtils.isNotEmpty(images)) {
+            //移除图片的原始数据
+            List<Map<String, Object>> _images = new ArrayList<>(images.size());
+            for (ImageData image : images) {
+                _images.add(FastBeanCopier.copy(image, new HashMap<>(), "data"));
+            }
+            return _images;
+        }
+        return null;
     }
 
 
