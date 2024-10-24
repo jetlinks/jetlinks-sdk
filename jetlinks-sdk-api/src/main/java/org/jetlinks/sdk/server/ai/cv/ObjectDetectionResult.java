@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
 
@@ -193,7 +194,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Getter
     @Setter
-    public static class FlatData {
+    public static class FlatData extends GenericHeaderSupport<FlatData> {
         @Schema(title = "数据id")
         private String outputId;
 
