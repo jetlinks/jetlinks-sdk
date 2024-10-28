@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.ai.cv;
 
+import com.ctc.wstx.shaded.msv_core.relaxns.reader.relax.AnyOtherElementState;
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,6 +35,9 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public String name() {
+        if (ObjectUtils.isEmpty(others)){
+            return "image.jpg";
+        }
         return (String) others.getOrDefault("name", "image.jpg");
     }
 

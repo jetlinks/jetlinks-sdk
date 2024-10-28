@@ -2,13 +2,16 @@ package org.jetlinks.sdk.server.ai.cv;
 
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jdk.internal.org.objectweb.asm.Type;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.AiOutput;
 import org.jetlinks.sdk.server.file.FileData;
+import reactor.core.publisher.Flux;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -191,6 +194,15 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
     }
 
+
+    @Override
+    public Boolean filterData() {
+            if (!this.isSuccess() || CollectionUtils.isEmpty(this.getImages())){
+                return false;
+            }
+           return this.getImages().stream()
+               .anyMatch(img-> ImageData.Type.labeled.equals(img.getType()));
+    }
 
     @Getter
     @Setter

@@ -4,6 +4,8 @@ import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.HeaderSupport;
 import org.jetlinks.core.metadata.Jsonable;
 import org.jetlinks.sdk.server.file.FileData;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.io.Externalizable;
 import java.util.Collections;
@@ -85,5 +87,11 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
         return flat();
     }
 
+    /**
+     * 过滤数据,用于快捷告警
+     */
+    default Boolean filterData() {
+        return true;
+    }
 
 }
