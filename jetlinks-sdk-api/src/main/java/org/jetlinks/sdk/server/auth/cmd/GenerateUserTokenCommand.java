@@ -6,6 +6,7 @@ import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.auth.AuthenticationInfo;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -21,6 +22,10 @@ public class GenerateUserTokenCommand extends AbstractCommand<Mono<String>, Gene
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 当前用户ID
+     * @return 用户ID
+     */
     public String getUserId() {
         return getOrNull("userId", String.class);
     }
@@ -29,12 +34,28 @@ public class GenerateUserTokenCommand extends AbstractCommand<Mono<String>, Gene
         return with("userId", userId);
     }
 
-    public Integer getTimeoutMinute() {
-        return getOrNull("timeoutMinute", Integer.class);
+    /**
+     * token过期时间，单位毫秒
+     * @return 过期时间
+     */
+    public Long getExpires() {
+        return getOrNull("expires", Long.class);
     }
 
-    public GenerateUserTokenCommand withTimeoutMinute(Integer timeoutMinute) {
-        return with("timeoutMinute", timeoutMinute);
+    public GenerateUserTokenCommand withExpires(Long expires) {
+        return with("expires", expires);
+    }
+
+    /**
+     * 指定token的用户权限
+     * @return 用户权限
+     */
+    public AuthenticationInfo getAuthentication() {
+        return getOrNull("authentication", AuthenticationInfo.class);
+    }
+
+    public GenerateUserTokenCommand withAuthentication(AuthenticationInfo authentication) {
+        return with("authentication", authentication);
     }
 
     public static CommandHandler<GenerateUserTokenCommand, Mono<String>> createHandler(
