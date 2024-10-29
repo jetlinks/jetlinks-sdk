@@ -60,11 +60,17 @@ public class AuthenticationInfo {
             .collectMap(DimensionType::getId)
             .flatMapMany(dimensionTypes -> Flux
                 .fromIterable(dimensions)
-                .map(dimension -> SimpleDimension.of(
-                    dimension.getId(),
-                    dimension.getName(),
-                    dimensionTypes.get(dimension.getType()),
-                    dimension.getOptions())));
+                .mapNotNull(dimension -> {
+                    DimensionType dimensionType = dimensionTypes.get(dimension.getType());
+                    if (dimensionType == null) {
+                        return null;
+                    }
+                    return SimpleDimension.of(
+                        dimension.getId(),
+                        dimension.getName(),
+                        dimensionTypes.get(dimension.getType()),
+                        dimension.getOptions());
+                }));
     }
 
     @Getter
