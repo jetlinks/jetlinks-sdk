@@ -86,4 +86,18 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     }
 
 
+    /**
+     * 释放资源
+     */
+    default void release() {
+        List<? extends FileData> files = files();
+        if (files != null) {
+            for (FileData file : files) {
+                file.release();
+            }
+        }
+
+    }
+
+
 }
