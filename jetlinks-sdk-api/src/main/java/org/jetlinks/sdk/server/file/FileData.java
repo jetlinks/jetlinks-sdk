@@ -35,4 +35,9 @@ public interface FileData {
      * @return 获取文件访问地址
      */
     String getUrl();
+
+    /**
+     * 释放文件资源
+     */
+    void release();
 }
