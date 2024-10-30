@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 用户权限信息.
@@ -36,28 +37,21 @@ public class AuthenticationInfo {
     @Schema(description = "其他配置")
     private Map<String, Serializable> attributes = new HashMap<>();
 
-    public Mono<SimpleAuthentication> toAuthentication() {
-        return this
-            .toDimensions()
-            .collectList()
-            .map(dimension -> {
-                SimpleAuthentication authentication = new SimpleAuthentication();
-                authentication.setUser(user);
-                authentication.setPermissions(new ArrayList<>(permissions));
-                authentication.setDimensions(dimension);
-                authentication.setAttributes(attributes);
-                return authentication;
-            });
-    }
-
-    private Flux<Dimension> toDimensions() {
-        return Flux
-            .fromIterable(dimensions)
-            .mapNotNull(dimension -> SimpleDimension.of(
-                dimension.getId(),
-                dimension.getName(),
-                SimpleDimensionType.of(dimension.getType()),
-                dimension.getOptions()));
+    public SimpleAuthentication toAuthentication() {
+        SimpleAuthentication authentication = new SimpleAuthentication();
+        authentication.setUser(user);
+        authentication.setPermissions(new ArrayList<>(permissions));
+        authentication.setDimensions(
+            dimensions
+                .stream()
+                .map(dimension -> SimpleDimension.of(
+                    dimension.getId(),
+                    dimension.getName(),
+                    SimpleDimensionType.of(dimension.getType()),
+                    dimension.getOptions()))
+                .collect(Collectors.toList()));
+        authentication.setAttributes(attributes);
+        return authentication;
     }
 
     @Getter
