@@ -2,6 +2,8 @@ package org.jetlinks.sdk.server.ai.cv;
 
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -68,7 +70,7 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public ByteBuf body() {
-        return data;
+        return data == null? null : Unpooled.unreleasableBuffer(data);
     }
 
     @Override
@@ -79,6 +81,11 @@ public class ImageData implements FileData, Externalizable {
     @Override
     public String getUrl() {
         return others == null ? null : (String) others.get("url");
+    }
+
+    @Override
+    public void release() {
+        ReferenceCountUtil.safeRelease(data);
     }
 
     @Getter
