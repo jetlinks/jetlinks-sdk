@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -35,7 +36,9 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public String name() {
-        return (String) others.getOrDefault("name", "image.jpg");
+        return ObjectUtils.isEmpty(this.others) ?
+            "image.jpg" : (String)this.others.getOrDefault("name", "image.jpg");
+
     }
 
     public ImageData withName(String key, String value) {
