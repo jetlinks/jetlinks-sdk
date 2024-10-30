@@ -68,6 +68,10 @@ public class ImageData implements FileData, Externalizable {
         type = Type.ALL[in.readByte()];
     }
 
+    public ByteBuf getData() {
+        return body();
+    }
+
     @Override
     public ByteBuf body() {
         return data == null? null : Unpooled.unreleasableBuffer(data);
