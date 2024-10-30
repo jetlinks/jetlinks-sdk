@@ -3,11 +3,8 @@ package org.jetlinks.sdk.server.auth;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.hswebframework.web.authorization.*;
-import org.hswebframework.web.authorization.simple.SimpleAuthentication;
-import org.hswebframework.web.authorization.simple.SimpleDimension;
-import org.hswebframework.web.authorization.simple.SimplePermission;
-import org.hswebframework.web.authorization.simple.SimpleUser;
+import org.hswebframework.web.authorization.Dimension;
+import org.hswebframework.web.authorization.simple.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,9 +36,9 @@ public class AuthenticationInfo {
     @Schema(description = "其他配置")
     private Map<String, Serializable> attributes = new HashMap<>();
 
-    public Mono<SimpleAuthentication> toAuthentication(List<DimensionProvider> dimensionProviders) {
+    public Mono<SimpleAuthentication> toAuthentication() {
         return this
-            .toDimensions(dimensionProviders)
+            .toDimensions()
             .collectList()
             .map(dimension -> {
                 SimpleAuthentication authentication = new SimpleAuthentication();
@@ -53,24 +50,14 @@ public class AuthenticationInfo {
             });
     }
 
-    private Flux<Dimension> toDimensions(List<DimensionProvider> dimensionProviders) {
+    private Flux<Dimension> toDimensions() {
         return Flux
-            .fromIterable(dimensionProviders)
-            .flatMap(DimensionProvider::getAllType)
-            .collectMap(DimensionType::getId)
-            .flatMapMany(dimensionTypes -> Flux
-                .fromIterable(dimensions)
-                .mapNotNull(dimension -> {
-                    DimensionType dimensionType = dimensionTypes.get(dimension.getType());
-                    if (dimensionType == null) {
-                        return null;
-                    }
-                    return SimpleDimension.of(
-                        dimension.getId(),
-                        dimension.getName(),
-                        dimensionTypes.get(dimension.getType()),
-                        dimension.getOptions());
-                }));
+            .fromIterable(dimensions)
+            .mapNotNull(dimension -> SimpleDimension.of(
+                dimension.getId(),
+                dimension.getName(),
+                SimpleDimensionType.of(dimension.getType()),
+                dimension.getOptions()));
     }
 
     @Getter
