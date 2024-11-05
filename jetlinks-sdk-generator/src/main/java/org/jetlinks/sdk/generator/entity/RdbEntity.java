@@ -27,8 +27,7 @@ public class RdbEntity extends Entity {
     @Schema(description = "记录修改信息")
     boolean recordModifier = false;
 
-    @Schema(description = "指定service命令id,为空不注册为命令")
-    String serviceCommand;
+    // TODO: 2024/11/5 资产
 
 
 }

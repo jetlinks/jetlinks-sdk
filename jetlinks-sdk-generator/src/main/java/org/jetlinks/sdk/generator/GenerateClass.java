@@ -11,9 +11,9 @@ import lombok.Setter;
 @Setter
 public class GenerateClass {
 
-    private String packageName;
+    private String classPackage;
 
-    private String className;
+    private String classSimpleName;
 
     private String generate;
 

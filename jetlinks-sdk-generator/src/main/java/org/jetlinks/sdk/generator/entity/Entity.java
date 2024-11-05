@@ -16,9 +16,9 @@ public class Entity {
     String name;
 
     @Schema(description = "实体类名")
-    String className;
+    String classSimpleName;
 
     @Schema(description = "包名")
-    String packageName;
+    String classPackage;
 
 }

@@ -2,6 +2,7 @@ package org.jetlinks.sdk.generator.java;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import org.jetlinks.sdk.generator.GenerateClass;
 import org.springframework.core.ResolvableType;
 
 import java.util.function.Consumer;
@@ -41,6 +42,8 @@ public interface JavaGenerator {
 
     JavaGenerator addField(String type, String name, Modifier.Keyword... modifiers);
 
-
+    @Deprecated
     String generate();
+
+    GenerateClass generateClass();
 }

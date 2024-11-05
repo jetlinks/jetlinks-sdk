@@ -4,6 +4,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import org.jetlinks.sdk.generator.GenerateClass;
 import org.springframework.core.ResolvableType;
 
 import java.util.function.Consumer;
@@ -98,6 +99,15 @@ class DefaultJavaGenerator implements JavaGenerator {
     @Override
     public String generate() {
         return cu.toString();
+    }
+
+    @Override
+    public GenerateClass generateClass() {
+        GenerateClass aClass = new GenerateClass();
+        aClass.setClassPackage(classPackage);
+        aClass.setClassSimpleName(classSimpleName);
+        aClass.setGenerate(cu.toString());
+        return aClass;
     }
 
     @Override

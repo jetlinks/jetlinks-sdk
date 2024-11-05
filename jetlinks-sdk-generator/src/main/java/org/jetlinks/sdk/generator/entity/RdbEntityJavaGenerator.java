@@ -20,18 +20,25 @@ public interface RdbEntityJavaGenerator extends JavaGenerator {
 
     RdbEntityJavaGenerator addField(RdbColumn rdbColumn);
 
-    RdbEntityJavaGenerator oneToOne(RdbEntityDetail one, String idColumn, relationMethod... method);
-
-    RdbEntityJavaGenerator oneToMany(RdbEntityDetail many, String idColumn, relationMethod... method);
+    RdbEntityServiceJavaGenerator serviceGenerator(String commandId);
 
     /**
      * 生成相关实体类，包含基础实体、vo实体、一对一实体、一对多实体
      */
     List<GenerateClass> generateEntity();
 
-    GenerateClass generatesService();
 
-    GenerateClass generatesController();
+    interface RdbEntityServiceJavaGenerator {
+
+        RdbEntityServiceJavaGenerator oneToOne(RdbEntityDetail one, String idColumn, relationMethod... method);
+
+        RdbEntityServiceJavaGenerator oneToMany(RdbEntityDetail many, String idColumn, relationMethod... method);
+
+        GenerateClass generatesService(String packageName);
+
+        GenerateClass generatesController(String packageName);
+
+    }
 
 
     /**
