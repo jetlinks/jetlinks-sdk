@@ -22,6 +22,9 @@ import java.io.ObjectOutput;
 @Setter
 public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput<SELF> {
 
+    @Schema(title = "源数据id")
+    private String sourceId;
+
     @Schema(title = "数据id")
     private String id;
 
