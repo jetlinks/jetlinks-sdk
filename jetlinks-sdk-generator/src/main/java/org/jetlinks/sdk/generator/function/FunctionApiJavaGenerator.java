@@ -8,7 +8,7 @@ import org.jetlinks.sdk.generator.java.JavaGenerator;
  * 方法定义代码生成器，可以生成对应接口类及实现类
  *
  * @author zhouhao
- * @since 1.0
+ * @since 1.0.1
  */
 public interface FunctionApiJavaGenerator extends JavaGenerator {
 

@@ -4,7 +4,7 @@ package org.jetlinks.sdk.generator.entity;
  * 常量
  *
  * @author gyl
- * @since 2.3
+ * @since 1.0.1
  */
 public interface EntityConstants {
 

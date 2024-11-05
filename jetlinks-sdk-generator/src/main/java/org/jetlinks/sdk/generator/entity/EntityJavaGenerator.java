@@ -6,7 +6,7 @@ import org.jetlinks.sdk.generator.java.JavaGenerator;
  * 实体相关代码生成器
  *
  * @author zhouhao
- * @since 1.0
+ * @since 1.0.1
  */
 public interface EntityJavaGenerator extends JavaGenerator {
 

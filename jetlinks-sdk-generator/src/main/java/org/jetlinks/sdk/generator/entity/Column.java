@@ -5,7 +5,7 @@ import org.jetlinks.core.metadata.DataType;
 
 /**
  * @author gyl
- * @since 2.3
+ * @since 1.0.1
  */
 public class Column {
     @Schema(description = "字段")

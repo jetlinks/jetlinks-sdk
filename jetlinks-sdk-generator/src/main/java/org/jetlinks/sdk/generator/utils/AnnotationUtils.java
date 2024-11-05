@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
  * 添加注释工具类
  *
  * @author gyl
- * @since 2.3
+ * @since 1.0.1
  */
 public class AnnotationUtils {
 

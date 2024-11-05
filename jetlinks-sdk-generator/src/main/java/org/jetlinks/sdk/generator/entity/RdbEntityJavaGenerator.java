@@ -9,7 +9,7 @@ import java.util.List;
  * 数据库实体相关代码生成器
  *
  * @author zhouhao
- * @since 1.0
+ * @since 1.0.1
  */
 public interface RdbEntityJavaGenerator extends JavaGenerator {
 

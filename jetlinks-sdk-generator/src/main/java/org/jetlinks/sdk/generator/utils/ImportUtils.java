@@ -7,7 +7,7 @@ import org.springframework.core.ResolvableType;
 
 /**
  * @author gyl
- * @since 2.3
+ * @since 1.0.1
  */
 public class ImportUtils {
 
