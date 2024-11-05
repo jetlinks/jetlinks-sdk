@@ -21,6 +21,12 @@ import java.util.Map;
  * @since 1.0.1
  */
 public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Self>, Externalizable, Jsonable {
+    /**
+     * 数据源ID
+     *有关图像处理中用拉流id作为数据源ID
+     */
+    String getSourceId();
+
 
     /**
      * 获取数据ID
