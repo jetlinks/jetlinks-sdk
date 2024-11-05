@@ -26,23 +26,28 @@ public class ByteBufUtils {
         if (length <= maxChunkSize) {
             return Flux.just(data);
         }
-        return Flux.create(sink -> {
-            try {
-                int chunk = length / maxChunkSize;
-                int remainder = length % maxChunkSize;
-
-                for (int i = 0; i < chunk; i++) {
-                    sink.next(data.retainedSlice(i * maxChunkSize, maxChunkSize));
-                }
-                if (remainder > 0) {
-                    sink.next(data.retainedSlice(length - remainder, remainder));
-                }
-                sink.complete();
-            } finally {
-                ReferenceCountUtil.safeRelease(data);
-            }
-
-        });
+        return Flux.
+            generate(
+                () -> data,
+                (buf, sink) -> {
+                    int readableBytes = buf.readableBytes();
+                    if (readableBytes == 0) {
+                        sink.complete();
+                        return buf;
+                    } else if (readableBytes > maxChunkSize) {
+                        sink.next(
+                            buf.retainedSlice(buf.readerIndex(), maxChunkSize)
+                        );
+                        return buf.readerIndex(buf.readerIndex() + maxChunkSize);
+                    } else {
+                        sink.next(
+                            buf.retainedSlice(buf.readerIndex(), buf.readableBytes())
+                        );
+                        sink.complete();
+                        return buf.readerIndex(buf.readableBytes());
+                    }
+                },
+                ReferenceCountUtil::safeRelease);
     }
 
     public static int computeBalanceEachSize(long fileLength, int lengthEachPart) {
@@ -138,6 +143,7 @@ public class ByteBufUtils {
                         hookOnNext0(buf.retainedSlice(readableBytes - remainder, remainder));
                     }
                 } finally {
+                    request(1);
                     ReferenceCountUtil.safeRelease(buf);
                 }
                 return;
