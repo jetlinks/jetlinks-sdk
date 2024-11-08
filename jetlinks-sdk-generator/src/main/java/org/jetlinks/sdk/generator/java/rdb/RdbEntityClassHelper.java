@@ -4,6 +4,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import lombok.Getter;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.sdk.generator.java.EntityClassHelper;
+import org.jetlinks.sdk.generator.java.constant.ClassOrInterfaceConstant;
 import org.jetlinks.sdk.generator.java.constant.ImportConstant;
 import org.jetlinks.sdk.generator.java.enums.RdbEntityAnnotation;
 import org.jetlinks.sdk.generator.java.info.BaseColumnInfo;
@@ -11,6 +12,8 @@ import org.jetlinks.sdk.generator.java.info.EntityInfo;
 import org.jetlinks.sdk.generator.java.info.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.info.base.FieldInfo;
+import org.jetlinks.sdk.generator.java.info.base.SuperClassOrInterfaceInfo;
+import org.jetlinks.sdk.generator.java.utils.DefaultValueUtils;
 
 import java.util.*;
 
@@ -21,7 +24,7 @@ public class RdbEntityClassHelper implements EntityClassHelper {
 
     @Override
     public RdbEntityClassHelper initClass(EntityInfo entityInfo) {
-        this.classInfo = ClassInfo.of(entityInfo);
+        this.classInfo = createEntityClassInfo(entityInfo);
         return this;
     }
 
@@ -73,6 +76,36 @@ public class RdbEntityClassHelper implements EntityClassHelper {
 
     @Override
     public ClassInfo getEntityClassInfo() {
+        return classInfo;
+    }
+
+    public ClassInfo createEntityClassInfo(EntityInfo entityInfo) {
+        ClassInfo classInfo = new ClassInfo();
+        //添加实体类父类信息
+        classInfo.setSuperClass(new SuperClassOrInterfaceInfo(ImportConstant.GENERIC_ENTITY,
+                                                              Collections.singletonList(entityInfo.getPkClass()),
+                                                              ClassOrInterfaceConstant.GENERIC_ENTITY));
+        classInfo.setName(entityInfo.getClassSimpleName());
+        //添加数据库实体类默认注解
+        List<AnnotationInfo> defaultAnnotation = DefaultValueUtils
+                .getDefaultAnnotation(entityInfo.getTableName(),
+                                      entityInfo.getName(),
+                                      entityInfo.isEnabledEntityEvent());
+        classInfo.getAnnotations().addAll(defaultAnnotation);
+
+        // 添加实体类实现的接口
+        List<SuperClassOrInterfaceInfo> interfaces = classInfo.getInterfaces();
+        if (entityInfo.isRecordCreation()) {
+            interfaces.add(new SuperClassOrInterfaceInfo(ImportConstant.RECORD_CREATION_ENTITY,
+                                                         new ArrayList<>(),
+                                                         ClassOrInterfaceConstant.RECORD_CREATION_ENTITY));
+        }
+        if (entityInfo.isRecordModifier()) {
+            interfaces.add(new SuperClassOrInterfaceInfo(ImportConstant.RECORD_MODIFIER_ENTITY,
+                                                         new ArrayList<>(),
+                                                         ClassOrInterfaceConstant.RECORD_MODIFIER_ENTITY));
+        }
+
         return classInfo;
     }
 }
