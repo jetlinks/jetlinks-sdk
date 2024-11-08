@@ -3,20 +3,25 @@ package org.jetlinks.sdk.generator.java;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.AnnotationExpr;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import org.springframework.core.ResolvableType;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-public class DefaultJavaGenerator implements JavaGenerator {
+class DefaultJavaGenerator implements JavaGenerator {
 
-    protected final CompilationUnit cu;
+    final CompilationUnit cu;
 
-    protected final ClassOrInterfaceDeclaration clazz;
+    final ClassOrInterfaceDeclaration clazz;
 
-    protected final String classSimpleName;
+    final String classSimpleName;
 
-    public DefaultJavaGenerator(String className) {
+    DefaultJavaGenerator(String className) {
         cu = new CompilationUnit();
         if (className.contains(".")) {
             int lastIndex = className.lastIndexOf(".");
@@ -73,6 +78,27 @@ public class DefaultJavaGenerator implements JavaGenerator {
     @Override
     public JavaGenerator addField(String type, String name, Modifier.Keyword... modifiers) {
         clazz.addField(type, name, modifiers);
+        return this;
+    }
+
+    @Override
+    public JavaGenerator extendsClass(String clazz, Type... types) {
+        ClassOrInterfaceType genericParentType = new ClassOrInterfaceType(clazz);
+        genericParentType.setTypeArguments(types);
+        this.clazz.addExtendedType(genericParentType);
+        return this;
+    }
+
+    @Override
+    public JavaGenerator addFieldWithAnnotation(String type, String name, List<AnnotationExpr> annotations, Modifier.Keyword... modifiers) {
+        FieldDeclaration fieldDeclaration = clazz.addField(type, name, modifiers);
+        annotations.forEach(fieldDeclaration::addAnnotation);
+        return this;
+    }
+
+    @Override
+    public JavaGenerator addClassAnnotation(AnnotationExpr annotation) {
+        clazz.addAnnotation(annotation);
         return this;
     }
 

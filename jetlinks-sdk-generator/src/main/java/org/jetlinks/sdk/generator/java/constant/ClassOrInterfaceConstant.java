@@ -82,4 +82,14 @@ public interface ClassOrInterfaceConstant {
      */
     String NOT_NULL = "NotNull";
 
+    /**
+     * GenericReactiveCrudService类
+     */
+    String GENERIC_REACTIVE_CRUD_SERVICE = "GenericReactiveCrudService";
+
+    /**
+     * Service注解
+     */
+    String SERVICE = "Service";
+
 }

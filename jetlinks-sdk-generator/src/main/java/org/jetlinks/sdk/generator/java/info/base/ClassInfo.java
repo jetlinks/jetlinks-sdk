@@ -14,6 +14,9 @@ public class ClassInfo {
     @Schema(description = "类名")
     private String name;
 
+    @Schema(description = "包路径")
+    private String classPackage;
+
     @Schema(description = "字段信息")
     private List<FieldInfo> fields = new ArrayList<>();
 
@@ -21,8 +24,8 @@ public class ClassInfo {
     private List<AnnotationInfo> annotations = new ArrayList<>();
 
     @Schema(description = "父类信息")
-    private SuperClassOrInterfaceInfo superClass;
+    private ClassInfo superClass;
 
     @Schema(description = "实现的接口信息")
-    private List<SuperClassOrInterfaceInfo> interfaces = new ArrayList<>();
+    private List<ClassInfo> interfaces = new ArrayList<>();
 }

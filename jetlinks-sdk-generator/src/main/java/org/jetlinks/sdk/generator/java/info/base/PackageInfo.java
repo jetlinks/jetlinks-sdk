@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PackageInfo {
 
-    @Schema(description = "包名")
+    @Schema(description = "包路径")
     private String name;
 
     @Schema(description = "类信息")

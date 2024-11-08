@@ -83,5 +83,15 @@ public interface ImportConstant {
      */
     String NOT_NULL = "javax.validation.constraints.NotNull";
 
+    /**
+     * GenericReactiveCrudService类导入路径
+     */
+    String GENERIC_REACTIVE_CRUD_SERVICE = "org.hswebframework.web.crud.service.GenericReactiveCrudService";
+
+    /**
+     * Service注解导入路径
+     */
+    String SERVICE = "org.springframework.stereotype.Service";
+
 
 }

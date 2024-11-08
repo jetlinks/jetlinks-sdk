@@ -2,70 +2,87 @@ package org.jetlinks.sdk.generator.java.enums;
 
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.type.TypeParameter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.hswebframework.web.dict.EnumDict;
-import org.jetlinks.sdk.generator.java.info.ColumnInfo;
+import org.jetlinks.sdk.generator.java.info.RdbColumnInfo;
+
+import java.util.Objects;
 
 import static org.jetlinks.sdk.generator.java.constant.ClassOrInterfaceConstant.*;
 
+/**
+ * 数据库实体类相关注解
+ */
 @Getter
 @AllArgsConstructor
 public enum EntityAnnotation implements EnumDict<String> {
-    size("@Size注解") {
+    column("@Column注解") {
         @Override
         public AnnotationExpr createAnnotation(Object value) {
-            ColumnInfo.SizeSpec sizeSpec = FastBeanCopier.copy(value, new ColumnInfo.SizeSpec());
+            RdbColumnInfo.ColumnSpec columnSpec = FastBeanCopier.copy(value, new RdbColumnInfo.ColumnSpec());
             NodeList<MemberValuePair> nodeList = new NodeList<>();
-            if (StringUtils.isNotBlank(sizeSpec.getMax())) {
-                nodeList.add(new MemberValuePair("max", new IntegerLiteralExpr(sizeSpec.getMax())));
+            if (Objects.nonNull(columnSpec.getNullable())) {
+                nodeList.add(new MemberValuePair("nullable", new BooleanLiteralExpr(columnSpec.getNullable())));
             }
-            if (StringUtils.isNotBlank(sizeSpec.getMin())) {
-                nodeList.add(new MemberValuePair("min", new IntegerLiteralExpr(sizeSpec.getMin())));
+            if (Objects.nonNull(columnSpec.getUpdatable())) {
+                nodeList.add(new MemberValuePair("updatable", new BooleanLiteralExpr(columnSpec.getUpdatable())));
             }
-            return new NormalAnnotationExpr(new Name(SIZE), nodeList);
+            if (StringUtils.isNotBlank(columnSpec.getLength())) {
+                nodeList.add(new MemberValuePair("length", new IntegerLiteralExpr(columnSpec.getLength())));
+            }
+            if (StringUtils.isNotBlank(columnSpec.getPrecision())) {
+                nodeList.add(new MemberValuePair("precision", new IntegerLiteralExpr(columnSpec.getPrecision())));
+            }
+            if (StringUtils.isNotBlank(columnSpec.getScale())) {
+                nodeList.add(new MemberValuePair("scale", new IntegerLiteralExpr(columnSpec.getScale())));
+            }
+            return new NormalAnnotationExpr(new Name(COLUMN), nodeList);
         }
     },
-    pattern("@Pattern注解") {
+    defaultValue("@DefaultValue注解") {
+        @Override
+        public AnnotationExpr createAnnotation(Object value) {
+            return new SingleMemberAnnotationExpr(new Name(DEFAULT_VALUE), new StringLiteralExpr(String.valueOf(value)));
+        }
+
+    },
+    columnType("@ColumnType注解") {
+        @Override
+        public AnnotationExpr createAnnotation(Object value) {
+            RdbColumnInfo.ColumnTypeSpec columnTypeSpec = FastBeanCopier.copy(value, new RdbColumnInfo.ColumnTypeSpec());
+            NodeList<MemberValuePair> nodeList = new NodeList<>();
+
+            nodeList.add(new MemberValuePair("jdbcType",
+                                             new FieldAccessExpr(new NameExpr("JDBCType"),
+                                                                 columnTypeSpec
+                                                                         .getJdbcType()
+                                                                         .getName())));
+            nodeList.add(new MemberValuePair("javaType", new ClassExpr(new TypeParameter(columnTypeSpec.getJavaType()))));
+            return new NormalAnnotationExpr(new Name(COLUMN_TYPE), nodeList);
+        }
+    },
+    table("@Table注解") {
+        @Override
+        public AnnotationExpr createAnnotation(Object value) {
+            return new SingleMemberAnnotationExpr(new Name(TABLE), new StringLiteralExpr(String.valueOf(value)));
+        }
+    },
+    enableEntityEvent("@EnableEntityEvent注解") {
+        @Override
+        public AnnotationExpr createAnnotation(Object value) {
+            return new MarkerAnnotationExpr(new Name(ENABLE_ENTITY_EVENT));
+        }
+    },
+    schema("@Schema注解") {
         @Override
         public AnnotationExpr createAnnotation(Object value) {
             NodeList<MemberValuePair> nodeList = new NodeList<>();
-            nodeList.add(new MemberValuePair("regexp", new StringLiteralExpr(String.valueOf(value))));
-            return new NormalAnnotationExpr(new Name(PATTERN), nodeList);
-        }
-    },
-    max("@Max注解") {
-        @Override
-        public AnnotationExpr createAnnotation(Object value) {
-            return new SingleMemberAnnotationExpr(new Name(MAX), new LongLiteralExpr(String.valueOf(value)));
-        }
-    },
-    min("@Min注解") {
-        @Override
-        public AnnotationExpr createAnnotation(Object value) {
-            return new SingleMemberAnnotationExpr(new Name(MIN), new LongLiteralExpr(String.valueOf(value)));
-        }
-    },
-
-    getter("@Getter注解") {
-        @Override
-        public AnnotationExpr createAnnotation(Object value) {
-            return new MarkerAnnotationExpr(new Name(GETTER));
-        }
-    },
-
-    setter("@Setter注解") {
-        @Override
-        public AnnotationExpr createAnnotation(Object value) {
-            return new MarkerAnnotationExpr(new Name(SETTER));
-        }
-    },
-    notnull("@NotNull注解") {
-        @Override
-        public AnnotationExpr createAnnotation(Object value) {
-            return new MarkerAnnotationExpr(new Name(NOT_NULL));
+            nodeList.add(new MemberValuePair("description", new StringLiteralExpr(String.valueOf(value))));
+            return new NormalAnnotationExpr(new Name(SCHEMA), nodeList);
         }
     };
 
