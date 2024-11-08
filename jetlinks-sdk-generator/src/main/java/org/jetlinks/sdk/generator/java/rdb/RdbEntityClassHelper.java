@@ -1,20 +1,19 @@
 package org.jetlinks.sdk.generator.java.rdb;
 
 import lombok.Getter;
-import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.sdk.generator.java.EntityClassHelper;
 import org.jetlinks.sdk.generator.java.constant.ClassOrInterfaceConstant;
 import org.jetlinks.sdk.generator.java.constant.ImportConstant;
-import org.jetlinks.sdk.generator.java.info.ColumnInfo;
 import org.jetlinks.sdk.generator.java.info.EntityInfo;
 import org.jetlinks.sdk.generator.java.info.RdbEntityInfo;
 import org.jetlinks.sdk.generator.java.info.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
-import org.jetlinks.sdk.generator.java.info.base.FieldInfo;
 import org.jetlinks.sdk.generator.java.info.base.SuperClassOrInterfaceInfo;
 import org.jetlinks.sdk.generator.java.utils.CommonOperationUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Getter
 public class RdbEntityClassHelper implements EntityClassHelper {
@@ -24,22 +23,6 @@ public class RdbEntityClassHelper implements EntityClassHelper {
     @Override
     public RdbEntityClassHelper initClass(EntityInfo entityInfo) {
         this.classInfo = createEntityClassInfo(entityInfo);
-        return this;
-    }
-
-    @Override
-    public EntityClassHelper addColumn(ColumnInfo info) {
-        List<AnnotationInfo> annotationInfos = new ArrayList<>();
-        FieldInfo fieldInfo = FieldInfo.of(info);
-        classInfo.getFields().add(fieldInfo);
-        Map<String, Object> columnMap = FastBeanCopier.copy(info, new HashMap<>());
-        for (String key : columnMap.keySet()) {
-            AnnotationInfo annotationInfo = CommonOperationUtils.createAnnotationInfo(key, columnMap.get(key));
-            if (Objects.nonNull(annotationInfo)) {
-                annotationInfos.add(annotationInfo);
-            }
-        }
-        fieldInfo.setAnnotations(annotationInfos);
         return this;
     }
 

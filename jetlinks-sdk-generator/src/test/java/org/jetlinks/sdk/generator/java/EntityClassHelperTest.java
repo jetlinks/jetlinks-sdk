@@ -1,26 +1,15 @@
 package org.jetlinks.sdk.generator.java;
 
-import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.type.TypeParameter;
-import org.jetlinks.sdk.generator.java.info.ColumnInfo;
-import org.jetlinks.sdk.generator.java.info.EntityInfo;
-import org.jetlinks.sdk.generator.java.info.RdbColumnInfo;
-import org.jetlinks.sdk.generator.java.info.RdbEntityInfo;
-import org.jetlinks.sdk.generator.java.info.base.AnnotationInfo;
-import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
-import org.jetlinks.sdk.generator.java.info.base.FieldInfo;
+import com.alibaba.fastjson.JSON;
+import org.jetlinks.sdk.generator.java.info.*;
 import org.jetlinks.sdk.generator.java.info.base.PackageInfo;
 import org.jetlinks.sdk.generator.java.rdb.RdbEntityClassHelper;
-import org.jetlinks.sdk.generator.java.rdb.RdbEntityJavaGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.sql.JDBCType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EntityClassHelperTest {
 
@@ -102,47 +91,10 @@ public class EntityClassHelperTest {
         columnInfos.forEach(helper::addColumn);
         PackageInfo entityPackage = new PackageInfo(entityInfo.getClassPackage(),
                                                     Collections.singletonList(helper.getEntityClassInfo()));
-        for (ClassInfo aClass : entityPackage.getClasses()) {
-            RdbEntityJavaGenerator javaGenerator = RdbEntityJavaGenerator.create(entityPackage.getName(), aClass.getName());
-            aClass
-                    .getInterfaces()
-                    .forEach(item -> javaGenerator
-                            .implement(item.getName())
-                            .addImport(item.getPackagePath()));
-            aClass
-                    .getAnnotations()
-                    .forEach(item -> javaGenerator
-                            .addClassAnnotation(item.getAnnotationExpr())
-                            .addImport(item.getPackagePath()));
-            
 
-            Type[] genericsArray = aClass
-                    .getSuperClass()
-                    .getGenerics()
-                    .stream()
-                    .map(TypeParameter::new)
-                    .toArray(Type[]::new);
+        PackageJavaGenerator javaGenerator = new DefaultPackageJavaGenerator();
+        List<GenerateResult> generate = javaGenerator.generate(entityPackage);
+        System.out.println("generate：" + JSON.toJSONString(generate));
 
-            javaGenerator.extendsClass(aClass.getSuperClass()
-                                             .getName(),
-                                       genericsArray)
-                         .addImport(aClass.getSuperClass()
-                                          .getPackagePath());
-            for (FieldInfo field : aClass.getFields()) {
-
-                List<AnnotationExpr> annotations = field
-                        .getAnnotations()
-                        .stream()
-                        .peek(annotationInfo -> javaGenerator.addImport(annotationInfo.getPackagePath()))
-                        .map(AnnotationInfo::getAnnotationExpr)
-                        .collect(Collectors.toList());
-                javaGenerator.addFieldWithAnnotation(field.getTypeClass(),
-                                                     field.getId(),
-                                                     annotations,
-                                                     field.getModifiers().toArray(new Modifier.Keyword[0]));
-            }
-            String generate = javaGenerator.generate();
-            System.out.println(generate);
-        }
     }
 }

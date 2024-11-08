@@ -8,23 +8,21 @@ import org.springframework.core.ResolvableType;
 
 import java.util.function.Consumer;
 
-class DefaultJavaGenerator implements JavaGenerator {
+public class DefaultJavaGenerator implements JavaGenerator {
 
-    final CompilationUnit cu;
+    protected final CompilationUnit cu;
 
-    final ClassOrInterfaceDeclaration clazz;
+    protected final ClassOrInterfaceDeclaration clazz;
 
-    final String classPackage;
-    final String classSimpleName;
+    protected final String classSimpleName;
 
-    DefaultJavaGenerator(String className) {
+    public DefaultJavaGenerator(String className) {
         cu = new CompilationUnit();
         if (className.contains(".")) {
             int lastIndex = className.lastIndexOf(".");
-            cu.setPackageDeclaration(classPackage = className.substring(0, lastIndex));
+            cu.setPackageDeclaration(className.substring(0, lastIndex));
             className = classSimpleName = className.substring(lastIndex + 1);
         } else {
-            classPackage = "";
             classSimpleName = className;
         }
         clazz = cu.addClass(className);
