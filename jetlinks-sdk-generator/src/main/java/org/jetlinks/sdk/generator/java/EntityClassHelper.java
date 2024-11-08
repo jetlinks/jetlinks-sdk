@@ -1,6 +1,6 @@
 package org.jetlinks.sdk.generator.java;
 
-import org.jetlinks.sdk.generator.java.info.BaseColumnInfo;
+import org.jetlinks.sdk.generator.java.info.ColumnInfo;
 import org.jetlinks.sdk.generator.java.info.EntityInfo;
 import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
 
@@ -12,7 +12,7 @@ public interface EntityClassHelper {
      * @param info 列信息
      * @return EntityClassHelper
      */
-    EntityClassHelper addColumn(BaseColumnInfo info);
+    EntityClassHelper addColumn(ColumnInfo info);
 
     /**
      * 初始化实体类信息

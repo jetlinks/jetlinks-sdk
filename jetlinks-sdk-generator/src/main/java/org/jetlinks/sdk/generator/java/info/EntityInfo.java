@@ -9,13 +9,13 @@ import lombok.Setter;
 public class EntityInfo {
 
     @Schema(description = "名称")
-    String name;
+    private String name;
 
     @Schema(description = "实体类名")
-    String classSimpleName;
+    private String classSimpleName;
 
     @Schema(description = "包名")
-    String classPackage;
+    private String classPackage;
 
-
+    //todo 描述实体类关联关系
 }

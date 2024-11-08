@@ -4,7 +4,7 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
-import org.jetlinks.sdk.generator.java.info.BaseColumnInfo;
+import org.jetlinks.sdk.generator.java.info.ColumnInfo;
 import org.jetlinks.sdk.generator.java.info.EntityInfo;
 import org.jetlinks.sdk.generator.java.info.RdbColumnInfo;
 import org.jetlinks.sdk.generator.java.info.RdbEntityInfo;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 
 public class EntityClassHelperTest {
 
-    private List<BaseColumnInfo> createColumnInfos() {
-        List<BaseColumnInfo> columnInfos = new ArrayList<>();
+    private List<ColumnInfo> createColumnInfos() {
+        List<ColumnInfo> columnInfos = new ArrayList<>();
 
         {
             RdbColumnInfo columnInfo = new RdbColumnInfo();
@@ -39,12 +39,17 @@ public class EntityClassHelperTest {
             columnTypeSpec.setJavaType("String");
             columnTypeSpec.setJdbcType(JDBCType.LONGNVARCHAR);
 
+            ColumnInfo.SizeSpec sizeSpec = new ColumnInfo.SizeSpec();
+            sizeSpec.setMax("20");
+            sizeSpec.setMin("5");
 
+            columnInfo.setSizeSpec(sizeSpec);
             columnInfo.setColumnSpec(columnSpec);
             columnInfo.setColumnTypeSpec(columnTypeSpec);
             columnInfo.setDefaultValue("enabled");
             columnInfo.setId("test");
             columnInfo.setName("测试");
+            columnInfo.setNotnull(true);
 
             columnInfos.add(columnInfo);
         }
@@ -67,6 +72,8 @@ public class EntityClassHelperTest {
             columnInfo.setDefaultValue("enabled");
             columnInfo.setId("testColumn");
             columnInfo.setName("测试第二个字段");
+            columnInfo.setMax("10");
+            columnInfo.setMin("1");
 
             columnInfos.add(columnInfo);
         }
@@ -89,7 +96,7 @@ public class EntityClassHelperTest {
     @Test
     void testGenerate() {
         EntityClassHelper helper = new RdbEntityClassHelper();
-        List<BaseColumnInfo> columnInfos = createColumnInfos();
+        List<ColumnInfo> columnInfos = createColumnInfos();
         EntityInfo entityInfo = createEntityInfo();
         helper.initClass(entityInfo);
         columnInfos.forEach(helper::addColumn);

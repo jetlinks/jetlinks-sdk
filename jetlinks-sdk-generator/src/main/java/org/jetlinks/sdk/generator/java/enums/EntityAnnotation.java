@@ -49,7 +49,7 @@ public enum EntityAnnotation implements EnumDict<String> {
         }
     },
 
-    getter("@Setter注解") {
+    getter("@Getter注解") {
         @Override
         public AnnotationExpr createAnnotation(Object value) {
             return new MarkerAnnotationExpr(new Name(GETTER));
@@ -60,6 +60,12 @@ public enum EntityAnnotation implements EnumDict<String> {
         @Override
         public AnnotationExpr createAnnotation(Object value) {
             return new MarkerAnnotationExpr(new Name(SETTER));
+        }
+    },
+    notnull("@NotNull注解") {
+        @Override
+        public AnnotationExpr createAnnotation(Object value) {
+            return new MarkerAnnotationExpr(new Name(NOT_NULL));
         }
     };
 

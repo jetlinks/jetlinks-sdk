@@ -8,7 +8,7 @@ import java.sql.JDBCType;
 
 @Setter
 @Getter
-public class RdbColumnInfo extends BaseColumnInfo {
+public class RdbColumnInfo extends ColumnInfo {
     @Schema(description = "实体类列描述信息")
     private ColumnSpec columnSpec;
 

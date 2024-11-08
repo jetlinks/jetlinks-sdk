@@ -77,4 +77,9 @@ public interface ClassOrInterfaceConstant {
      */
     String SCHEMA = "Schema";
 
+    /**
+     * NotNull注解
+     */
+    String NOT_NULL = "NotNull";
+
 }

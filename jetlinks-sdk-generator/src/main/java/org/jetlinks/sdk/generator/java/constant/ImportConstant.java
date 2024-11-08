@@ -73,8 +73,15 @@ public interface ImportConstant {
     String GENERIC_ENTITY = "org.hswebframework.web.api.crud.entity.GenericEntity";
 
     /**
-     * Schema导入路径
+     * Schema注解导入路径
      */
     String SCHEMA = "io.swagger.v3.oas.annotations.media.Schema";
+
+
+    /**
+     * NotNull注解导入路径
+     */
+    String NOT_NULL = "javax.validation.constraints.NotNull";
+
 
 }

@@ -6,7 +6,16 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ColumnInfo extends BaseColumnInfo {
+public class ColumnInfo {
+
+    @Schema(description = "字段")
+    private String id;
+
+    @Schema(description = "名称")
+    private String name;
+
+    @Schema(description = "类型")
+    private String typeClass;
 
     @Schema(description = "正则")
     private String pattern;
