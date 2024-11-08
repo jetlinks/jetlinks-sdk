@@ -9,6 +9,7 @@ import org.jetlinks.sdk.generator.java.constant.ImportConstant;
 import org.jetlinks.sdk.generator.java.enums.RdbEntityAnnotation;
 import org.jetlinks.sdk.generator.java.info.BaseColumnInfo;
 import org.jetlinks.sdk.generator.java.info.EntityInfo;
+import org.jetlinks.sdk.generator.java.info.RdbEntityInfo;
 import org.jetlinks.sdk.generator.java.info.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.info.base.FieldInfo;
@@ -80,27 +81,28 @@ public class RdbEntityClassHelper implements EntityClassHelper {
     }
 
     public ClassInfo createEntityClassInfo(EntityInfo entityInfo) {
+        RdbEntityInfo rdbEntityInfo = (RdbEntityInfo) entityInfo;
         ClassInfo classInfo = new ClassInfo();
         //添加实体类父类信息
         classInfo.setSuperClass(new SuperClassOrInterfaceInfo(ImportConstant.GENERIC_ENTITY,
-                                                              Collections.singletonList(entityInfo.getPkClass()),
+                                                              Collections.singletonList(rdbEntityInfo.getPkClass()),
                                                               ClassOrInterfaceConstant.GENERIC_ENTITY));
-        classInfo.setName(entityInfo.getClassSimpleName());
+        classInfo.setName(rdbEntityInfo.getClassSimpleName());
         //添加数据库实体类默认注解
         List<AnnotationInfo> defaultAnnotation = DefaultValueUtils
-                .getDefaultAnnotation(entityInfo.getTableName(),
-                                      entityInfo.getName(),
-                                      entityInfo.isEnabledEntityEvent());
+                .getDefaultAnnotation(rdbEntityInfo.getTableName(),
+                                      rdbEntityInfo.getName(),
+                                      rdbEntityInfo.isEnabledEntityEvent());
         classInfo.getAnnotations().addAll(defaultAnnotation);
 
         // 添加实体类实现的接口
         List<SuperClassOrInterfaceInfo> interfaces = classInfo.getInterfaces();
-        if (entityInfo.isRecordCreation()) {
+        if (rdbEntityInfo.isRecordCreation()) {
             interfaces.add(new SuperClassOrInterfaceInfo(ImportConstant.RECORD_CREATION_ENTITY,
                                                          new ArrayList<>(),
                                                          ClassOrInterfaceConstant.RECORD_CREATION_ENTITY));
         }
-        if (entityInfo.isRecordModifier()) {
+        if (rdbEntityInfo.isRecordModifier()) {
             interfaces.add(new SuperClassOrInterfaceInfo(ImportConstant.RECORD_MODIFIER_ENTITY,
                                                          new ArrayList<>(),
                                                          ClassOrInterfaceConstant.RECORD_MODIFIER_ENTITY));

@@ -7,6 +7,7 @@ import com.github.javaparser.ast.type.TypeParameter;
 import org.jetlinks.sdk.generator.java.info.BaseColumnInfo;
 import org.jetlinks.sdk.generator.java.info.EntityInfo;
 import org.jetlinks.sdk.generator.java.info.RdbColumnInfo;
+import org.jetlinks.sdk.generator.java.info.RdbEntityInfo;
 import org.jetlinks.sdk.generator.java.info.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.info.base.FieldInfo;
@@ -74,7 +75,7 @@ public class EntityClassHelperTest {
     }
 
     private EntityInfo createEntityInfo() {
-        EntityInfo entityInfo = new EntityInfo();
+        RdbEntityInfo entityInfo = new RdbEntityInfo();
         entityInfo.setClassPackage("org.jetlinks.test");
         entityInfo.setClassSimpleName("Test");
         entityInfo.setTableName("s_student");
