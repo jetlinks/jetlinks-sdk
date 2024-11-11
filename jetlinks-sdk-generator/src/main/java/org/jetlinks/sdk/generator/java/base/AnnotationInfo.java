@@ -1,4 +1,4 @@
-package org.jetlinks.sdk.generator.java.info.base;
+package org.jetlinks.sdk.generator.java.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -12,11 +12,15 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PackageInfo {
+public class AnnotationInfo {
 
-    @Schema(description = "包路径")
+    @Schema(description = "名称")
     private String name;
 
-    @Schema(description = "类信息")
-    private List<ClassInfo> classes;
+    @Schema(description = "类型")
+    private ClassInfo type;
+
+    @Schema(description = "属性信息")
+    private List<AnnotationProperty> properties;
+
 }

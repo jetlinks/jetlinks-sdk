@@ -5,12 +5,13 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import org.jetlinks.sdk.generator.java.base.ClassInfo;
+import org.jetlinks.sdk.generator.java.base.FieldInfo;
+import org.jetlinks.sdk.generator.java.utils.AnnotationUtils;
 import org.springframework.core.ResolvableType;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 class DefaultJavaGenerator implements JavaGenerator {
@@ -90,15 +91,21 @@ class DefaultJavaGenerator implements JavaGenerator {
     }
 
     @Override
-    public JavaGenerator addFieldWithAnnotation(String type, String name, List<AnnotationExpr> annotations, Modifier.Keyword... modifiers) {
-        FieldDeclaration fieldDeclaration = clazz.addField(type, name, modifiers);
-        annotations.forEach(fieldDeclaration::addAnnotation);
+    public JavaGenerator addFieldWithAnnotation(FieldInfo fieldInfo) {
+        FieldDeclaration fieldDeclaration = clazz.addField(fieldInfo.getTypeClass(),
+                                                           fieldInfo.getName(),
+                                                           fieldInfo.getModifiers().toArray(new Modifier.Keyword[0]));
+        AnnotationUtils
+                .createAnnotation(fieldInfo.getAnnotations())
+                .forEach(fieldDeclaration::addAnnotation);
         return this;
     }
 
     @Override
-    public JavaGenerator addClassAnnotation(AnnotationExpr annotation) {
-        clazz.addAnnotation(annotation);
+    public JavaGenerator addClassAnnotation(ClassInfo classInfo) {
+        AnnotationUtils
+                .createAnnotation(classInfo.getAnnotations())
+                .forEach(clazz::addAnnotation);
         return this;
     }
 

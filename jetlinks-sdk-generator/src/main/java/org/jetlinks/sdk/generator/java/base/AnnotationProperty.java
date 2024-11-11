@@ -1,9 +1,8 @@
-package org.jetlinks.sdk.generator.java.info;
+package org.jetlinks.sdk.generator.java.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.sdk.generator.java.info.base.ClassInfo;
 
 @Setter
 @Getter

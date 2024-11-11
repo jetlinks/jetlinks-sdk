@@ -2,11 +2,11 @@ package org.jetlinks.sdk.generator.java;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.type.Type;
+import org.jetlinks.sdk.generator.java.base.ClassInfo;
+import org.jetlinks.sdk.generator.java.base.FieldInfo;
 import org.springframework.core.ResolvableType;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -55,22 +55,18 @@ public interface JavaGenerator {
 
     /**
      * 添加字段并同时添加字段注解信息
-     *
-     * @param type        字段类型
-     * @param name        字段名称
-     * @param annotations 注解信息
-     * @param modifiers   字段修饰符
+     * @param fieldInfo 字段信息
      * @return RdbEntityJavaGenerator
      */
-    JavaGenerator addFieldWithAnnotation(String type, String name, List<AnnotationExpr> annotations, Modifier.Keyword... modifiers);
+    JavaGenerator addFieldWithAnnotation(FieldInfo fieldInfo);
 
     /**
      * 添加类注解
      *
-     * @param annotation 注解表达式
+     * @param classInfo 类信息
      * @return RdbEntityJavaGenerator
      */
-    JavaGenerator addClassAnnotation(AnnotationExpr annotation);
+    JavaGenerator addClassAnnotation(ClassInfo classInfo);
 
 
     String generate();
