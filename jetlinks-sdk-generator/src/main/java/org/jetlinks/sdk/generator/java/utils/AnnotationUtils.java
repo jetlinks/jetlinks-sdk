@@ -6,6 +6,7 @@ import com.github.javaparser.ast.type.TypeParameter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.sdk.generator.java.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.base.AnnotationProperty;
+import org.jetlinks.sdk.generator.java.base.ClassInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,9 @@ public class AnnotationUtils {
      * @return List<AnnotationExpr>
      */
     public static List<AnnotationExpr> createAnnotation(List<AnnotationInfo> annotationInfos) {
+        if (CollectionUtils.isEmpty(annotationInfos)) {
+            return new ArrayList<>();
+        }
         List<AnnotationExpr> annotations = new ArrayList<>();
         for (AnnotationInfo annotationInfo : annotationInfos) {
             String name = annotationInfo.getName();
@@ -45,7 +49,7 @@ public class AnnotationUtils {
     public static AnnotationExpr createNormalAnnotation(String name, List<AnnotationProperty> properties) {
         NodeList<MemberValuePair> nodeList = new NodeList<>();
         for (AnnotationProperty property : properties) {
-            Expression expression = getExpression(property.getType().getName(),
+            Expression expression = getExpression(property.getType(),
                                                   property.getDefaultValue());
             MemberValuePair memberValuePair = new MemberValuePair(property.getName(), expression);
             nodeList.add(memberValuePair);
@@ -61,7 +65,7 @@ public class AnnotationUtils {
      * @return AnnotationExpr
      */
     public static AnnotationExpr createSingleAnnotation(String name, AnnotationProperty property) {
-        Expression expression = getExpression(property.getType().getName(),
+        Expression expression = getExpression(property.getType(),
                                               property.getDefaultValue());
         return new SingleMemberAnnotationExpr(new Name(name), expression);
     }
@@ -75,7 +79,8 @@ public class AnnotationUtils {
         return new MarkerAnnotationExpr(new Name(annotationName));
     }
 
-    private static Expression getExpression(String type, Object value) {
+    private static Expression getExpression(ClassInfo classInfo, Object value) {
+        String type = classInfo.getName();
         String valueStr = String.valueOf(value);
         switch (type) {
             case "String":
@@ -86,13 +91,15 @@ public class AnnotationUtils {
                 return new BooleanLiteralExpr(Boolean.parseBoolean(valueStr));
             case "Class":
                 return new ClassExpr(new TypeParameter(valueStr));
-            case "Enum":
+            default:
+                String intactClassName = ClassInfo.getIntactClassName(classInfo);
                 if (valueStr.contains(".")) {
                     String[] split = valueStr.split("\\.");
-                    return new FieldAccessExpr(new NameExpr(split[0]), split[1]);
+                    return new FieldAccessExpr(new NameExpr(intactClassName), split[split.length - 1]);
+                } else {
+                    return new FieldAccessExpr(new NameExpr(intactClassName), valueStr);
                 }
-            default:
-                return null;
+
         }
 
     }
