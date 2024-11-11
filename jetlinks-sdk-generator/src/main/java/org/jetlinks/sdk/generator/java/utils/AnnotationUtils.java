@@ -87,7 +87,10 @@ public class AnnotationUtils {
             case "Class":
                 return new ClassExpr(new TypeParameter(valueStr));
             case "Enum":
-                return new FieldAccessExpr(new NameExpr("JDBCType"), valueStr);
+                if (valueStr.contains(".")) {
+                    String[] split = valueStr.split("\\.");
+                    return new FieldAccessExpr(new NameExpr(split[0]), split[1]);
+                }
             default:
                 return null;
         }
