@@ -5,8 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.jetlinks.sdk.generator.java.info.AnnotationProperty;
 
-import java.util.Map;
+import java.util.List;
 
 @Setter
 @Getter
@@ -21,6 +22,6 @@ public class AnnotationInfo {
     private ClassInfo type;
 
     @Schema(description = "属性信息")
-    private Map<String, Object> properties;
+    private List<AnnotationProperty> properties;
 
 }
