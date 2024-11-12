@@ -1,6 +1,6 @@
 package org.jetlinks.sdk.server.device.cmd;
 
-import org.jetlinks.core.command.AbstractCommand;
+import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import java.util.List;
 import java.util.function.Function;
 
-public class BatchUnbindDeviceCommand<T> extends AbstractCommand<Flux<T>, BatchUnbindDeviceCommand<T>> {
+public class BatchUnbindDeviceCommand<T> extends AbstractConvertCommand<Flux<T>, BatchUnbindDeviceCommand<T>> {
 
     public static final String TYPE = "type";
 
@@ -46,7 +46,8 @@ public class BatchUnbindDeviceCommand<T> extends AbstractCommand<Flux<T>, BatchU
         return with(KEY, key);
     }
 
-    public static <T> CommandHandler<BatchUnbindDeviceCommand<T>, Flux<T>> createHandler(Function<BatchUnbindDeviceCommand<T>, Flux<T>> handler) {
+    public static <T> CommandHandler<BatchUnbindDeviceCommand<T>, Flux<T>> createHandler(Function<BatchUnbindDeviceCommand<T>, Flux<T>> handler,
+                                                                                         Function<Object, T> resultConverter) {
         return CommandHandler.of(
             () -> {
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
@@ -56,7 +57,7 @@ public class BatchUnbindDeviceCommand<T> extends AbstractCommand<Flux<T>, BatchU
                 return metadata;
             },
             (cmd, ignore) -> handler.apply(cmd),
-            BatchUnbindDeviceCommand::new
+            () -> new BatchUnbindDeviceCommand<T>().withConverter(resultConverter)
         );
     }
 }
