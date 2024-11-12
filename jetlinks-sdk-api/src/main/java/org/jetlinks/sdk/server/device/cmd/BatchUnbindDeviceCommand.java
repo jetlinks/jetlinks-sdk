@@ -7,14 +7,16 @@ import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import org.springframework.core.ResolvableType;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class BatchUnbindDeviceCommand extends AbstractCommand<Mono<Void>, BatchUnbindDeviceCommand> {
+public class BatchUnbindDeviceCommand<T> extends AbstractCommand<Flux<T>, BatchUnbindDeviceCommand<T>> {
 
     public static final String TYPE = "type";
+
+    public static final String KEY = "key";
 
     public static final String DEVICE_ID = "deviceId";
 
@@ -22,7 +24,7 @@ public class BatchUnbindDeviceCommand extends AbstractCommand<Mono<Void>, BatchU
         return getOrNull(TYPE, String.class);
     }
 
-    public BatchUnbindDeviceCommand setType(String type) {
+    public BatchUnbindDeviceCommand<T> setType(String type) {
         return with(TYPE, type);
     }
 
@@ -31,11 +33,20 @@ public class BatchUnbindDeviceCommand extends AbstractCommand<Mono<Void>, BatchU
             .convertToList(readable().get(DEVICE_ID), String::valueOf);
     }
 
-    public BatchUnbindDeviceCommand setDeviceId(List<String> deviceId) {
+    public BatchUnbindDeviceCommand<T> setDeviceId(List<String> deviceId) {
         return with(DEVICE_ID, deviceId);
     }
 
-    public static CommandHandler<BatchUnbindDeviceCommand, Mono<Void>> createHandler(Function<BatchUnbindDeviceCommand, Mono<Void>> handler) {
+    public List<String> getKey() {
+        return ConverterUtils
+            .convertToList(readable().get(KEY), String::valueOf);
+    }
+
+    public BatchUnbindDeviceCommand<T> setKey(List<String> key) {
+        return with(KEY, key);
+    }
+
+    public static <T> CommandHandler<BatchUnbindDeviceCommand<T>, Flux<T>> createHandler(Function<BatchUnbindDeviceCommand<T>, Flux<T>> handler) {
         return CommandHandler.of(
             () -> {
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
