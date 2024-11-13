@@ -2,12 +2,14 @@ package org.jetlinks.sdk.server.device.cmd;
 
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -47,9 +49,7 @@ public class UnbindChildDeviceCommand extends AbstractCommand<Mono<Void>, Unbind
                 metadata.setId(CommandUtils.getCommandIdByType(UnbindChildDeviceCommand.class));
                 metadata.setName("解绑子设备");
                 metadata.setDescription("解绑子设备");
-                metadata.setInputs(Collections.singletonList(SimplePropertyMetadata
-                                                                 .of("idList", "id数组",
-                                                                     new ArrayType().elementType(StringType.GLOBAL))));
+                metadata.setInputs(CommandMetadataResolver.resolveInputs(ResolvableType.forType(UnbindChildDeviceCommand.class)));
                 return metadata;
             },
             (cmd, ignore) -> handler.apply(cmd),
