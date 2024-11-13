@@ -1,6 +1,7 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 
@@ -23,6 +24,7 @@ public abstract class OperationByIdCommand<T, Self extends OperationByIdCommand<
      *
      * @return List
      */
+    @Schema(description = "ID集合")
     public List<Object> getIdList() {
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY_ID));
     }
@@ -64,6 +66,7 @@ public abstract class OperationByIdCommand<T, Self extends OperationByIdCommand<
      *
      * @return ID
      */
+    @Schema(description = "ID")
     public String getId() {
         List<Object> list = getIdList();
         if (!list.isEmpty()) {
