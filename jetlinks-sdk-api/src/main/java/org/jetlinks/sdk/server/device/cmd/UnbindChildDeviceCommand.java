@@ -51,6 +51,6 @@ public class UnbindChildDeviceCommand extends AbstractCommand<Mono<Void>, Unbind
     }
 
     public static FunctionMetadata metadata() {
-        return CommandMetadataResolver.resolve(PrepareUploadCommand.class);
+        return CommandMetadataResolver.resolve(UnbindChildDeviceCommand.class);
     }
 }
