@@ -66,7 +66,6 @@ public abstract class OperationByIdCommand<T, Self extends OperationByIdCommand<
      *
      * @return ID
      */
-    @Schema(description = "ID")
     public String getId() {
         List<Object> list = getIdList();
         if (!list.isEmpty()) {
