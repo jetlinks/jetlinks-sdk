@@ -24,7 +24,7 @@ public abstract class OperationByIdCommand<T, Self extends OperationByIdCommand<
      *
      * @return List
      */
-    @Schema(description = "ID集合")
+    @Schema(name = PARAMETER_KEY_ID, title = "ID")
     public List<Object> getIdList() {
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY_ID));
     }
