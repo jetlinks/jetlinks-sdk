@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
  * @since 1.0.1
  */
 @Schema(title = "获取设备拉流地址信息")
-public class GetPullStreamCommand extends AbstractCommand<Mono<MediaStreamPushInfo>, GetPullStreamCommand> {
+public class GetPullStreamCommand extends AbstractCommand<Mono<MediaInfo>, GetPullStreamCommand> {
 
     @Schema(title = "设备ID")
     public String getDeviceId() {
