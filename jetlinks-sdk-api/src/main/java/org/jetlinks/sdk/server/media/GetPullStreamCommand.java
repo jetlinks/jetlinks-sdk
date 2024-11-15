@@ -28,14 +28,14 @@ public class GetPullStreamCommand extends AbstractCommand<Mono<MediaInfo>, GetPu
 
     @Schema(title = "播放有效期")
     public Integer getExpireSeconds () {
-        return getOrNull("expirationSeconds",Integer.class);
+        return getOrNull("expireSeconds",Integer.class);
     }
 
     public GetPullStreamCommand setDeviceId(String deviceId) {
         return with("deviceId", deviceId);
     }
-    public GetPullStreamCommand setExpireSeconds(Integer expirationSeconds) {
-        return with("expirationSeconds", expirationSeconds);
+    public GetPullStreamCommand setExpireSeconds(Integer expireSeconds) {
+        return with("expireSeconds", expireSeconds);
     }
 
     @Schema(title = "通道ID")
