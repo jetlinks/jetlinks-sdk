@@ -181,7 +181,8 @@ public class ConverterUtils {
         return factory.wrap(convertNettyBuffer(obj));
     }
 
-    public static ByteBuf convertNettyBuffer(Object obj) {
+    public static <T> ByteBuf convertNettyBuffer(T obj,
+                                                 Function<T, ByteBuf> fallback) {
         if (obj == null) {
             return null;
         }
@@ -232,7 +233,11 @@ public class ConverterUtils {
             return Unpooled.wrappedBuffer(strBytes);
         }
 
-        return Unpooled.wrappedBuffer(String.valueOf(obj).getBytes());
+        return fallback.apply(obj);
+    }
+
+    public static ByteBuf convertNettyBuffer(Object obj) {
+        return convertNettyBuffer(obj, val -> Unpooled.wrappedBuffer(String.valueOf(val).getBytes()));
     }
 
 
