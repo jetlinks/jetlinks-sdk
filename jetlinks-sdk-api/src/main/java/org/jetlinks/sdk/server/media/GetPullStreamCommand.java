@@ -8,7 +8,6 @@ import org.jetlinks.sdk.server.utils.CastUtils;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 
 /**
  * 获取设备推流地址,获取设备推流地址,可以用于推流到流媒体服务器.
@@ -28,15 +27,15 @@ public class GetPullStreamCommand extends AbstractCommand<Mono<MediaInfo>, GetPu
     }
 
     @Schema(title = "播放有效期")
-    public Duration getExpirationDate () {
-        return getOrNull("expirationDate",Duration.class);
+    public Integer getExpireSeconds () {
+        return getOrNull("expirationSeconds",Integer.class);
     }
 
     public GetPullStreamCommand setDeviceId(String deviceId) {
         return with("deviceId", deviceId);
     }
-    public GetPullStreamCommand setExpirationDate(Duration expirationDate) {
-        return with("expirationDate", expirationDate);
+    public GetPullStreamCommand setExpireSeconds(Integer expirationSeconds) {
+        return with("expirationSeconds", expirationSeconds);
     }
 
     @Schema(title = "通道ID")
