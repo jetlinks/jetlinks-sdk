@@ -1,5 +1,7 @@
 package org.jetlinks.sdk.generator.pom;
 
+import org.springframework.core.io.buffer.DataBuffer;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.OutputStream;
@@ -19,5 +21,7 @@ public interface PomParser {
     MavenModel parse();
 
     Mono<Void> write(OutputStream stream);
+
+    Mono<Void> write(Flux<DataBuffer> buffers);
 
 }
