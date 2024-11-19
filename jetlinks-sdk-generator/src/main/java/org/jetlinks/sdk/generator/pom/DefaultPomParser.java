@@ -50,40 +50,17 @@ public class DefaultPomParser implements PomParser {
     @Override
     public Mono<Void> write(OutputStream stream) {
         return Mono.fromCallable(() -> {
-            try {
-                new MavenXpp3Writer().write(stream, model);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to write POM", e);
-            }
-            return Mono.empty();
-        }).subscribeOn(Schedulers.boundedElastic()).then();
+                    new MavenXpp3Writer().write(stream, model);
+                    return null;
+                })
+                .onErrorResume(err -> Mono.error(new RuntimeException("Failed to write POM", err)))
+                .subscribeOn(Schedulers.boundedElastic()).then();
     }
 
     @Override
     public Mono<Void> write(Flux<DataBuffer> buffers) {
-        return Mono.using(
-                () -> Files.newOutputStream(pomPath),
-                outputStream -> buffers
-                        .map(dataBuffer -> {
-                            byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                            dataBuffer.read(bytes);
-                            DataBufferUtils.release(dataBuffer);
-                            return bytes;
-                        })
-                        .doOnNext(bytes -> {
-                            try {
-                                outputStream.write(bytes);
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .then(),
-                outputStream -> {
-                    try {
-                        outputStream.close();
-                    } catch (Exception ignored) {
-                    }
-                }
-        ).subscribeOn(Schedulers.boundedElastic());
+        return DataBufferUtils.write(buffers, pomPath)
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 }
