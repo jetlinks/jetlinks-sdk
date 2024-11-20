@@ -35,6 +35,8 @@ public class DeviceInfo implements Externalizable, Jsonable {
 
     private String parentId;
 
+    private String describe;
+
     @Override
     public JSONObject toJson() {
         JSONObject jsonObject = Jsonable.super.toJson();
