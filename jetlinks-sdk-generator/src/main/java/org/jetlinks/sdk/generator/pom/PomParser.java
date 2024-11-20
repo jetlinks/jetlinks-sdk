@@ -20,6 +20,8 @@ public interface PomParser {
 
     MavenModel parse();
 
+    Flux<DataBuffer> toFileStream(MavenModel model);
+
     Mono<Void> write(OutputStream stream);
 
     Mono<Void> write(Flux<DataBuffer> buffers);
