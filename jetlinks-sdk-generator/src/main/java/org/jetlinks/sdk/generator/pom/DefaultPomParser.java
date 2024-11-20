@@ -5,8 +5,6 @@ import lombok.SneakyThrows;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
-import org.hswebframework.web.bean.FastBeanCopier;
-import org.jetlinks.sdk.server.utils.ObjectMappers;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -15,57 +13,58 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 
 @Getter
 public class DefaultPomParser implements PomParser {
 
     private final static String POM_PREFIX = "pom.xml";
 
-    private final Path pomPath;
-
-    private final Model model;
-
     private final DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
 
+    @Override
     @SneakyThrows
-    public DefaultPomParser(Path pomPath) {
-        this.pomPath = pomPath.resolve(POM_PREFIX);
-        try (InputStreamReader fileReader = new InputStreamReader(Files.newInputStream(pomPath), StandardCharsets.UTF_8)) {
-            this.model = new MavenXpp3Reader().read(fileReader);
+    public MavenModel parse(Path pomPath) {
+        Path path = pomPath.resolve(POM_PREFIX);
+        try (InputStreamReader fileReader = new InputStreamReader(Files.newInputStream(path), StandardCharsets.UTF_8)) {
+            Model model = new MavenXpp3Reader().read(fileReader);
+            return MavenModel.convertToMavenModel(model);
         }
     }
 
+
     @Override
-    public MavenModel parse() {
-        MavenModel mavenModel = new MavenModel();
-        mavenModel.setGroupId(model.getGroupId());
-        mavenModel.setArtifactId(model.getArtifactId());
-        mavenModel.setVersion(model.getVersion());
-        mavenModel.setModules(model.getModules());
-        mavenModel.setProperties(FastBeanCopier.copy(model.getProperties(), new HashMap<>()));
-        mavenModel.setProfiles(model.getProfiles());
-        mavenModel.setRepositories(model.getRepositories());
-        return mavenModel;
+    @SneakyThrows
+    public Mono<MavenModel> parse(Flux<DataBuffer> buffers) {
+        return DataBufferUtils.join(buffers)
+                .flatMap(dataBuffer -> {
+                    try (InputStream inputStream = dataBuffer.asInputStream(true)) {
+                        Model model = new MavenXpp3Reader().read(inputStream);
+                        return Mono.just(MavenModel.convertToMavenModel(model));
+                    } catch (Exception e) {
+                        return Mono.error(new RuntimeException("Error parsing POM file stream", e));
+                    }
+                });
     }
 
     @Override
     public Flux<DataBuffer> toFileStream(MavenModel mavenModel) {
-        return Mono.fromSupplier(() -> {
-            String mavenString = ObjectMappers.toJsonString(mavenModel);
-            byte[] bytes = mavenString.getBytes(StandardCharsets.UTF_8);
+        return Mono.fromCallable(() -> {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            Model model = MavenModel.convertToModel(mavenModel);
+            new MavenXpp3Writer().write(outputStream, model);
+            byte[] bytes = outputStream.toByteArray();
             return bufferFactory.wrap(bytes);
         }).flux();
     }
 
     @Override
-    public Mono<Void> write(OutputStream stream) {
+    public Mono<Void> write(OutputStream stream, MavenModel mavenModel) {
         return Mono.fromCallable(() -> {
+                    Model model = MavenModel.convertToModel(mavenModel);
                     new MavenXpp3Writer().write(stream, model);
                     return null;
                 })
@@ -74,7 +73,7 @@ public class DefaultPomParser implements PomParser {
     }
 
     @Override
-    public Mono<Void> write(Flux<DataBuffer> buffers) {
+    public Mono<Void> write(Flux<DataBuffer> buffers, Path pomPath) {
         return DataBufferUtils.write(buffers, pomPath)
                 .subscribeOn(Schedulers.boundedElastic())
                 .then();
