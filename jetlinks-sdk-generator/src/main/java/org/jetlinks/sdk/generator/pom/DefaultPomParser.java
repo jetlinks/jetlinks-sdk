@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.generator.pom;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+@Getter
 public class DefaultPomParser implements PomParser {
 
     private final static String POM_PREFIX = "pom.xml";
