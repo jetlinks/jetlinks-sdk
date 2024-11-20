@@ -5,8 +5,11 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.sdk.server.utils.ObjectMappers;
 import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferFactory;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -25,6 +28,8 @@ public class DefaultPomParser implements PomParser {
     private final Path pomPath;
 
     private final Model model;
+
+    private final DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
 
     @SneakyThrows
     public DefaultPomParser(Path pomPath) {
@@ -45,6 +50,15 @@ public class DefaultPomParser implements PomParser {
         mavenModel.setProfiles(model.getProfiles());
         mavenModel.setRepositories(model.getRepositories());
         return mavenModel;
+    }
+
+    @Override
+    public Flux<DataBuffer> toFileStream(MavenModel mavenModel) {
+        return Mono.fromSupplier(() -> {
+            String mavenString = ObjectMappers.toJsonString(mavenModel);
+            byte[] bytes = mavenString.getBytes(StandardCharsets.UTF_8);
+            return bufferFactory.wrap(bytes);
+        }).flux();
     }
 
     @Override
