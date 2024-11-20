@@ -14,16 +14,18 @@ import java.nio.file.Path;
 public interface PomParser {
 
 
-    static DefaultPomParser create(Path pomPath) {
-        return new DefaultPomParser(pomPath);
+    static DefaultPomParser create() {
+        return new DefaultPomParser();
     }
 
-    MavenModel parse();
+    MavenModel parse(Path pomPath);
+
+    Mono<MavenModel> parse(Flux<DataBuffer> dataBufferFlux);
 
     Flux<DataBuffer> toFileStream(MavenModel model);
 
-    Mono<Void> write(OutputStream stream);
+    Mono<Void> write(OutputStream stream, MavenModel model);
 
-    Mono<Void> write(Flux<DataBuffer> buffers);
+    Mono<Void> write(Flux<DataBuffer> buffers, Path path);
 
 }
