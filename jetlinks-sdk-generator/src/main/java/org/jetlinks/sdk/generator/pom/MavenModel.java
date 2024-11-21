@@ -1,17 +1,18 @@
 package org.jetlinks.sdk.generator.pom;
 
 import lombok.*;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.sdk.generator.core.Dependency;
 
 import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -35,6 +36,8 @@ public class MavenModel {
 
     private List<Repository> repositories;
 
+    private List<Dependency> dependencies;
+
     public static MavenModel convertToMavenModel(Model model) {
         MavenModel mavenModel = new MavenModel();
         mavenModel.setGroupId(model.getGroupId());
@@ -44,6 +47,9 @@ public class MavenModel {
         mavenModel.setProperties(FastBeanCopier.copy(model.getProperties(), new HashMap<>()));
         mavenModel.setProfiles(model.getProfiles());
         mavenModel.setRepositories(model.getRepositories());
+        List<Dependency> dependencyStream = model.getDependencies().stream()
+                .map(d -> FastBeanCopier.copy(d, new Dependency())).collect(Collectors.toList());
+        mavenModel.setDependencies(dependencyStream);
         return mavenModel;
     }
 
@@ -60,6 +66,9 @@ public class MavenModel {
         }
         model.setProfiles(mavenModel.getProfiles());
         model.setRepositories(mavenModel.getRepositories());
+        List<org.apache.maven.model.Dependency> dependencyStream = mavenModel.getDependencies().stream()
+                .map(d -> FastBeanCopier.copy(d, new org.apache.maven.model.Dependency())).collect(Collectors.toList());
+        model.setDependencies(dependencyStream);
         return model;
     }
 }
