@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.sdk.generator.java.base.enums.Modifier;
+import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
 import java.util.List;
 
@@ -20,5 +20,5 @@ public class MethodInfo extends AnnotatedElementInfo {
     private ClassInfo returnParam;
 
     @Schema(description = "方法修饰符")
-    private List<Modifier> modifiers;
+    private List<Modifiers> modifiers;
 }

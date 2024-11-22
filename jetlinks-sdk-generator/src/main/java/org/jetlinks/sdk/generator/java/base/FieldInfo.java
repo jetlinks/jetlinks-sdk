@@ -3,7 +3,7 @@ package org.jetlinks.sdk.generator.java.base;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.sdk.generator.java.base.enums.Modifier;
+import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
 import java.util.List;
 
@@ -18,11 +18,11 @@ public class FieldInfo extends AnnotatedElementInfo {
     private ClassInfo typeClass;
 
     @Schema(description = "字段修饰符")
-    private List<Modifier> modifiers;
+    private List<Modifiers> modifiers;
 
     public static FieldInfo of(String id,
                                ClassInfo typeClass,
-                               List<Modifier> modifiers,
+                               List<Modifiers> modifiers,
                                List<AnnotationInfo> annotations) {
         FieldInfo fieldInfo = new FieldInfo();
         fieldInfo.setId(id);

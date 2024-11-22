@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetlinks.sdk.generator.java.base.enums.Modifier;
+import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class ClassInfo extends AnnotatedElementInfo {
     private List<MethodInfo> methods;
 
     @Schema(description = "类访问修饰符")
-    private List<Modifier> modifiers;
+    private List<Modifiers> modifiers;
 
     public static ClassInfo of(String name, String classPackage) {
         ClassInfo classInfo = of(name);
@@ -78,7 +78,7 @@ public class ClassInfo extends AnnotatedElementInfo {
         return this;
     }
 
-    public ClassInfo withModifiers(List<Modifier> modifiers) {
+    public ClassInfo withModifiers(List<Modifiers> modifiers) {
         this.modifiers = this.mergeList(this.modifiers, modifiers);
         return this;
 

@@ -6,7 +6,7 @@ import org.hswebframework.web.dict.EnumDict;
 
 @Getter
 @AllArgsConstructor
-public enum Modifier implements EnumDict<String> {
+public enum Modifiers implements EnumDict<String> {
     DEFAULT("default"),
     PUBLIC("public"),
     PROTECTED("protected"),
