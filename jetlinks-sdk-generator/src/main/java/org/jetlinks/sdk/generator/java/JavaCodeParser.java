@@ -1,6 +1,6 @@
 package org.jetlinks.sdk.generator.java;
 
-import org.jetlinks.sdk.generator.java.base.PackageInfo;
+import org.jetlinks.sdk.generator.java.base.ClassInfo;
 
 import java.io.InputStream;
 
@@ -12,5 +12,5 @@ public interface JavaCodeParser {
      * @param inputStream java文件输入流
      * @return PackageInfo
      */
-    PackageInfo parse(InputStream inputStream);
+    ClassInfo parse(InputStream inputStream);
 }
