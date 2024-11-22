@@ -12,10 +12,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor(staticName = "of")
-public class AnnotationInfo {
-
-    @Schema(description = "名称")
-    private String name;
+public class AnnotationInfo extends AnnotatedElementInfo {
 
     @Schema(description = "类型")
     private ClassInfo type;

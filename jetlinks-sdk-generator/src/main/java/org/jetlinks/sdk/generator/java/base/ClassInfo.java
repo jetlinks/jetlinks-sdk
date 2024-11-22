@@ -1,11 +1,11 @@
 package org.jetlinks.sdk.generator.java.base;
 
-import com.github.javaparser.ast.Modifier;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetlinks.sdk.generator.java.base.enums.Modifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +13,13 @@ import java.util.Objects;
 
 @Setter
 @Getter
-public class ClassInfo {
-
-    @Schema(description = "类名")
-    private String name;
+public class ClassInfo extends AnnotatedElementInfo {
 
     @Schema(description = "包路径")
     private String classPackage;
 
     @Schema(description = "字段信息")
     private List<FieldInfo> fields;
-
-    @Schema(description = "注解信息")
-    private List<AnnotationInfo> annotations;
 
     @Schema(description = "父类信息")
     private ClassInfo superClass;
@@ -40,7 +34,7 @@ public class ClassInfo {
     private List<MethodInfo> methods;
 
     @Schema(description = "类访问修饰符")
-    private List<Modifier.Keyword> modifiers;
+    private List<Modifier> modifiers;
 
     public static ClassInfo of(String name, String classPackage) {
         ClassInfo classInfo = of(name);
@@ -55,7 +49,7 @@ public class ClassInfo {
     }
 
     public ClassInfo withAnnotations(List<AnnotationInfo> annotations) {
-        this.annotations = this.mergeList(this.annotations, annotations);
+        this.setAnnotations(this.mergeList(this.getAnnotations(), annotations));
         return this;
     }
 
@@ -84,7 +78,7 @@ public class ClassInfo {
         return this;
     }
 
-    public ClassInfo withModifiers(List<Modifier.Keyword> modifiers) {
+    public ClassInfo withModifiers(List<Modifier> modifiers) {
         this.modifiers = this.mergeList(this.modifiers, modifiers);
         return this;
 
