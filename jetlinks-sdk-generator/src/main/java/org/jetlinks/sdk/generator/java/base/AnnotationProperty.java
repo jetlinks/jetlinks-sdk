@@ -17,13 +17,13 @@ public class AnnotationProperty {
     @Schema(description = "属性值")
     private Object defaultValue;
 
-    public static AnnotationProperty of(String defaultValue) {
+    public static AnnotationProperty of(Object defaultValue) {
         AnnotationProperty annotationProperty = new AnnotationProperty();
         annotationProperty.setDefaultValue(defaultValue);
         return annotationProperty;
     }
 
-    public static AnnotationProperty of(String defaultValue, String name, ClassInfo type) {
+    public static AnnotationProperty of(String name, Object defaultValue, ClassInfo type) {
         AnnotationProperty annotationProperty = of(defaultValue);
         annotationProperty.setName(name);
         annotationProperty.setType(type);

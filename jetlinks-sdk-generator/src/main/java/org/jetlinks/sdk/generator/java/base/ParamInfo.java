@@ -20,12 +20,15 @@ public class ParamInfo extends AnnotatedElementInfo {
     @Schema(description = "泛型信息")
     private List<ClassInfo> generics;
 
-    public static ParamInfo of(ClassInfo type, List<ClassInfo> generics) {
-        ParamInfo paramInfo = of();
-        paramInfo.setType(type);
-        paramInfo.setGenerics(generics);
-        return paramInfo;
 
+    public static ParamInfo of(String name,
+                               List<AnnotationInfo> annotationInfos,
+                               ClassInfo type,
+                               List<ClassInfo> generics) {
+        ParamInfo paramInfo = of(type, generics);
+        paramInfo.setAnnotations(annotationInfos);
+        paramInfo.setName(name);
+        return paramInfo;
     }
 
 }

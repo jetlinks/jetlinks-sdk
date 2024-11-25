@@ -2,6 +2,7 @@ package org.jetlinks.sdk.generator.java.base;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@NoArgsConstructor(staticName = "of")
 public class ClassInfo extends AnnotatedElementInfo {
 
     @Schema(description = "包路径")
