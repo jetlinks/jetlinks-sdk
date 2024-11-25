@@ -34,56 +34,67 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
             TypeDeclaration<?> typeDeclaration = typeOptional.get();
             if (typeDeclaration.isClassOrInterfaceDeclaration()) {
                 ClassOrInterfaceDeclaration classType = typeDeclaration.asClassOrInterfaceDeclaration();
-
-                //构建类信息
-                ClassInfo classInfo = ClassInfo.of(classType.getNameAsString());
-                cu.getPackageDeclaration()
-                  .ifPresent(packageDeclaration -> classInfo
-                          .setClassPackage(packageDeclaration.getNameAsString()));
-
-
-                //获取类上注解信息
-                List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(classType.getAnnotations(), importsMap);
-
-                //获取父类信息
-                classType
-                        .getExtendedTypes()
-                        .getFirst()
-                        .ifPresent(superType -> classInfo
-                                .withSuperClass(TypeUtils.handleClassOrInterface(superType, importsMap)));
-
-                // 获取接口信息
-                List<ClassInfo> interfaceInfo = TypeUtils.handleClassOrInterface(classType.getImplementedTypes(), importsMap);
-
-                // 获取字段和方法信息
-                List<FieldInfo> fieldInfos = null;
-                List<MethodInfo> methodInfos = null;
-                if (CollectionUtils.isNotEmpty(classType.getMembers())) {
-                    fieldInfos = new ArrayList<>();
-                    methodInfos = new ArrayList<>();
-                    for (BodyDeclaration<?> member : classType.getMembers()) {
-                        if (member.isFieldDeclaration()) {
-                            fieldInfos.add(MembersUtils.handleFieldMember(member, importsMap));
-                        } else if (member.isMethodDeclaration()) {
-                            methodInfos.add(MembersUtils.handleMethodMember(member, importsMap));
-                        }
-                    }
-                }
-
-                //获取类的访问修饰符
-                List<Modifiers> modifiers = TypeUtils.handleModifier(classType.getModifiers());
-
-                //填充类各部分信息
-                return classInfo
-                        .withAnnotations(annotationInfos)
-                        .withFields(fieldInfos)
-                        .withInterfaces(interfaceInfo)
-                        .withMethods(methodInfos)
-                        .withModifiers(modifiers);
+                return doParse(classType, importsMap);
             }
         }
         return ClassInfo.of();
     }
 
+    /**
+     * 解析类定义为类描述信息
+     *
+     * @param clazz      类定义
+     * @param importsMap 导包Map
+     * @return ClassInfo
+     */
+    private ClassInfo doParse(ClassOrInterfaceDeclaration clazz, Map<String, String> importsMap) {
 
+        //构建类信息
+        ClassInfo classInfo = ClassInfo.of(clazz.getNameAsString());
+
+        //获取类上注解信息
+        List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(clazz.getAnnotations(), importsMap);
+
+        //获取父类信息
+        clazz.getExtendedTypes()
+             .getFirst()
+             .ifPresent(superType -> classInfo
+                     .withSuperClass(TypeUtils.handleClassOrInterface(superType, importsMap)));
+
+        // 获取接口信息
+        List<ClassInfo> interfaceInfo = TypeUtils.handleClassOrInterface(clazz.getImplementedTypes(), importsMap);
+
+        // 获取字段、内部类、方法信息
+        List<FieldInfo> fieldInfos = null;
+        List<MethodInfo> methodInfos = null;
+        if (CollectionUtils.isNotEmpty(clazz.getMembers())) {
+            fieldInfos = new ArrayList<>();
+            methodInfos = new ArrayList<>();
+            for (BodyDeclaration<?> member : clazz.getMembers()) {
+                if (member.isFieldDeclaration()) {
+                    fieldInfos.add(MembersUtils.handleFieldMember(member, importsMap));
+                } else if (member.isMethodDeclaration()) {
+                    methodInfos.add(MembersUtils.handleMethodMember(member, importsMap));
+                } else if (member.isClassOrInterfaceDeclaration()) {
+                    // 解析内部类
+                    ClassInfo innerClass = doParse(member.asClassOrInterfaceDeclaration(), importsMap);
+                    fieldInfos.add(FieldInfo.copyFrom(innerClass));
+                }
+            }
+        }
+
+        //获取类的访问修饰符
+        List<Modifiers> modifiers = TypeUtils.handleModifier(clazz.getModifiers());
+
+        //填充类各部分信息
+        return classInfo
+                .withAnnotations(annotationInfos)
+                .withFields(fieldInfos)
+                .withInterfaces(interfaceInfo)
+                .withMethods(methodInfos)
+                .withModifiers(modifiers);
+    }
 }
+
+
+

@@ -30,8 +30,15 @@ public class ExpressionUtils {
             return expression.asArrayInitializerExpr().getValues();
         } else if (expression.isFieldAccessExpr()) {
             FieldAccessExpr fieldAccessExpr = expression.asFieldAccessExpr();
-            NameExpr scope = fieldAccessExpr.getScope().asNameExpr();
-            return String.join(".", scope.getNameAsString(), fieldAccessExpr.getNameAsString());
+            Expression scope = fieldAccessExpr.getScope();
+            String scopeName;
+            if (fieldAccessExpr.getScope().isNameExpr()) {
+                scopeName = scope.asNameExpr().getNameAsString();
+            } else {
+                scopeName = String.valueOf(getExpressionValue(scope));
+            }
+
+            return String.join(".", scopeName, fieldAccessExpr.getNameAsString());
         } else {
             return expression;
         }
@@ -59,9 +66,15 @@ public class ExpressionUtils {
             classInfo = ClassInfo.of("Array");
         } else if (expression.isFieldAccessExpr()) {
             FieldAccessExpr fieldAccessExpr = expression.asFieldAccessExpr();
-            NameExpr scope = fieldAccessExpr.getScope().asNameExpr();
-            String fieldName = String.join(".", scope.getNameAsString(), fieldAccessExpr.getNameAsString());
-            classInfo = ClassInfo.of(fieldName, importMap.get(scope.getNameAsString()));
+            Expression scope = fieldAccessExpr.getScope();
+            String scopeName;
+            if (fieldAccessExpr.getScope().isNameExpr()) {
+                scopeName = scope.asNameExpr().getNameAsString();
+            } else {
+                scopeName = String.valueOf(getExpressionValue(scope));
+            }
+            String fieldName = String.join(".", scopeName, fieldAccessExpr.getNameAsString());
+            classInfo = ClassInfo.of(fieldName, importMap.get(scopeName));
         } else {
             classInfo = null;
         }
