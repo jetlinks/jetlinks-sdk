@@ -29,7 +29,17 @@ public class MembersUtils {
         List<Modifiers> modifiers = collectModifier(method.getModifiers());
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(method.getAnnotations(), importsMap);
         List<ParamInfo> paramInfos = handleParameterMember(method.getParameters(), importsMap);
-        ClassInfo returnType = TypeUtils.toClassInfo(method.getType(), importsMap);
+        ClassInfo returnType;
+        if (method.getType().isPrimitiveType()) {
+            String primitiveTypeName = method.getType()
+                                             .asPrimitiveType()
+                                             .getType()
+                                             .asString();
+            returnType = ClassInfo.of(primitiveTypeName);
+        } else {
+            returnType = TypeUtils.toClassInfo(method.getType(), importsMap);
+        }
+
         return MethodInfo.of(method.getNameAsString(), annotationInfos, paramInfos, returnType, modifiers);
     }
 
@@ -96,7 +106,7 @@ public class MembersUtils {
                     .asPrimitiveType()
                     .getType()
                     .asString();
-            classInfo = ClassInfo.of(primitiveTypeName, null);
+            classInfo = ClassInfo.of(primitiveTypeName);
         } else {
             ClassOrInterfaceType type = parameterType.asClassOrInterfaceType();
             String genericClassName = type.asClassOrInterfaceType().getNameAsString();
