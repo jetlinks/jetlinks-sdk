@@ -4,28 +4,52 @@ import org.springframework.core.io.buffer.DataBuffer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.OutputStream;
-import java.nio.file.Path;
-
 /**
  * POM文件解析.
- *
  */
 public interface PomParser {
 
 
-    static DefaultPomParser create() {
+    static PomParser create() {
         return new DefaultPomParser();
     }
 
-    MavenModel parse(Path pomPath);
+    /**
+     * 加载pom文件流为解析对象
+     *
+     * @param buffers
+     * @return
+     */
+    static Mono<PomParser> load(Flux<DataBuffer> buffers) {
+        return DefaultPomParser.parse(buffers);
+    }
 
-    Mono<MavenModel> parse(Flux<DataBuffer> dataBufferFlux);
+    /**
+     * 解析pom信息
+     *
+     * @return pom信息
+     */
+    MavenPom parse();
 
-    Flux<DataBuffer> toFileStream(MavenModel model);
+    /**
+     * 更新pom信息
+     *
+     * @param pom pom信息
+     */
+    void update(MavenPom pom);
 
-    Mono<Void> write(OutputStream stream, MavenModel model);
+    /**
+     * 加载为文件流
+     *
+     * @return 文件流
+     */
+    Flux<DataBuffer> toFileStream();
 
-    Mono<Void> write(Flux<DataBuffer> buffers, Path path);
+    /**
+     * 复制pom解析对象
+     *
+     * @return
+     */
+    PomParser copy();
 
 }

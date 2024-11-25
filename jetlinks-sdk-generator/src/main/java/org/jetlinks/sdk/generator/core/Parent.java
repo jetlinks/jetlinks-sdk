@@ -7,4 +7,10 @@ import lombok.Setter;
 @Setter
 public class Parent extends Artifact {
 
+
+    public void merge(Parent project) {
+        super.merge(project);
+    }
+
+
 }

@@ -16,6 +16,18 @@ public class Artifact {
     private String artifactId;
     private String version;
 
+    public void merge(Artifact artifact) {
+        if (StringUtils.hasText(artifact.getArtifactId())) {
+            this.artifactId = artifact.getArtifactId();
+        }
+        if (StringUtils.hasText(artifact.getGroupId())) {
+            this.groupId = artifact.getGroupId();
+        }
+        if (StringUtils.hasText(artifact.getVersion())) {
+            this.version = artifact.getVersion();
+        }
+    }
+
     public void withPattern(String pattern) {
         String[] split = pattern.split(":");
         if (split.length > 0) {
