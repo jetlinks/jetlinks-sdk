@@ -119,17 +119,27 @@ public class AnnotationExpressionUtils {
     private static Object handleAnnotationChildProperties(NodeList<Expression> childProperties, Map<String, String> importsMap) {
         List<ClassInfo> childAnnotationClass = new ArrayList<>();
         List<AnnotationInfo> childAnnoExpression = new ArrayList<>();
-
+        List<Object> childPrimitiveProperties = new ArrayList<>();
         for (Expression expression : childProperties) {
             if (expression.isClassExpr()) {
                 childAnnotationClass.add(ExpressionUtils.getExpressionClassInfo(expression, importsMap));
-            }
-            if (expression.isAnnotationExpr()) {
+            } else if (expression.isAnnotationExpr()) {
                 childAnnoExpression.add(handleAnnotationExpression(expression.asAnnotationExpr(), importsMap));
+            } else if (expression.isStringLiteralExpr()) {
+                childPrimitiveProperties.add(ExpressionUtils.getExpressionValue(expression));
             }
         }
 
-        return CollectionUtils.isEmpty(childAnnotationClass) ? childAnnoExpression : childAnnotationClass;
+        if (CollectionUtils.isEmpty(childAnnotationClass)) {
+            if (CollectionUtils.isEmpty(childAnnoExpression)) {
+                return childPrimitiveProperties;
+            } else {
+                return childAnnoExpression;
+            }
+        } else {
+            return childAnnotationClass;
+        }
+
     }
 
     /**
