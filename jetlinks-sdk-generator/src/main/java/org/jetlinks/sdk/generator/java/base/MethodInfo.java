@@ -21,4 +21,16 @@ public class MethodInfo extends AnnotatedElementInfo {
 
     @Schema(description = "方法修饰符")
     private List<Modifiers> modifiers;
+
+    public static MethodInfo of(String name,
+                                List<AnnotationInfo> annotationInfos,
+                                List<ParamInfo> params,
+                                ClassInfo returnType,
+                                List<Modifiers> modifiers) {
+
+        MethodInfo methodInfo = of(params, returnType, modifiers);
+        methodInfo.setName(name);
+        methodInfo.setAnnotations(annotationInfos);
+        return methodInfo;
+    }
 }

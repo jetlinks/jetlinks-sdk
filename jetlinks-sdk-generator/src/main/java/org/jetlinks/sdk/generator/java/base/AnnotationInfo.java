@@ -27,4 +27,9 @@ public class AnnotationInfo extends AnnotatedElementInfo {
         return annotationInfo;
     }
 
+    public static AnnotationInfo of(String annotationName, ClassInfo classInfo, List<AnnotationProperty> properties) {
+        AnnotationInfo annotationInfo = of(classInfo, properties);
+        annotationInfo.setName(annotationName);
+        return annotationInfo;
+    }
 }
