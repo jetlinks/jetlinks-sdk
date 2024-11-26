@@ -3,12 +3,14 @@ package org.jetlinks.sdk.generator.java.utils;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import org.jetlinks.sdk.generator.java.base.*;
 import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,17 +31,7 @@ public class MembersUtils {
         List<Modifiers> modifiers = collectModifier(method.getModifiers());
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(method.getAnnotations(), importsMap);
         List<ParamInfo> paramInfos = handleParameterMember(method.getParameters(), importsMap);
-        ClassInfo returnType;
-        if (method.getType().isPrimitiveType()) {
-            String primitiveTypeName = method.getType()
-                                             .asPrimitiveType()
-                                             .getType()
-                                             .asString();
-            returnType = ClassInfo.of(primitiveTypeName);
-        } else {
-            returnType = TypeUtils.toClassInfo(method.getType(), importsMap);
-        }
-
+        ClassInfo returnType = TypeUtils.handleClassOrInterface(method.getType(), importsMap);
         return MethodInfo.of(method.getNameAsString(), annotationInfos, paramInfos, returnType, modifiers);
     }
 
@@ -69,8 +61,7 @@ public class MembersUtils {
         List<Modifiers> modifiers = collectModifier(field.getModifiers());
         VariableDeclarator variable = field.getVariable(0);
         String fieldName = variable.getNameAsString();
-        ClassOrInterfaceType type = variable.getType().asClassOrInterfaceType();
-        ClassInfo typeClass = ClassInfo.of(type.getNameAsString(), importsMap.get(type.getNameAsString()));
+        ClassInfo typeClass = TypeUtils.handleClassOrInterface(variable.getType(), importsMap);
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(field.getAnnotations(), importsMap);
         return FieldInfo.of(fieldName, typeClass, modifiers, annotationInfos);
     }
@@ -98,24 +89,10 @@ public class MembersUtils {
      * @return ParamInfo
      */
     public static ParamInfo handleParameterMember(Parameter parameter, Map<String, String> importsMap) {
-        ClassInfo classInfo;
-        List<ClassInfo> genericTypes = null;
         Type parameterType = parameter.getType();
-        if (parameterType.isPrimitiveType()) {
-            String primitiveTypeName = parameterType
-                    .asPrimitiveType()
-                    .getType()
-                    .asString();
-            classInfo = ClassInfo.of(primitiveTypeName);
-        } else {
-            ClassOrInterfaceType type = parameterType.asClassOrInterfaceType();
-            String genericClassName = type.asClassOrInterfaceType().getNameAsString();
-            Optional<NodeList<Type>> typeArguments = type.getTypeArguments();
-            if (typeArguments.isPresent()) {
-                genericTypes = TypeUtils.handleClassOrInterface(typeArguments.get(), importsMap);
-            }
-            classInfo = ClassInfo.of(genericClassName, importsMap.get(genericClassName));
-        }
+        ClassInfo classInfo = TypeUtils.handleClassOrInterface(parameterType, importsMap);
+        List<ClassInfo> genericTypes = classInfo.getGenerics();
+        classInfo.setGenerics(null);
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(parameter.getAnnotations(), importsMap);
         return ParamInfo.of(parameter.getNameAsString(), annotationInfos, classInfo, genericTypes);
     }

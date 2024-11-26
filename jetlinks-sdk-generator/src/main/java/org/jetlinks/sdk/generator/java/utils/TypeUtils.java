@@ -6,6 +6,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
@@ -43,11 +44,15 @@ public class TypeUtils {
      * @return ClassInfo
      */
     public static ClassInfo handleClassOrInterface(Type type, Map<String, String> importsMap) {
-        ClassInfo classInfo = toClassInfo(type, importsMap);
-        type.asClassOrInterfaceType()
-            .getTypeArguments()
-            .ifPresent(types -> classInfo.withGenerics(toClassInfo(types, importsMap)));
-        return classInfo;
+        if (type.isPrimitiveType()) {
+            return ClassInfo.of(type.asPrimitiveType().asString());
+        } else {
+            ClassInfo classInfo = toClassInfo(type, importsMap);
+            type.asClassOrInterfaceType()
+                .getTypeArguments()
+                .ifPresent(types -> classInfo.withGenerics(toClassInfo(types, importsMap)));
+            return classInfo;
+        }
     }
 
     /**
@@ -58,9 +63,16 @@ public class TypeUtils {
      * @return ClassInfo
      */
     public static ClassInfo toClassInfo(Type type, Map<String, String> importsMap) {
-        ClassOrInterfaceType genericType = type.asClassOrInterfaceType();
-        String genericTypeName = genericType.getNameAsString();
-        return ClassInfo.of(genericTypeName, importsMap.get(genericTypeName));
+        ClassOrInterfaceType classType = type.asClassOrInterfaceType();
+        String className = classType.getNameAsString();
+        String classPackage = importsMap.get(className);
+        if (!classType.isBoxedType() && Objects.isNull(importsMap.get(className))) {
+            if (!StringUtils.equals(className, "Object")
+                    && !StringUtils.equals(className, "String")) {
+                classPackage = String.join(".", importsMap.get("classPackage"), className);
+            }
+        }
+        return ClassInfo.of(className, classPackage);
     }
 
     /**

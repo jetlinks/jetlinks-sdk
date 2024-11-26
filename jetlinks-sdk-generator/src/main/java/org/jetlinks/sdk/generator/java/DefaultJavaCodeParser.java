@@ -28,6 +28,8 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
         CompilationUnit cu = StaticJavaParser.parse(inputStream);
 
         Map<String, String> importsMap = TypeUtils.handleImports(cu.getImports());
+        cu.getPackageDeclaration()
+          .ifPresent(packageDeclaration -> importsMap.put("classPackage", packageDeclaration.getNameAsString()));
 
         Optional<TypeDeclaration<?>> typeOptional = cu.getTypes().getFirst();
         if (typeOptional.isPresent()) {
@@ -49,8 +51,10 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
      */
     private ClassInfo doParse(ClassOrInterfaceDeclaration clazz, Map<String, String> importsMap) {
 
+        String classPackage = importsMap.get("classPackage");
+        String className = clazz.getNameAsString();
         //构建类信息
-        ClassInfo classInfo = ClassInfo.of(clazz.getNameAsString());
+        ClassInfo classInfo = ClassInfo.of(className, String.join(".", classPackage, className));
 
         //获取类上注解信息
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(clazz.getAnnotations(), importsMap);
