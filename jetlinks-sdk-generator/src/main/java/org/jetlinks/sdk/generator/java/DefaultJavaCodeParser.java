@@ -6,6 +6,7 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.base.FieldInfo;
@@ -53,8 +54,12 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
 
         String classPackage = importsMap.get("classPackage");
         String className = clazz.getNameAsString();
+        if (StringUtils.isNotBlank(classPackage)) {
+            classPackage = String.join(".", classPackage, className);
+        }
+
         //构建类信息
-        ClassInfo classInfo = ClassInfo.of(className, String.join(".", classPackage, className));
+        ClassInfo classInfo = ClassInfo.of(className, classPackage);
 
         //获取类上注解信息
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(clazz.getAnnotations(), importsMap);

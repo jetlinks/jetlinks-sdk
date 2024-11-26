@@ -69,7 +69,9 @@ public class TypeUtils {
         if (!classType.isBoxedType() && Objects.isNull(importsMap.get(className))) {
             if (!StringUtils.equals(className, "Object")
                     && !StringUtils.equals(className, "String")) {
-                classPackage = String.join(".", importsMap.get("classPackage"), className);
+                if (StringUtils.isNotBlank(classPackage)) {
+                    classPackage = String.join(".", classPackage, className);
+                }
             }
         }
         return ClassInfo.of(className, classPackage);
