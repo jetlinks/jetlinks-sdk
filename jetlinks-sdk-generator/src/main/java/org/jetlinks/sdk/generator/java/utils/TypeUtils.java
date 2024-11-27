@@ -46,6 +46,8 @@ public class TypeUtils {
     public static ClassInfo handleClassOrInterface(Type type, Map<String, String> importsMap) {
         if (type.isPrimitiveType()) {
             return ClassInfo.of(type.asPrimitiveType().asString());
+        } else if (type.isVoidType()) {
+            return ClassInfo.of(type.asVoidType().asString());
         } else {
             ClassInfo classInfo = toClassInfo(type, importsMap);
             type.asClassOrInterfaceType()
