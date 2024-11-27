@@ -10,10 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,11 +45,21 @@ public class TypeUtils {
             return ClassInfo.of(type.asPrimitiveType().asString());
         } else if (type.isVoidType()) {
             return ClassInfo.of(type.asVoidType().asString());
+        } else if (type.isArrayType()) {
+            Type componentType = type.asArrayType().getComponentType();
+            return ClassInfo.of("Array")
+                            .withGenerics(Collections.singletonList(handleClassOrInterface(componentType, importsMap)));
+        } else if (type.isWildcardType()) {
+            return type
+                    .asWildcardType()
+                    .getExtendedType()
+                    .map(referenceType -> toClassInfo(referenceType, importsMap))
+                    .orElseGet(() -> ClassInfo.of(type.asWildcardType().asString()));
         } else {
             ClassInfo classInfo = toClassInfo(type, importsMap);
             type.asClassOrInterfaceType()
                 .getTypeArguments()
-                .ifPresent(types -> classInfo.withGenerics(toClassInfo(types, importsMap)));
+                .ifPresent(types -> classInfo.withGenerics(handleClassOrInterface(types, importsMap)));
             return classInfo;
         }
     }
