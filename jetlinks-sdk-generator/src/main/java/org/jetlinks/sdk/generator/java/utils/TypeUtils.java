@@ -5,7 +5,9 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.WildcardType;
 import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
 import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
@@ -50,11 +52,15 @@ public class TypeUtils {
             return ClassInfo.of("Array")
                             .withGenerics(Collections.singletonList(handleClassOrInterface(componentType, importsMap)));
         } else if (type.isWildcardType()) {
-            return type
-                    .asWildcardType()
-                    .getExtendedType()
+            WildcardType wildcardType = type.asWildcardType();
+            Optional<ReferenceType> extendedType = wildcardType.getExtendedType();
+            Optional<ReferenceType> superType = wildcardType.getSuperType();
+            return extendedType
                     .map(referenceType -> toClassInfo(referenceType, importsMap))
-                    .orElseGet(() -> ClassInfo.of(type.asWildcardType().asString()));
+                    .orElseGet(() -> superType
+                            .map(referenceType -> toClassInfo(referenceType, importsMap))
+                            .orElseGet(() -> ClassInfo.of(type.asWildcardType().asString())));
+
         } else {
             ClassInfo classInfo = toClassInfo(type, importsMap);
             type.asClassOrInterfaceType()
