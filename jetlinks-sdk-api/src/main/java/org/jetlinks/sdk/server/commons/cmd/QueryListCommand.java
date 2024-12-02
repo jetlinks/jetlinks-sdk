@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.PropertyMetadata;
@@ -25,6 +27,7 @@ import java.util.function.Function;
  * @see QueryCommand
  * @since 2.1
  */
+@Schema(title = "查询列表",description = "支持动态查询条件、排序等")
 public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<T>> {
 
     /**
@@ -36,6 +39,11 @@ public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<
     @Deprecated
     public QueryListCommand() {
 
+    }
+
+
+    public static <T> FunctionMetadata metadata(Class<T> elementType) {
+        return CommandMetadataResolver.resolve(QueryListCommand.class, elementType);
     }
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
@@ -88,14 +96,11 @@ public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<
 
 
     public static List<PropertyMetadata> getQueryParamMetadata() {
-        return Arrays.asList(
-            getTermsMetadata(),
-            SimplePropertyMetadata.of("sorts", "排序", new ArrayType().elementType(
-                new ObjectType()
-                    .addProperty("name", "列名(属性名)", StringType.GLOBAL)
-                    .addProperty("order", "排序方式,如:asc,desc", StringType.GLOBAL)
-            ))
-        );
+        return CommandMetadataResolver.resolveInputs(ResolvableType.forType(InputSpec.class));
     }
 
+    protected static class InputSpec extends QueryCommand.InputSpec {
+
+
+    }
 }

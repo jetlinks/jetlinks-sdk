@@ -1,10 +1,12 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.web.api.crud.entity.PagerResult;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.*;
 import org.jetlinks.core.metadata.types.ArrayType;
@@ -121,21 +123,29 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
     }
 
     public static List<PropertyMetadata> getQueryParamMetadata() {
-        return Arrays.asList(
-            SimplePropertyMetadata.of("pageIndex", "页码,从0开始.", IntType.GLOBAL),
-            SimplePropertyMetadata.of("pageSize", "每页数量", IntType.GLOBAL),
-            SimplePropertyMetadata.of("terms", "查询条件", new ArrayType().elementType(
-                new ObjectType()
-                    .addProperty("column", "列名(属性名)", StringType.GLOBAL)
-                    .addProperty("termType", "条件类型,如:like,gt,lt", StringType.GLOBAL)
-                    .addProperty("value", "条件值", new ObjectType())
-            )),
-            SimplePropertyMetadata.of("sorts", "排序", new ArrayType().elementType(
-                new ObjectType()
-                    .addProperty("name", "列名(属性名)", StringType.GLOBAL)
-                    .addProperty("order", "排序方式,如:asc,desc", StringType.GLOBAL)
-            ))
-        );
+        return CommandMetadataResolver.resolveInputs(ResolvableType.forClass(InputSpec.class));
+    }
+
+    @Getter
+    @Setter
+    public abstract static class OutputSpec<T> {
+        @Schema(title = "总数")
+        private Integer total;
+
+        @Schema(title = "数据")
+        private List<T> data;
+    }
+
+    @Getter
+    @Setter
+    protected static class InputSpec extends QueryCommand.InputSpec {
+
+        @Schema(title = "页码", description = "从0开始",defaultValue = "0")
+        private Integer pageIndex;
+
+        @Schema(title = "每页数量", defaultValue = "25")
+        private Integer pageSize;
+
     }
 
 }
