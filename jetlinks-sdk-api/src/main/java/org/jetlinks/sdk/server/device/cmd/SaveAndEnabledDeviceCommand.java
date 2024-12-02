@@ -17,38 +17,38 @@ import java.util.function.Function;
  * @author wangsheng
  */
 @Schema(description = "批量创建并启用设备")
-public class CreateAndEnabledDeviceCommand<T> extends BatchDataCommand<T, CreateAndEnabledDeviceCommand<T>> {
+public class SaveAndEnabledDeviceCommand<T> extends BatchDataCommand<T, SaveAndEnabledDeviceCommand<T>> {
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-        metadata.setId(CommandUtils.getCommandIdByType(CreateAndEnabledDeviceCommand.class));
+        metadata.setId(CommandUtils.getCommandIdByType(SaveAndEnabledDeviceCommand.class));
         metadata.setName("批量创建并启用设备");
-        metadata.setInputs(CommandMetadataResolver.resolveInputs(ResolvableType.forType(CreateAndEnabledDeviceCommand.class)));
+        metadata.setInputs(CommandMetadataResolver.resolveInputs(ResolvableType.forType(SaveAndEnabledDeviceCommand.class)));
         custom.accept(metadata);
         return metadata;
     }
 
 
-    public static <T> CommandHandler<CreateAndEnabledDeviceCommand<T>, Flux<T>> createHandler(
+    public static <T> CommandHandler<SaveAndEnabledDeviceCommand<T>, Flux<T>> createHandler(
         Consumer<SimpleFunctionMetadata> custom,
-        Function<CreateAndEnabledDeviceCommand<T>, Flux<T>> handler,
+        Function<SaveAndEnabledDeviceCommand<T>, Flux<T>> handler,
         ResolvableType elementType) {
         return createHandler(custom, handler, CommandUtils.createConverter(elementType));
     }
 
 
-    public static <T> CommandHandler<CreateAndEnabledDeviceCommand<T>, Flux<T>> createHandler(
+    public static <T> CommandHandler<SaveAndEnabledDeviceCommand<T>, Flux<T>> createHandler(
         Consumer<SimpleFunctionMetadata> custom,
-        Function<CreateAndEnabledDeviceCommand<T>, Flux<T>> handler,
+        Function<SaveAndEnabledDeviceCommand<T>, Flux<T>> handler,
         Function<Object, T> resultConverter) {
         return CommandHandler.of(
             () -> metadata(custom),
             (cmd, ignore) -> handler.apply(cmd),
-            () -> new CreateAndEnabledDeviceCommand<T>().withConverter(resultConverter)
+            () -> new SaveAndEnabledDeviceCommand<T>().withConverter(resultConverter)
         );
     }
 
     public static FunctionMetadata metadata() {
-        return CommandMetadataResolver.resolve(CreateAndEnabledDeviceCommand.class);
+        return CommandMetadataResolver.resolve(SaveAndEnabledDeviceCommand.class);
     }
 }
