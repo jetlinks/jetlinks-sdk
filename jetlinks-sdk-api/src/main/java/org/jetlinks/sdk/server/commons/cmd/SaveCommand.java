@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
@@ -10,8 +12,21 @@ import reactor.core.publisher.Flux;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Schema(title = "保存数据", description = "ID对应的数据不存在则新增，否则为修改。支持批量保存。", example = "{\"data\":[  ]}")
 public class SaveCommand<T> extends BatchDataCommand<T, SaveCommand<T>> {
 
+
+    public static FunctionMetadata metadata(Class<?> dataType) {
+        return metadata(ResolvableType.forClass(dataType));
+    }
+
+    public static FunctionMetadata metadata(ResolvableType dataType) {
+        return CommandMetadataResolver
+            .resolve(ResolvableType.forClassWithGenerics(SaveCommand.class, dataType),
+                     dataType);
+    }
+
+    @Deprecated
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
         //Save
@@ -51,6 +66,10 @@ public class SaveCommand<T> extends BatchDataCommand<T, SaveCommand<T>> {
             (cmd, ignore) -> handler.apply(cmd),
             SaveCommand::new
         );
+
+    }
+
+    public static class InputSpec<T> extends BatchDataCommand.InputSpec<T> {
 
     }
 

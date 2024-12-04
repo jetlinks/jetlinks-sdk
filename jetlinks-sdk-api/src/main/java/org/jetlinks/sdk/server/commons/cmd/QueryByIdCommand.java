@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -19,6 +20,7 @@ import java.util.function.Function;
  * @author zhouhao
  * @since 2.1
  */
+@Schema(title = "根据ID查询")
 public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdCommand<T>> {
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {

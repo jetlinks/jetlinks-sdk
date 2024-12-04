@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
  */
 @Getter
 @Setter
+@Schema(title = "分页查询")
 public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, QueryPagerCommand<T>> {
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {

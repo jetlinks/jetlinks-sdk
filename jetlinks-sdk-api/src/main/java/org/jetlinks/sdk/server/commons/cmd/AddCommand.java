@@ -1,14 +1,29 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
+import org.jetlinks.core.command.GenericInputCommand;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
+import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class AddCommand<T> extends BatchDataCommand<T, AddCommand<T>> {
+public class AddCommand<T> extends BatchDataCommand<T, AddCommand<T>> implements GenericInputCommand<T> {
+
+    public static FunctionMetadata metadata(Class<?> dataType) {
+        return metadata(ResolvableType.forClass(dataType));
+    }
+
+    public static FunctionMetadata metadata(ResolvableType dataType) {
+        return CommandMetadataResolver
+            .resolve(ResolvableType.forClassWithGenerics(AddCommand.class, dataType),
+                     dataType);
+    }
+
 
     public static <T> CommandHandler<AddCommand<T>, Flux<T>> createHandler(Consumer<SimpleFunctionMetadata> custom,
                                                                            Function<AddCommand<T>, Flux<T>> handler) {
@@ -27,6 +42,10 @@ public class AddCommand<T> extends BatchDataCommand<T, AddCommand<T>> {
             (cmd, ignore) -> handler.apply(cmd),
             AddCommand::new
         );
+
+    }
+
+    protected static class InputSpec<T> extends BatchDataCommand.InputSpec<T> {
 
     }
 
