@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.commons.cmd;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.ezorm.core.dsl.Query;
+import org.hswebframework.ezorm.core.param.QueryParam;
 import org.hswebframework.web.api.crud.entity.QueryParamEntity;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.AbstractConvertCommand;
@@ -13,6 +14,8 @@ import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.cmd.metadata.QueryParamSpec;
 
+import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -58,8 +61,18 @@ public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extend
      */
     public Self withQueryParam(QueryParamEntity queryParam) {
         this.queryParam = queryParam;
-        FastBeanCopier.copy(queryParam, writable());
+
+       // FastBeanCopier.copy(queryParam, writable());
         return castSelf();
+    }
+
+    @Override
+    public Map<String, Object> readable() {
+        Map<String, Object> prop = super.readable();
+        if (prop.isEmpty() && this.queryParam != null) {
+            FastBeanCopier.copy(this.queryParam, writable());
+        }
+        return super.readable();
     }
 
     /**
@@ -86,6 +99,14 @@ public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extend
             .addProperty("value", "条件值", StringType.GLOBAL);
     }
 
+    @Override
+    @SuppressWarnings("all")
+    public <T1> T1 as(Type type) {
+        if (type == QueryParamEntity.class || type == QueryParam.class) {
+            return (T1) asQueryParam();
+        }
+        return super.as(type);
+    }
 
     @Getter
     @Setter
