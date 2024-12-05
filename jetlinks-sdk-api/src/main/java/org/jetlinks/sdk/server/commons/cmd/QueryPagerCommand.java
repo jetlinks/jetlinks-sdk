@@ -36,6 +36,17 @@ import java.util.stream.Collectors;
 @Schema(title = "分页查询")
 public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, QueryPagerCommand<T>> {
 
+
+    public static FunctionMetadata metadata(Class<?> dataType) {
+        return metadata(ResolvableType.forClass(dataType));
+    }
+
+    public static FunctionMetadata metadata(ResolvableType dataType) {
+        return CommandMetadataResolver
+            .resolve(ResolvableType.forClassWithGenerics(QueryPagerCommand.class, dataType));
+    }
+
+    @Deprecated
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
         //QueryPager
@@ -141,7 +152,7 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
     @Setter
     protected static class InputSpec extends QueryCommand.InputSpec {
 
-        @Schema(title = "页码", description = "从0开始",defaultValue = "0")
+        @Schema(title = "页码", description = "从0开始", defaultValue = "0")
         private Integer pageIndex;
 
         @Schema(title = "每页数量", defaultValue = "25")

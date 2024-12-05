@@ -22,7 +22,11 @@ public class SaveAndEnableCommand<T> extends BatchDataCommand<T, SaveAndEnableCo
         return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
     }
 
-    public static FunctionMetadata metadata(Class<?> outputType){
-        return CommandMetadataResolver.resolve(SaveAndEnableCommand.class,outputType);
+    public static FunctionMetadata metadata(Class<?> dataType) {
+        return CommandMetadataResolver.resolve(
+            ResolvableType
+                .forClassWithGenerics(
+                    SaveAndEnableCommand.class, dataType
+                ));
     }
 }
