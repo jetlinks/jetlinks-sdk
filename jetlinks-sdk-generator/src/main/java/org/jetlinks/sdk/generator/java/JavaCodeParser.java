@@ -10,7 +10,7 @@ public interface JavaCodeParser {
      * 基于文件流，解析java文件
      *
      * @param inputStream java文件输入流
-     * @return PackageInfo
+     * @return ClassInfo
      */
     ClassInfo parse(InputStream inputStream);
 }

@@ -9,12 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 @Setter
 @Getter
-@NoArgsConstructor(staticName = "of")
+@NoArgsConstructor
 public class ClassInfo extends AnnotatedElementInfo {
 
     @Schema(description = "包路径")
@@ -38,6 +39,9 @@ public class ClassInfo extends AnnotatedElementInfo {
     @Schema(description = "类访问修饰符")
     private List<Modifiers> modifiers;
 
+    @Schema(description = "类的所有导包信息")
+    private List<String> importInfos;
+
     public static ClassInfo of(String name, String classPackage) {
         ClassInfo classInfo = of(name);
         classInfo.setClassPackage(classPackage);
@@ -48,6 +52,10 @@ public class ClassInfo extends AnnotatedElementInfo {
         ClassInfo classInfo = new ClassInfo();
         classInfo.setName(name);
         return classInfo;
+    }
+
+    public static ClassInfo of() {
+        return new ClassInfo();
     }
 
     public ClassInfo withAnnotations(List<AnnotationInfo> annotations) {
@@ -86,6 +94,11 @@ public class ClassInfo extends AnnotatedElementInfo {
 
     }
 
+    public ClassInfo withImportInfos(Collection<String> importInfos) {
+        this.importInfos = this.mergeList(this.importInfos, importInfos);
+        return this;
+    }
+
     /**
      * 获取完整类名
      *
@@ -103,7 +116,7 @@ public class ClassInfo extends AnnotatedElementInfo {
         return classInfo.getName();
     }
 
-    private <T> List<T> mergeList(List<T> list, List<T> dataList) {
+    private <T> List<T> mergeList(List<T> list, Collection<T> dataList) {
         if (CollectionUtils.isEmpty(dataList)) {
             return list;
         }

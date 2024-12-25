@@ -1,19 +1,16 @@
 package org.jetlinks.sdk.generator.java.utils;
 
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.Name;
-import com.github.javaparser.ast.type.ClassOrInterfaceType;
-import com.github.javaparser.ast.type.ReferenceType;
-import com.github.javaparser.ast.type.Type;
-import com.github.javaparser.ast.type.WildcardType;
+import com.github.javaparser.ast.type.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
-import org.jetlinks.sdk.generator.java.base.enums.Modifiers;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -121,22 +118,74 @@ public class TypeUtils {
     }
 
     /**
-     * 收集访问修饰符
+     * 转换泛型为JavaParser指定的类型
      *
-     * @param modifiers 访问修饰符集合
-     * @return List<Modifier.Keyword>
+     * @param generics      带泛型的类描述
+     * @return ype[]
      */
-    public static List<Modifiers> handleModifier(NodeList<Modifier> modifiers) {
-        Map<String, Modifiers> modifiersMap = Arrays
-                .stream(Modifiers.values())
-                .collect(Collectors.toMap(Modifiers::getValue,
-                                          Function.identity(),
-                                          (o, n) -> n));
-        return modifiers
+    public static Type[] toGenericTypeArr(List<ClassInfo> generics) {
+        if (CollectionUtils.isEmpty(generics)) {
+            return new Type[0];
+        }
+        return generics
                 .stream()
-                .map(modifier -> modifier.getKeyword().name())
-                .map(modifiersMap::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+                .map(clazz -> StaticJavaParser.parseType(clazz.getName()))
+                .toArray(Type[]::new);
     }
+
+    /**
+     * 转换泛型为JavaParser指定的类型
+     *
+     * @param generics      带泛型的类描述
+     * @return ype[]
+     */
+    public static NodeList<TypeParameter> toTypeParameterArr(List<ClassInfo> generics) {
+        if (CollectionUtils.isEmpty(generics)) {
+            return new NodeList<>();
+        }
+        return generics
+                .stream()
+                .map(clazz -> StaticJavaParser.parseTypeParameter(clazz.getName()))
+                .collect(Collectors.toCollection(NodeList::new));
+    }
+
+    /**
+     * 转换方法返回值描述为JavaParser指定的类型
+     *
+     * @param returnParam 方法返回值描述
+     * @return Type
+     */
+    public static Type toMethodReturnType(ClassInfo returnParam) {
+        return toFieldType(returnParam);
+    }
+
+
+    public static Type toFieldType(ClassInfo fieldClass) {
+        String fieldClassName = fieldClass.getName();
+        if (StringUtils.equals("Array", fieldClassName)) {
+            ClassInfo generic = fieldClass.getGenerics().get(0);
+            return new ArrayType(StaticJavaParser.parseType(generic.getName()));
+        }
+
+        Optional<PrimitiveType.Primitive> primitive = PrimitiveType
+                .Primitive
+                .byTypeName(fieldClassName);
+        if (primitive.isPresent()) {
+            return new PrimitiveType(primitive.get());
+        }
+
+        if (StringUtils.equals("void", fieldClassName)) {
+            return new VoidType();
+        }
+
+        ClassOrInterfaceType returnParamType = StaticJavaParser.parseClassOrInterfaceType(fieldClassName);
+
+        Type[] genericTypes = TypeUtils.toGenericTypeArr(fieldClass.getGenerics());
+        if (ArrayUtils.isNotEmpty(genericTypes)) {
+            returnParamType.setTypeArguments(genericTypes);
+        }
+        return returnParamType;
+    }
+
+
 }

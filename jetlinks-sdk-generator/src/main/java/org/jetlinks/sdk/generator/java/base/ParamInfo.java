@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor(staticName = "of")
-@NoArgsConstructor(staticName = "of")
+@NoArgsConstructor
 public class ParamInfo extends AnnotatedElementInfo {
 
     @Schema(description = "参数类型")
@@ -25,10 +25,14 @@ public class ParamInfo extends AnnotatedElementInfo {
                                List<AnnotationInfo> annotationInfos,
                                ClassInfo type,
                                List<ClassInfo> generics) {
-        ParamInfo paramInfo = of(type, generics);
+        ParamInfo paramInfo = ParamInfo.of(type, generics);
         paramInfo.setAnnotations(annotationInfos);
         paramInfo.setName(name);
         return paramInfo;
+    }
+
+    public static ParamInfo of() {
+        return new ParamInfo();
     }
 
 }

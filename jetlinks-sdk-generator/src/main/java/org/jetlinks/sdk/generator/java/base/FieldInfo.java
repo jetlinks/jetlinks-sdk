@@ -34,6 +34,15 @@ public class FieldInfo extends AnnotatedElementInfo {
 
     public static FieldInfo copyFrom(ClassInfo classInfo) {
         return FieldInfo.of(classInfo.getName(), classInfo, classInfo.getModifiers(), classInfo.getAnnotations());
+    }
 
+    public static FieldInfo of(String id,
+                               ClassInfo typeClass,
+                               List<Modifiers> modifiers) {
+        FieldInfo fieldInfo = new FieldInfo();
+        fieldInfo.setId(id);
+        fieldInfo.setModifiers(modifiers);
+        fieldInfo.setTypeClass(typeClass);
+        return fieldInfo;
     }
 }

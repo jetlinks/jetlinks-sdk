@@ -3,6 +3,7 @@ package org.jetlinks.sdk.generator.java.utils;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.base.AnnotationProperty;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
@@ -159,7 +160,7 @@ public class AnnotationExpressionUtils {
             AnnotationExpr annotationExpr;
             if (CollectionUtils.isEmpty(properties)) {
                 annotationExpr = toMarkerAnnotationExpr(name);
-            } else if (properties.size() == 1) {
+            } else if (properties.size() == 1 && StringUtils.equals(properties.get(0).getName(), "value")) {
                 annotationExpr = toSingleMemberAnnotationExpr(name, properties.get(0));
             } else {
                 annotationExpr = toNormalAnnotationExpr(name, properties);
@@ -179,8 +180,7 @@ public class AnnotationExpressionUtils {
     public static AnnotationExpr toNormalAnnotationExpr(String name, List<AnnotationProperty> properties) {
         NodeList<MemberValuePair> nodeList = new NodeList<>();
         for (AnnotationProperty property : properties) {
-            Expression expression = ExpressionUtils.getExpression(property.getType(),
-                                                                  property.getDefaultValue());
+            Expression expression = ExpressionUtils.getExpression(property.getType(), property.getDefaultValue());
             MemberValuePair memberValuePair = new MemberValuePair(property.getName(), expression);
             nodeList.add(memberValuePair);
         }
@@ -195,8 +195,7 @@ public class AnnotationExpressionUtils {
      * @return AnnotationExpr
      */
     public static AnnotationExpr toSingleMemberAnnotationExpr(String name, AnnotationProperty property) {
-        Expression expression = ExpressionUtils.getExpression(property.getType(),
-                                                              property.getDefaultValue());
+        Expression expression = ExpressionUtils.getExpression(property.getType(), property.getDefaultValue());
         return new SingleMemberAnnotationExpr(new Name(name), expression);
     }
 

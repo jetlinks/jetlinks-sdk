@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @AllArgsConstructor(staticName = "of")
-@NoArgsConstructor(staticName = "of")
+@NoArgsConstructor
 public class AnnotationInfo extends AnnotatedElementInfo {
 
     @Schema(description = "类型")
@@ -21,7 +21,7 @@ public class AnnotationInfo extends AnnotatedElementInfo {
     private List<AnnotationProperty> properties;
 
     public static AnnotationInfo of(String name, ClassInfo type) {
-        AnnotationInfo annotationInfo = of();
+        AnnotationInfo annotationInfo = new AnnotationInfo();
         annotationInfo.setName(name);
         annotationInfo.setType(type);
         return annotationInfo;
