@@ -10,6 +10,9 @@ public enum Modifiers implements EnumDict<String> {
     DEFAULT("default"),
     PUBLIC("public"),
     PROTECTED("protected"),
+    ABSTRACT("abstract"),
+    STATIC("static"),
+    FINAL("final"),
     PRIVATE("private");
     private final String text;
 

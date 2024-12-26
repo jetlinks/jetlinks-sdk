@@ -1,10 +1,18 @@
 package org.jetlinks.sdk.generator.java.utils;
 
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.TypeParameter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.sdk.generator.java.base.AnnotationInfo;
+import org.jetlinks.sdk.generator.java.base.ArgumentsInfo;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
+import org.jetlinks.sdk.server.utils.ConverterUtils;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 表达式转换工具类
@@ -100,6 +108,36 @@ public class ExpressionUtils {
                 return new BooleanLiteralExpr(Boolean.parseBoolean(valueStr));
             case "Class":
                 return new ClassExpr(new TypeParameter(valueStr));
+            case "Array":
+                List<?> valueList = (List<?>) value;
+                List<Expression> expressionList;
+                if (CollectionUtils.isEmpty(valueList)) {
+                    return new ArrayInitializerExpr();
+                }
+                Object item = valueList.get(0);
+                if (item instanceof AnnotationInfo) {
+                    List<AnnotationInfo> annotationInfos = ConverterUtils
+                            .convertToList(item, object -> FastBeanCopier.copy(object, AnnotationInfo.class));
+                    expressionList = AnnotationExpressionUtils
+                            .toAnnotationExprList(annotationInfos)
+                            .stream()
+                            .map(annotationExpr -> ((Expression) annotationExpr))
+                            .collect(Collectors.toList());
+                } else if (item instanceof ClassInfo) {
+                    expressionList = ConverterUtils
+                            .convertToList(item, object -> FastBeanCopier.copy(object, ClassInfo.class))
+                            .stream()
+                            .map(clazz -> getExpression(ClassInfo.of("Class", clazz.getClassPackage()), clazz.getName()))
+                            .collect(Collectors.toList());
+                } else {
+                    expressionList = ConverterUtils
+                            .convertToList(item, String::valueOf)
+                            .stream()
+                            .map(clazz -> getExpression(ClassInfo.of("String"), clazz))
+                            .collect(Collectors.toList());
+                }
+                return new ArrayInitializerExpr(new NodeList<>(expressionList));
+
             default:
                 String intactClassName = ClassInfo.getIntactClassName(classInfo);
                 if (valueStr.contains(".")) {
@@ -111,5 +149,18 @@ public class ExpressionUtils {
 
         }
 
+    }
+
+    public static ArgumentsInfo getExpressionArgumentsInfos(Expression expression, Map<String, String> importMap) {
+        ClassInfo classInfo = getExpressionClassInfo(expression, importMap);
+        Object expressionValue = getExpressionValue(expression);
+        return ArgumentsInfo.of(classInfo, expressionValue);
+    }
+
+    public static List<ArgumentsInfo> getExpressionArgumentsInfos(List<Expression> expressions, Map<String, String> importMap) {
+        return expressions
+                .stream()
+                .map(expression -> getExpressionArgumentsInfos(expression, importMap))
+                .collect(Collectors.toList());
     }
 }
