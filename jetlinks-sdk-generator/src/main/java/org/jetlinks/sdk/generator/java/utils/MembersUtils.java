@@ -97,7 +97,6 @@ public class MembersUtils {
         Type parameterType = parameter.getType();
         ClassInfo classInfo = TypeUtils.handleClassOrInterface(parameterType, importsMap);
         List<ClassInfo> genericTypes = classInfo.getGenerics();
-        classInfo.setGenerics(null);
         List<AnnotationInfo> annotationInfos = AnnotationExpressionUtils.handleAnnotationExpression(parameter.getAnnotations(), importsMap);
         return ParamInfo.of(parameter.getNameAsString(), annotationInfos, classInfo, genericTypes);
     }
