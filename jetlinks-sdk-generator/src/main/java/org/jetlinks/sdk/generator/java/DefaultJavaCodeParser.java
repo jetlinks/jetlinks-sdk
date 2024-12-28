@@ -78,6 +78,7 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
                     List<MethodInfo> methodInfos = entry
                             .getClassBody()
                             .stream()
+                            .filter(BodyDeclaration::isMethodDeclaration) // todo 暂时忽略枚举非方法类型的定义
                             .map(BodyDeclaration::asMethodDeclaration)
                             .map(methodDec -> MembersUtils.handleMethodMember(methodDec, importsMap))
                             .collect(Collectors.toList());
