@@ -279,7 +279,11 @@ public class MembersUtils {
                     .getModifiers()
                     .stream()
                     .anyMatch(modifiers -> modifiers == Modifiers.ABSTRACT);
-            if (anyMatch) {
+            boolean commandHandler = methodInfo
+                    .getAnnotations()
+                    .stream()
+                    .anyMatch(ann -> StringUtils.equals(ann.getName(), "CommandHandler"));
+            if (anyMatch || commandHandler) {
                 methodDeclaration.setBody(null);
             } else if (!StringUtils.equals(methodInfo.getReturnParam().getName(), "void")) {
                 methodDeclaration.createBody()
