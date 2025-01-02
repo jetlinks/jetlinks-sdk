@@ -282,7 +282,10 @@ public class MembersUtils {
             boolean commandHandler = methodInfo
                     .getAnnotations()
                     .stream()
-                    .anyMatch(ann -> StringUtils.equals(ann.getName(), "CommandHandler"));
+                    .anyMatch(ann -> StringUtils
+                            .equals(ann.getType()
+                                       .getClassPackage(),
+                                    "org.jetlinks.core.annotation.command.CommandHandler"));
             if (anyMatch || commandHandler) {
                 methodDeclaration.setBody(null);
             } else if (!StringUtils.equals(methodInfo.getReturnParam().getName(), "void")) {
