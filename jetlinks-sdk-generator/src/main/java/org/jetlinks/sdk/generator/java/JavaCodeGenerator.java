@@ -20,6 +20,10 @@ public interface JavaCodeGenerator {
         return new JavaEnumGenerator(classPackage, className);
     }
 
+    static JavaCodeGenerator createInterface(String classPackage, String className) {
+        return new JavaInterfaceGenerator(classPackage, className);
+    }
+
 
     /**
      * 添加导包信息
