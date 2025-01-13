@@ -11,7 +11,8 @@ import org.hswebframework.web.dict.I18nEnumDict;
 @Getter
 public enum AiDomain implements I18nEnumDict<String> {
 
-    ComputerVision("计算机视觉");
+    ComputerVision("计算机视觉"),
+    LLM("大模型");
 
     private final String text;
 

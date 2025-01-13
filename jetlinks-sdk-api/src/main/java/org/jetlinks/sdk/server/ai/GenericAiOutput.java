@@ -20,7 +20,7 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput<SELF> {
+public class GenericAiOutput<SELF extends GenericAiOutput<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput<SELF> {
 
     @Schema(title = "源数据id")
     private String sourceId;
