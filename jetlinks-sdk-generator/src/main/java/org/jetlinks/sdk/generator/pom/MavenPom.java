@@ -17,6 +17,8 @@ import java.util.Map;
 @ToString
 public class MavenPom {
 
+    private String modelVersion = "4.0.0";
+
     @NotBlank
     private Project project;
 
