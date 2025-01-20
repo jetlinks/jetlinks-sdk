@@ -58,6 +58,9 @@ public class TypeUtils {
                             .map(referenceType -> toClassInfo(referenceType, importsMap))
                             .orElseGet(() -> ClassInfo.of(type.asWildcardType().asString())));
 
+        } else if (type.isTypeParameter()) {
+            String paramName = type.asTypeParameter().getNameAsString();
+            return ClassInfo.of(paramName, importsMap.get(paramName));
         } else {
             ClassInfo classInfo = toClassInfo(type, importsMap);
             type.asClassOrInterfaceType()
@@ -129,7 +132,17 @@ public class TypeUtils {
         }
         return generics
                 .stream()
-                .map(clazz -> StaticJavaParser.parseType(clazz.getName()))
+                .map(clazz -> {
+                    Type type = StaticJavaParser.parseType(clazz.getName());
+                    if (CollectionUtils.isNotEmpty(clazz.getGenerics())
+                            && type.isClassOrInterfaceType()) {
+                        Type[] genericTypeArr = toGenericTypeArr(clazz.getGenerics());
+                        ClassOrInterfaceType classOrInterfaceType = type.asClassOrInterfaceType();
+                        classOrInterfaceType.setTypeArguments(genericTypeArr);
+                        return classOrInterfaceType;
+                    }
+                    return type;
+                })
                 .toArray(Type[]::new);
     }
 

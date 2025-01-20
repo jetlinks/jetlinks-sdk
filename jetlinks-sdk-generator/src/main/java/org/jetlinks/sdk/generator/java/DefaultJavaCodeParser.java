@@ -45,6 +45,11 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
      * @param importsMap 导包Map
      */
     private void doParseClass(ClassOrInterfaceDeclaration clazz, ClassInfo classInfo, Map<String, String> importsMap) {
+        List<ClassInfo> generics = clazz
+                .getTypeParameters()
+                .stream()
+                .map(typeParameter -> TypeUtils.handleClassOrInterface(typeParameter, importsMap))
+                .collect(Collectors.toList());
 
         //获取父类信息
         clazz.getExtendedTypes()
@@ -57,7 +62,8 @@ public class DefaultJavaCodeParser implements JavaCodeParser {
 
         //填充类各部分信息
         classInfo
-                .withInterfaces(interfaceInfo);
+                .withInterfaces(interfaceInfo)
+                .withGenerics(generics);
     }
 
     /**
