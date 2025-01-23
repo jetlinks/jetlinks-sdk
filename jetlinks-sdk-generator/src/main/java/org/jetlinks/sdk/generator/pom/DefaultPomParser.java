@@ -56,6 +56,7 @@ public class DefaultPomParser implements PomParser {
     @Override
     public void update(MavenPom pom) {
         copyFromProject(pom.getProject());
+        model.setModelVersion(pom.getModelVersion());
         model.setModules(pom.getModules());
         if (pom.getProperties() == null) {
             model.setProperties(new Properties());
@@ -109,6 +110,7 @@ public class DefaultPomParser implements PomParser {
     private static MavenPom parse(Model model) {
         MavenPom mavenPom = new MavenPom();
         mavenPom.setProject(copyProject(model));
+        mavenPom.setModelVersion(model.getModelVersion());
         mavenPom.setModules(model.getModules());
         mavenPom.setProperties(FastBeanCopier.copy(model.getProperties(), new HashMap<>()));
         mavenPom.setProfiles(model.getProfiles());
