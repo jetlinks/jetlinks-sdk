@@ -1,14 +1,12 @@
 package org.jetlinks.sdk.server.ui.field.annotation.field.select;
 
-import org.hswebframework.web.api.crud.entity.GenericEntity;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 通用实体查询选择器
+ * 实体通用查询接口选择器
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,7 +16,7 @@ public @interface EntitySelector {
     /**
      * 来源为实体类
      */
-    Class<? extends GenericEntity<?>> value();
+    Class<?> value();
 
     /**
      * 配置组件的提交字段
