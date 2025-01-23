@@ -17,5 +17,5 @@ public @interface JoinVo {
     /**
      * 主表实体类
      */
-    Class<? extends GenericEntity<?>> value();
+    Class<?> value();
 }
