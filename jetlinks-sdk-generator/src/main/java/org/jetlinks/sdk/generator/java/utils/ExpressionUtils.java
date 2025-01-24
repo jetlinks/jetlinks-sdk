@@ -4,7 +4,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.TypeParameter;
 import org.apache.commons.collections4.CollectionUtils;
-import org.hswebframework.web.bean.FastBeanCopier;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.sdk.generator.java.base.AnnotationInfo;
 import org.jetlinks.sdk.generator.java.base.ArgumentsInfo;
 import org.jetlinks.sdk.generator.java.base.ClassInfo;
@@ -68,8 +68,7 @@ public class ExpressionUtils {
         } else if (expression.isBooleanLiteralExpr()) {
             classInfo = ClassInfo.of("Boolean");
         } else if (expression.isClassExpr()) {
-            String className = expression.asClassExpr().getTypeAsString();
-            classInfo = ClassInfo.of(className, importMap.get(className));
+            classInfo = ClassInfo.of("Class");
         } else if (expression.isArrayInitializerExpr()) {
             classInfo = ClassInfo.of("Array");
         } else if (expression.isFieldAccessExpr()) {
@@ -106,40 +105,45 @@ public class ExpressionUtils {
                 return new IntegerLiteralExpr(valueStr);
             case "Boolean":
                 return new BooleanLiteralExpr(Boolean.parseBoolean(valueStr));
+            case "Long":
+                return new LongLiteralExpr(valueStr);
+            case "Double":
+                return new DoubleLiteralExpr(valueStr);
+            case "Character":
+                return new CharLiteralExpr(valueStr);
             case "Class":
+                if (value instanceof ClassInfo) {
+                    ClassInfo clazz = (ClassInfo) value;
+                    return new ClassExpr(new TypeParameter(clazz.getName()));
+                }
                 return new ClassExpr(new TypeParameter(valueStr));
             case "Array":
                 List<?> valueList = (List<?>) value;
-                List<Expression> expressionList;
                 if (CollectionUtils.isEmpty(valueList)) {
                     return new ArrayInitializerExpr();
                 }
-                Object item = valueList.get(0);
-                if (item instanceof AnnotationInfo) {
-                    List<AnnotationInfo> annotationInfos = ConverterUtils
-                            .convertToList(item, object -> FastBeanCopier.copy(object, AnnotationInfo.class));
-                    expressionList = AnnotationExpressionUtils
-                            .toAnnotationExprList(annotationInfos)
-                            .stream()
-                            .map(annotationExpr -> ((Expression) annotationExpr))
-                            .collect(Collectors.toList());
-                } else if (item instanceof ClassInfo) {
-                    expressionList = ConverterUtils
-                            .convertToList(item, object -> FastBeanCopier.copy(object, ClassInfo.class))
-                            .stream()
-                            .map(clazz -> getExpression(ClassInfo.of("Class", clazz.getClassPackage()), clazz.getName()))
-                            .collect(Collectors.toList());
-                } else {
-                    expressionList = ConverterUtils
-                            .convertToList(item, String::valueOf)
-                            .stream()
-                            .map(clazz -> getExpression(ClassInfo.of("String"), clazz))
-                            .collect(Collectors.toList());
-                }
+                List<Expression> expressionList = ConverterUtils
+                        .convertToList(valueList, obj -> {
+                            if (obj instanceof AnnotationInfo) {
+                                return AnnotationExpressionUtils.toAnnotationExpr((AnnotationInfo) obj);
+                            } else if (obj instanceof ClassInfo) {
+                                ClassInfo clazz = (ClassInfo) obj;
+                                if (StringUtils.contains(clazz.getName(), ".")) {
+                                    // 处理枚举类型
+                                    return getExpression(clazz, clazz.getName());
+                                }
+                                return getExpression(ClassInfo.of("Class", clazz.getClassPackage()), clazz.getName());
+                            } else {
+                                return getExpression(ClassInfo.of(obj.getClass().getSimpleName()), obj);
+                            }
+                        });
                 return new ArrayInitializerExpr(new NodeList<>(expressionList));
 
             default:
                 String intactClassName = ClassInfo.getIntactClassName(classInfo);
+                if (intactClassName.contains(".")) {
+                    intactClassName = intactClassName.substring(0, intactClassName.lastIndexOf("."));
+                }
                 if (valueStr.contains(".")) {
                     String[] split = valueStr.split("\\.");
                     return new FieldAccessExpr(new NameExpr(intactClassName), split[split.length - 1]);

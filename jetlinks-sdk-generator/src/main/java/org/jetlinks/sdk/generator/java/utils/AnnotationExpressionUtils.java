@@ -128,6 +128,8 @@ public class AnnotationExpressionUtils {
                 childAnnoExpression.add(handleAnnotationExpression(expression.asAnnotationExpr(), importsMap));
             } else if (expression.isStringLiteralExpr()) {
                 childPrimitiveProperties.add(ExpressionUtils.getExpressionValue(expression));
+            } else if (expression.isFieldAccessExpr()) {
+                childAnnotationClass.add(ExpressionUtils.getExpressionClassInfo(expression, importsMap));
             }
         }
 
@@ -153,21 +155,30 @@ public class AnnotationExpressionUtils {
         if (CollectionUtils.isEmpty(annotationInfos)) {
             return new ArrayList<>();
         }
-        List<AnnotationExpr> annotations = new ArrayList<>();
-        for (AnnotationInfo annotationInfo : annotationInfos) {
-            String name = annotationInfo.getName();
-            List<AnnotationProperty> properties = annotationInfo.getProperties();
-            AnnotationExpr annotationExpr;
-            if (CollectionUtils.isEmpty(properties)) {
-                annotationExpr = toMarkerAnnotationExpr(name);
-            } else if (properties.size() == 1 && StringUtils.equals(properties.get(0).getName(), "value")) {
-                annotationExpr = toSingleMemberAnnotationExpr(name, properties.get(0));
-            } else {
-                annotationExpr = toNormalAnnotationExpr(name, properties);
-            }
-            annotations.add(annotationExpr);
+        return annotationInfos
+                .stream()
+                .map(AnnotationExpressionUtils::toAnnotationExpr)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 根据注解描述，构建单个注解
+     *
+     * @param annotationInfo 注解信息
+     * @return AnnotationExpr
+     */
+    public static AnnotationExpr toAnnotationExpr(AnnotationInfo annotationInfo) {
+        String name = annotationInfo.getName();
+        List<AnnotationProperty> properties = annotationInfo.getProperties();
+        AnnotationExpr annotationExpr;
+        if (CollectionUtils.isEmpty(properties)) {
+            annotationExpr = toMarkerAnnotationExpr(name);
+        } else if (properties.size() == 1 && StringUtils.equals(properties.get(0).getName(), "value")) {
+            annotationExpr = toSingleMemberAnnotationExpr(name, properties.get(0));
+        } else {
+            annotationExpr = toNormalAnnotationExpr(name, properties);
         }
-        return annotations;
+        return annotationExpr;
     }
 
     /**
