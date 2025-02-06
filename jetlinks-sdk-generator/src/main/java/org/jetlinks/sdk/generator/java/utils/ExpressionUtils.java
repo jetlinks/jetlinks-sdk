@@ -12,6 +12,7 @@ import org.jetlinks.sdk.server.utils.ConverterUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -68,7 +69,11 @@ public class ExpressionUtils {
         } else if (expression.isBooleanLiteralExpr()) {
             classInfo = ClassInfo.of("Boolean");
         } else if (expression.isClassExpr()) {
-            classInfo = ClassInfo.of("Class");
+            String className = expression.asClassExpr().getTypeAsString();
+            String clazzPackage = Optional
+                .ofNullable(importMap.get(className))
+                .orElseGet(() -> String.join(".", importMap.get("classPackage"), className));
+            classInfo = ClassInfo.of("Class", clazzPackage);
         } else if (expression.isArrayInitializerExpr()) {
             classInfo = ClassInfo.of("Array");
         } else if (expression.isFieldAccessExpr()) {
