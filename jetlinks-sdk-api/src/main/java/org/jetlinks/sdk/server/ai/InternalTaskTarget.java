@@ -17,11 +17,13 @@ public enum InternalTaskTarget implements TaskTarget {
     ObjectDetection("目标检测"),
 
     ImageRecognition("图像识别"),
+    ImageEmbedding("图片向量化"),
 
     /* =- 自然语言处理 -= */
     TextClassification("文本分类"),
     SpeechRecognition("语音识别"),
     TextGeneration("文本生成"),
+    TextEmbedding("文本向量化"),
 
     /* =- 语音处理 -= */
     SpeechSynthesis("语音合成"),

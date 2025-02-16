@@ -14,6 +14,7 @@ import org.jetlinks.core.utils.MetadataUtils;
 import org.springframework.core.ResolvableType;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

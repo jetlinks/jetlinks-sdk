@@ -22,7 +22,7 @@ import java.util.List;
  * @see org.jetlinks.sdk.server.ai.InternalTaskTarget#ImageRecognition
  * @since 1.0.1
  */
-public abstract class ComputerVisionCommand<R extends AiOutput, Self extends ComputerVisionCommand<R, Self>>
+public abstract class ComputerVisionCommand<R extends AiOutput<R>, Self extends ComputerVisionCommand<R, Self>>
     extends AbstractCommand<Flux<R>, Self> implements AiCommand<R> {
 
     @Schema(title = "任务ID")

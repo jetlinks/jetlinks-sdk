@@ -9,6 +9,6 @@ import reactor.core.publisher.Flux;
  * @param <R> 命令返回类型
  * @see AiDomain
  */
-public interface AiCommand<R extends AiOutput> extends Command<Flux<R>> {
+public interface AiCommand<R extends AiOutput<R>> extends Command<Flux<R>> {
 
 }
