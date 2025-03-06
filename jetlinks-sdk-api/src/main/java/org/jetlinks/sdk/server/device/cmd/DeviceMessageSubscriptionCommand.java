@@ -41,7 +41,8 @@ public class DeviceMessageSubscriptionCommand extends AbstractCommand<Flux<Devic
     }
 
     public static FunctionMetadata metadata() {
-        return CommandMetadataResolver.resolve(DeviceMessageSubscriptionCommand.class)
+        return CommandMetadataResolver
+            .resolve(DeviceMessageSubscriptionCommand.class)
             .expand(CommandConstant.UNBOUNDED, true);
     }
 
