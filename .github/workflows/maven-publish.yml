@@ -2,8 +2,6 @@ name: Auto Deploy jetlinks-sdk to the JetLinks Maven Repository
 on:
   push:
     branches: ["master"]
-  pull_request:
-    branches: ["master"]
 
 jobs:
   publish:
@@ -42,7 +40,7 @@ jobs:
                     </server>
                   </servers>
                 </settings>" > ~/.m2/settings.xml
-          
+
           # Step 4: 构建并发布到 Maven 私有仓库
       - name: Build and Deploy to Maven
         run: mvn clean deploy
