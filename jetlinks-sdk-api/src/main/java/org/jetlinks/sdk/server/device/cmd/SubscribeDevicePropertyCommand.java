@@ -11,13 +11,12 @@ import reactor.core.publisher.Flux;
 
 import java.util.List;
 
-@Schema(title = "订阅设备属性数据", description = "根据参数返回指定条数历史数据和实时数据")
+@Schema(title = "订阅设备属性数据", description = "根据参数设备的实时属性数据")
 public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceProperty>, SubscribeDevicePropertyCommand>
     implements UnboundedResponseCommand<DeviceProperty> {
 
     public static final String DEVICE_IDS = "deviceIds";
     public static final String PRODUCT_ID = "productId";
-    public static final String HISTORY = "history";
 
     @Schema(title = "设备ID集合")
     public List<String> getDeviceIds() {
@@ -27,16 +26,6 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
 
     public SubscribeDevicePropertyCommand setDeviceIds(List<String> deviceIds) {
         return with(DEVICE_IDS, deviceIds);
-    }
-
-    @Schema(title = "历史数据条数")
-    public Integer getHistory() {
-        return (Integer) readable()
-            .getOrDefault(HISTORY, 0);
-    }
-
-    public SubscribeDevicePropertyCommand setHistory() {
-        return with(HISTORY, Integer.class);
     }
 
     public static FunctionMetadata metadata() {
