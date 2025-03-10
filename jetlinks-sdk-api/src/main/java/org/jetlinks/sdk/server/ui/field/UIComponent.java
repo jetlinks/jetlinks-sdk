@@ -1,12 +1,5 @@
 package org.jetlinks.sdk.server.ui.field;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.jetlinks.sdk.server.ui.field.annotation.field.Select;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-
-import java.lang.annotation.Annotation;
-
 public interface UIComponent {
     /**
      * 文本框
@@ -87,6 +80,36 @@ public interface UIComponent {
      * 下拉选择
      */
     String SELECT = "select";
+
+    /**
+     * 数据源配置
+     */
+    String DATA_SOURCE_CONFIG = "dataSourceConfig";
+
+    /**
+     * 数据源支持
+     */
+    String DATA_SOURCE_SUPPORT = "dataSourceSupport";
+
+    /**
+     * 设备
+     */
+    String DEVICE = "device";
+
+    /**
+     * 组织
+     */
+    String ORGANIZATION = "organization";
+
+    /**
+     * 产品
+     */
+    String PRODUCT = "product";
+
+    /**
+     * 用户
+     */
+    String USER = "user";
 
 
 }
