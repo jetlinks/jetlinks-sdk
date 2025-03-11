@@ -35,7 +35,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
 
     @Schema(title = "产品ID")
     public String getProductId() {
-        return String.valueOf(readable().get(PRODUCT_ID));
+        return getOrNull(PRODUCT_ID, String.class);
     }
 
     public SubscribeDevicePropertyCommand setProductId(String productId) {
