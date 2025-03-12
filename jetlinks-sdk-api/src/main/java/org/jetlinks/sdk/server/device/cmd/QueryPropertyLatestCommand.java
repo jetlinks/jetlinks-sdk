@@ -10,6 +10,8 @@ import org.jetlinks.sdk.server.device.DeviceProperty;
 import reactor.core.publisher.Flux;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -26,11 +28,15 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     ) {
         return CommandHandler.of(
             () -> {
+                Map<String, Object> selectorMap = new HashMap<>();
+                selectorMap.put("type", "device");
+                selectorMap.put("multiple", false);
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
                 metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyLatestCommand.class));
                 metadata.setName("根据ID查询设备最新的属性值");
                 metadata.setInputs(
-                    Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL))
+                    Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL)
+                        .expand("selector", selectorMap))
                 );
                 return metadata;
             },

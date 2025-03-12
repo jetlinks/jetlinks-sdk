@@ -9,17 +9,14 @@ import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.IntType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
-import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
+import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -58,12 +55,16 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     ) {
         return CommandHandler.of(
             () -> {
+                Map<String, Object> selectorMap = new HashMap<>();
+                selectorMap.put("type", "device");
+                selectorMap.put("multiple", false);
                 SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
                 metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyAggCommand.class));
                 metadata.setName("聚合查询设备属性值");
                 metadata.setInputs(getQueryParamMetadata());
                 metadata.setInputs(
-                    Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL))
+                    Collections.singletonList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL)
+                        .expand("selector", selectorMap))
                 );
                 return metadata;
             },
