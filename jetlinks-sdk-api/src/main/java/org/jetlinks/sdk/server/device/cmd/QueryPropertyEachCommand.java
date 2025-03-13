@@ -3,10 +3,10 @@ package org.jetlinks.sdk.server.device.cmd;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.core.annotation.ui.Selector;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.annotation.DeviceSelector;
 import org.jetlinks.sdk.server.commons.cmd.QueryCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
@@ -20,7 +20,7 @@ import java.util.function.Function;
  */
 @Schema(title = "按条件查询指定ID设备的指定属性", description = "若未指定属性，则查询设备全部属性")
 public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>, QueryPropertyEachCommand> {
-    
+
     public String getDeviceId() {
         return (String) readable().get("deviceId");
     }
@@ -60,7 +60,7 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
     @Setter
     protected static class InputSpec extends QueryCommand.InputSpec {
 
-        @Selector(type = "device")
+        @DeviceSelector
         @Schema(title = "设备ID")
         private String deviceId;
 

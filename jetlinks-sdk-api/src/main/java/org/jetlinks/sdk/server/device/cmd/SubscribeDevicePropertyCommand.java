@@ -1,10 +1,11 @@
 package org.jetlinks.sdk.server.device.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.jetlinks.core.annotation.ui.Selector;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.annotation.DeviceSelector;
+import org.jetlinks.sdk.server.annotation.ProductSelector;
 import org.jetlinks.sdk.server.commons.cmd.UnboundedResponseCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
@@ -19,7 +20,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
     public static final String DEVICE_IDS = "deviceIds";
     public static final String PRODUCT_ID = "productId";
 
-    @Selector(type = "device", multiple = true)
+    @DeviceSelector(multiple = true)
     @Schema(title = "设备ID集合")
     public List<String> getDeviceIds() {
         return ConverterUtils
@@ -35,7 +36,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
             .resolve(SubscribeDevicePropertyCommand.class);
     }
 
-    @Selector(type = "product")
+    @ProductSelector
     @Schema(title = "产品ID")
     public String getProductId() {
         return String.valueOf(readable().get(PRODUCT_ID));

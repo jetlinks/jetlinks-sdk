@@ -1,10 +1,10 @@
 package org.jetlinks.sdk.server.device.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.jetlinks.core.annotation.ui.Selector;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.annotation.DeviceSelector;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
 import reactor.core.publisher.Flux;
@@ -23,7 +23,7 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     private static final long serialVersionUID = 1L;
 
     @Override
-    @Selector(type = "device", multiple = true)
+    @DeviceSelector(multiple = true)
     public List<Object> getIdList() {
         return super.getIdList();
     }
