@@ -5,7 +5,7 @@ import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.sdk.server.file.PrepareUploadCommand;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +22,7 @@ public class UnbindChildDeviceCommand extends AbstractCommand<Mono<Void>, Unbind
 
     public static final String DEVICE_IDS = "deviceIds";
 
+    @DeviceSelector
     @Schema(description = "父设备ID")
     public String  getParentId(){
         return getOrNull("parentId", String.class);
@@ -31,6 +32,7 @@ public class UnbindChildDeviceCommand extends AbstractCommand<Mono<Void>, Unbind
         return with(PARENT_ID, parentId);
     }
 
+    @DeviceSelector(multiple = true)
     @Schema(description = "设备ID集合")
     public List<String> getDeviceIds(){
         return ConverterUtils

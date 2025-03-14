@@ -6,6 +6,8 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.commons.cmd.UnboundedResponseCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.ProductSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 
@@ -18,6 +20,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
     public static final String DEVICE_IDS = "deviceIds";
     public static final String PRODUCT_ID = "productId";
 
+    @DeviceSelector(multiple = true)
     @Schema(title = "设备ID集合")
     public List<String> getDeviceIds() {
         return ConverterUtils
@@ -33,6 +36,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
             .resolve(SubscribeDevicePropertyCommand.class);
     }
 
+    @ProductSelector
     @Schema(title = "产品ID")
     public String getProductId() {
         return getOrNull(PRODUCT_ID, String.class);

@@ -1,23 +1,24 @@
 package org.jetlinks.sdk.server.device.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetlinks.core.command.CommandHandler;
-import org.jetlinks.core.command.CommandUtils;
-import org.jetlinks.core.metadata.SimpleFunctionMetadata;
-import org.jetlinks.core.metadata.SimplePropertyMetadata;
-import org.jetlinks.core.metadata.types.ArrayType;
-import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.core.command.CommandMetadataResolver;
+import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.commons.cmd.QueryCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 /**
  * 按条件查询指定ID设备的指定属性，不指定属性则查询全部属性
  */
+@Schema(title = "按条件查询指定ID设备的指定属性", description = "若未指定属性，则查询设备全部属性")
 public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>, QueryPropertyEachCommand> {
 
     public String getDeviceId() {
@@ -45,23 +46,28 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
             Function<QueryPropertyEachCommand, Flux<DeviceProperty>> handler
     ) {
         return CommandHandler.of(
-                () -> {
-                    SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    metadata.setId(CommandUtils.getCommandIdByType(QueryPropertyEachCommand.class));
-                    metadata.setName("按条件查询指定ID设备的指定属性");
-                    metadata.setDescription("若未指定属性，则查询设备全部属性");
-                    metadata.setInputs(
-                            Arrays.asList(SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL),
-                                          SimplePropertyMetadata.of("properties",
-                                                                    "物模型属性ID",
-                                                                    new ArrayType()
-                                                                            .elementType(StringType.GLOBAL)),
-                                          getTermsMetadata())
-                    );
-                    return metadata;
-                },
+            QueryPropertyEachCommand::metadata,
                 (cmd, ignore) -> handler.apply(cmd),
                 QueryPropertyEachCommand::new
         );
     }
+
+    public static FunctionMetadata metadata() {
+        return CommandMetadataResolver.resolve(QueryPropertyEachCommand.class);
+    }
+
+    @Getter
+    @Setter
+    protected static class InputSpec extends QueryCommand.InputSpec {
+
+        @DeviceSelector
+        @Schema(title = "设备ID")
+        private String deviceId;
+
+        @Schema(title = "物模型属性ID")
+        private List<String> properties;
+
+    }
+
+
 }
