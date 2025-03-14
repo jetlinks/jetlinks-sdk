@@ -1,18 +1,20 @@
-package org.jetlinks.sdk.server.annotation;
+package org.jetlinks.sdk.server.ui.field.annotation.field.select;
 
 import org.jetlinks.core.annotation.ui.Selector;
 import org.springframework.core.annotation.AliasFor;
 
-import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 
-@Target({FIELD, METHOD, PARAMETER})
+/**
+ * 设备选择器
+ */
+@Target({FIELD, METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 @Selector(type = "device")
 public @interface DeviceSelector {
 

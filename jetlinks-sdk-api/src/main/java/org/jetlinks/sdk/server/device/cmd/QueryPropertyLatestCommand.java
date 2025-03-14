@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.sdk.server.annotation.DeviceSelector;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
 import java.util.List;

@@ -5,7 +5,7 @@ import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.sdk.server.annotation.DeviceSelector;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Mono;
 

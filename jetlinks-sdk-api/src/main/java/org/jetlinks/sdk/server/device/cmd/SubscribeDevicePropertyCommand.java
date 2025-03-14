@@ -4,10 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.sdk.server.annotation.DeviceSelector;
-import org.jetlinks.sdk.server.annotation.ProductSelector;
 import org.jetlinks.sdk.server.commons.cmd.UnboundedResponseCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.ProductSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 

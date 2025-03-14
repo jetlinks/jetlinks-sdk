@@ -10,10 +10,10 @@ import org.jetlinks.core.metadata.types.ArrayType;
 import org.jetlinks.core.metadata.types.IntType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
-import org.jetlinks.sdk.server.annotation.DeviceSelector;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
