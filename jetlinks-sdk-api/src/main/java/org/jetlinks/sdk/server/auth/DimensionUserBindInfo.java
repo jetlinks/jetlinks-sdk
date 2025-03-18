@@ -11,6 +11,6 @@ import java.util.List;
  */
 @Getter
 @Setter
-public class DimensionUserBindInfo extends DimensionUserBindRequset {
+public class DimensionUserBindInfo extends DimensionUserBindRequest {
     private List<String> userId;
 }
