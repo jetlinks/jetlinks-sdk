@@ -13,15 +13,6 @@ import java.util.Map;
 @Schema(title = "申请私人令牌")
 public class RequestPersonalTokenCommand extends AbstractCommand<Mono<PersonalToken>, RequestPersonalTokenCommand> {
 
-    @Schema(title = "私人令牌Id", description = "已申请令牌的唯一ID，当该值不为空时，会先尝试根据该ID修改已有配置")
-    public String getId() {
-        return getOrNull("id", String.class);
-    }
-
-    public RequestPersonalTokenCommand setId(String id) {
-        return with("id", id);
-    }
-
     @Schema(title = "源类型", description = "用于标识业务类型,如: 大屏链接共享. api token等.")
     public String getSourceType() {
         return getOrNull("sourceType", String.class);

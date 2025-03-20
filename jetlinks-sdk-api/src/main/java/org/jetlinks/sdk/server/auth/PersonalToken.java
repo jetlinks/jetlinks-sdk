@@ -16,9 +16,6 @@ public class PersonalToken implements Serializable {
     public PersonalToken() {
     }
 
-    @Schema(title = "令牌唯一ID")
-    private String id;
-
     @Schema(title = "所属用户ID")
     private String ownerId;
 
