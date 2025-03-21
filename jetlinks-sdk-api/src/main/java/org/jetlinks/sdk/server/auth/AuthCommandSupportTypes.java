@@ -14,7 +14,7 @@ public interface AuthCommandSupportTypes {
     // 组织
     String organization = "organization";
 
-    // 菜单那
+    // 菜单
     String menu = "menu";
 
 
