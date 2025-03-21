@@ -7,6 +7,9 @@ import org.jetlinks.sdk.server.auth.GrantScope;
 import org.jetlinks.sdk.server.auth.PersonalToken;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
+import java.util.Map;
+
 @Schema(title = "申请私人令牌")
 public class RequestPersonalTokenCommand extends AbstractCommand<Mono<PersonalToken>, RequestPersonalTokenCommand> {
 
@@ -38,12 +41,12 @@ public class RequestPersonalTokenCommand extends AbstractCommand<Mono<PersonalTo
     }
 
     @Schema(title = "重定向地址", description = "用于分享页面访问等场景 ")
-    public String getUrl() {
-        return getOrNull("url", String.class);
+    public String getRedirect() {
+        return getOrNull("redirect", String.class);
     }
 
-    public RequestPersonalTokenCommand setUrl(String url) {
-        return with("url", url);
+    public RequestPersonalTokenCommand setRedirect(String url) {
+        return with("redirect", url);
     }
 
     @Schema(title = "令牌持有者")
@@ -71,6 +74,26 @@ public class RequestPersonalTokenCommand extends AbstractCommand<Mono<PersonalTo
 
     public RequestPersonalTokenCommand setExpires(Long expires) {
         return with("expires", expires);
+    }
+
+    @Schema(title = "认证类型", description = "认证类型,用于获取token时的二次认证")
+    public String getAuthType() {
+        return getOrNull("authType", String.class);
+    }
+
+    public RequestPersonalTokenCommand setAuthType(String authType) {
+        return with("authType", authType);
+    }
+
+    @Schema(title = "认证配置", description = "认证配置,用于获取token时的二次认证")
+    public Map<String, Object> getAuthConfiguration() {
+        @SuppressWarnings("all")
+        Map<String, Object> map = getOrNull("authConfiguration", Map.class);
+        return map == null ? Collections.emptyMap() : map;
+    }
+
+    public RequestPersonalTokenCommand setAuthConfiguration(Map<String, Object> authConfiguration) {
+        return with("authConfiguration", authConfiguration);
     }
 
 
