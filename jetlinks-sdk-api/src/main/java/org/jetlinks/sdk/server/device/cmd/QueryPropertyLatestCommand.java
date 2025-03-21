@@ -6,7 +6,6 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
-import org.jetlinks.sdk.server.ui.field.annotation.InputType;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
@@ -19,7 +18,6 @@ import java.util.function.Function;
  * @author zhangji 2024/1/16
  */
 @Schema(title = "根据ID查询设备最新的属性值")
-@InputType(type = "query")
 public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<DeviceProperty>, QueryPropertyLatestCommand> {
 
     private static final long serialVersionUID = 1L;
