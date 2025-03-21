@@ -13,6 +13,7 @@ import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
+import org.jetlinks.sdk.server.ui.field.annotation.field.form.AggregationComponent;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
@@ -29,6 +30,7 @@ import java.util.function.Function;
  * @author zhangji 2024/1/16
  */
 @Schema(title = "聚合查询设备属性")
+@AggregationComponent(fields = DevicePropertyAggregation.class)
 public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<String, Object>>, QueryPropertyAggCommand> {
 
     private static final long serialVersionUID = 1L;
