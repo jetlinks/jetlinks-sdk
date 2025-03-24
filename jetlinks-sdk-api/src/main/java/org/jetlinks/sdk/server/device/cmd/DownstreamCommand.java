@@ -1,15 +1,19 @@
 package org.jetlinks.sdk.server.device.cmd;
 
+import org.jetlinks.core.annotation.ui.Selector;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
+import org.jetlinks.core.metadata.PropertyMetadata;
+import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.BooleanType;
 import org.jetlinks.core.metadata.types.LongType;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Flux;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,6 +24,8 @@ import java.util.Map;
  */
 public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageReply>
         extends AbstractCommand<Flux<R>, DownstreamCommand<T, R>> {
+
+    private static final String SELECTOR_DEVICE = "device";
 
     @SuppressWarnings("all")
     public T getMessage() {
@@ -51,11 +57,21 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
     }
 
     public static ObjectType getCommonHeadersMetadata() {
+        SimplePropertyMetadata deviceId = SimplePropertyMetadata.of("deviceId", "设备id", StringType.GLOBAL);
         return new ObjectType()
-                .addProperty("deviceId", "设备id", StringType.GLOBAL)
+            .addPropertyMetadata(addDeviceSelector(deviceId))
                 .addProperty("headers", "消息头", new ObjectType()
                         .addProperty("timeout", "指定发送消息的超时时间", LongType.GLOBAL)
                         .addProperty("async", "是否异步", BooleanType.GLOBAL));
+    }
+
+    private static PropertyMetadata addDeviceSelector(PropertyMetadata metadata) {
+        Map<String, Object> selectorMap = new HashMap<>();
+        selectorMap.put("type", SELECTOR_DEVICE);
+        selectorMap.put("multiple", false);
+        metadata.expand(Selector.KEY, selectorMap);
+
+        return metadata;
     }
 
 }
