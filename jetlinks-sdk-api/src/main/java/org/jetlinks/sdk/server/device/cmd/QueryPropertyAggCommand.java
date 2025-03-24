@@ -34,9 +34,10 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     private static final long serialVersionUID = 1L;
 
     @Override
-    @DeviceSelector(multiple = true)
-    public List<Object> getIdList() {
-        return super.getIdList();
+    @DeviceSelector
+    @Schema(name = PARAMETER_KEY_ID, title = "ID")
+    public String getId() {
+        return super.getId();
     }
 
     static Type columnsType = ResolvableType

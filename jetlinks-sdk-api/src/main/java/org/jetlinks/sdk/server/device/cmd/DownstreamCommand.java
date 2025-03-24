@@ -1,13 +1,13 @@
 package org.jetlinks.sdk.server.device.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
-import org.jetlinks.core.metadata.types.BooleanType;
-import org.jetlinks.core.metadata.types.LongType;
-import org.jetlinks.core.metadata.types.ObjectType;
-import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
@@ -18,6 +18,7 @@ import java.util.Map;
  * @see org.jetlinks.core.message.DeviceMessage
  * @see org.jetlinks.core.message.DeviceMessageReply
  */
+@Schema(title = "发送消息给设备")
 public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageReply>
         extends AbstractCommand<Flux<R>, DownstreamCommand<T, R>> {
 
@@ -50,12 +51,39 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
         return castSelf();
     }
 
-    public static ObjectType getCommonHeadersMetadata() {
-        return new ObjectType()
-                .addProperty("deviceId", "设备id", StringType.GLOBAL)
-                .addProperty("headers", "消息头", new ObjectType()
-                        .addProperty("timeout", "指定发送消息的超时时间", LongType.GLOBAL)
-                        .addProperty("async", "是否异步", BooleanType.GLOBAL));
+
+    @Setter
+    @Getter
+    protected static class InputSpec {
+
+        @Schema(title = "消息")
+        private Message message;
     }
 
+    @Setter
+    @Getter
+    protected static class Headers {
+
+        @Schema(title = "指定发送消息的超时时间")
+        private Long timeout;
+
+        @Schema(title = "是否异步")
+        private Boolean async;
+    }
+
+    @Setter
+    @Getter
+    protected static class Message {
+
+        @DeviceSelector
+        @Schema(title = "设备id")
+        private String deviceId;
+
+        @Schema(title = "消息头")
+        private Headers headers;
+    }
+
+    public static class Properties {
+
+    }
 }

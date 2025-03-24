@@ -1,21 +1,19 @@
 package org.jetlinks.sdk.server.device.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetlinks.core.command.CommandHandler;
-import org.jetlinks.core.command.CommandUtils;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.device.DeviceOperator;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.MessageType;
 import org.jetlinks.core.message.function.FunctionInvokeMessage;
 import org.jetlinks.core.message.function.FunctionInvokeMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
-import org.jetlinks.core.metadata.SimpleFunctionMetadata;
-import org.jetlinks.core.metadata.SimplePropertyMetadata;
-import org.jetlinks.core.metadata.types.ArrayType;
-import org.jetlinks.core.metadata.types.ObjectType;
-import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.sdk.server.ui.field.annotation.field.select.FunctionSelector;
 import reactor.core.publisher.Flux;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -27,6 +25,7 @@ import java.util.function.Function;
  * @see DeviceOperator#messageSender()
  * @since 1.0.1
  */
+@Schema(title = "调用设备功能", description = "向设备发送调用设备功能消息")
 public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessage, FunctionInvokeMessageReply> {
 
     @Override
@@ -47,23 +46,7 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
     }
 
     public static FunctionMetadata metadata() {
-        SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-        metadata.setId(CommandUtils.getCommandIdByType(FunctionInvokeCommand.class));
-        metadata.setName("调用设备功能");
-        metadata.setDescription("向设备发送调用设备功能消息");
-
-        SimplePropertyMetadata simplePropertyMetadata = SimplePropertyMetadata
-            .of("message", "消息",
-                getCommonHeadersMetadata()
-                    .addProperty("functionId", "功能id", StringType.GLOBAL)
-                    .addProperty("inputs", "参数",
-                                 new ArrayType()
-                                     .elementType(new ObjectType()
-                                                      .addProperty("name", "参数名称", new StringType())
-                                                      .addProperty("value", "参数值", new StringType()))));
-
-        metadata.setInputs(Collections.singletonList(simplePropertyMetadata));
-        return metadata;
+        return CommandMetadataResolver.resolve(FunctionInvokeCommand.class);
     }
 
     public static CommandHandler<FunctionInvokeCommand, Flux<FunctionInvokeMessageReply>> createHandler(
@@ -75,6 +58,36 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
                 (cmd, ignore) -> handler.apply(cmd),
                 FunctionInvokeCommand::new
             );
+    }
+
+    @Setter
+    @Getter
+    public static class InputSpec {
+
+        @Schema(title = "消息")
+        private Message message;
+    }
+
+    @Setter
+    @Getter
+    public static class Message extends DownstreamCommand.Message {
+
+        @FunctionSelector(deviceIdKey = "deviceId")
+        @Schema(title = "功能id")
+        private String functionId;
+
+        @Schema(title = "参数")
+        private Inputs[] inputs;
+    }
+
+    @Setter
+    @Getter
+    public static class Inputs {
+        @Schema(title = "参数名称")
+        private String name;
+
+        @Schema(title = "参数值")
+        private String value;
     }
 
 }

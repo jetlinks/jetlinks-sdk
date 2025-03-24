@@ -9,7 +9,6 @@ import org.jetlinks.sdk.server.device.DeviceProperty;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -23,9 +22,10 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     private static final long serialVersionUID = 1L;
 
     @Override
-    @DeviceSelector(multiple = true)
-    public List<Object> getIdList() {
-        return super.getIdList();
+    @DeviceSelector
+    @Schema(name = PARAMETER_KEY_ID, title = "ID")
+    public String getId() {
+        return super.getId();
     }
 
     public static CommandHandler<QueryPropertyLatestCommand, Flux<DeviceProperty>> createHandler(
