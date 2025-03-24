@@ -7,6 +7,7 @@ import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
+import org.jetlinks.sdk.server.ui.field.annotation.InputProperties;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
@@ -76,6 +77,7 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
     protected static class Message {
 
         @DeviceSelector
+        @InputProperties(required = true)
         @Schema(title = "设备id")
         private String deviceId;
 

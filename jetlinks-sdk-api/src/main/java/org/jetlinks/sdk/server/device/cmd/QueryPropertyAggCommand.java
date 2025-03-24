@@ -13,6 +13,7 @@ import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
+import org.jetlinks.sdk.server.ui.field.annotation.InputProperties;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
@@ -35,6 +36,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
 
     @Override
     @DeviceSelector
+    @InputProperties(required = true)
     @Schema(name = PARAMETER_KEY_ID, title = "ID")
     public String getId() {
         return super.getId();
@@ -45,6 +47,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         .getType();
 
     @Schema(title = "聚合字段")
+    @InputProperties(required = true)
     public List<DevicePropertyAggregation> getColumns() {
         return getOrNull("columns", columnsType);
     }
@@ -55,6 +58,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
     }
 
     @Schema(title = "查询条件")
+    @InputProperties(required = true)
     public AggregationRequest getQuery() {
         return getOrNull("query", AggregationRequest.class);
     }

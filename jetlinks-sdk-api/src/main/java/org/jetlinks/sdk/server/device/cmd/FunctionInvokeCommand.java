@@ -11,6 +11,7 @@ import org.jetlinks.core.message.MessageType;
 import org.jetlinks.core.message.function.FunctionInvokeMessage;
 import org.jetlinks.core.message.function.FunctionInvokeMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.ui.field.annotation.InputProperties;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.FunctionSelector;
 import reactor.core.publisher.Flux;
 
@@ -73,6 +74,7 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
     public static class Message extends DownstreamCommand.Message {
 
         @FunctionSelector(deviceIdKey = "deviceId")
+        @InputProperties(required = true)
         @Schema(title = "功能id")
         private String functionId;
 
