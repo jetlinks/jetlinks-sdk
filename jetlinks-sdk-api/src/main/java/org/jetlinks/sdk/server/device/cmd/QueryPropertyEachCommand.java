@@ -13,6 +13,7 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import reactor.core.publisher.Flux;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.function.Function;
 
@@ -63,6 +64,7 @@ public class QueryPropertyEachCommand extends QueryCommand<Flux<DeviceProperty>,
     protected static class InputSpec extends QueryCommand.InputSpec {
 
         @DeviceSelector
+        @NotBlank
         @Schema(title = "设备ID")
         private String deviceId;
 

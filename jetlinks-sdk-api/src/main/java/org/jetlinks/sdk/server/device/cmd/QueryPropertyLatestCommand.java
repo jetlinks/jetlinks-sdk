@@ -6,10 +6,10 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
-import org.jetlinks.sdk.server.ui.field.annotation.InputProperties;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
+import javax.validation.constraints.NotBlank;
 import java.util.function.Function;
 
 /**
@@ -25,7 +25,7 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     @Override
     @DeviceSelector
     @Schema(name = PARAMETER_KEY_ID, title = "ID")
-    @InputProperties(required = true)
+    @NotBlank
     public String getId() {
         return super.getId();
     }

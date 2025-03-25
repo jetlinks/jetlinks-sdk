@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Flux;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+@Schema(title = "新增数据", description = "批量新增数据")
 public class AddCommand<T> extends BatchDataCommand<T, AddCommand<T>> implements GenericInputCommand<T> {
 
     public static FunctionMetadata metadata(Class<?> dataType) {
