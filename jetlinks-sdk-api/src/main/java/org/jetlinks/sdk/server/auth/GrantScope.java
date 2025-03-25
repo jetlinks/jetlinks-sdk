@@ -4,27 +4,62 @@ import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.hswebframework.web.authorization.Authentication;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.*;
-import java.util.List;
-import java.util.Set;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+import java.util.*;
 
 @Getter
 @Setter
 public class GrantScope implements Externalizable {
 
     @Schema(title = "授权维度", description = "如授权访问指定的组织,角色等.")
-    private List<DimensionInfo> dimensions;
+    private List<DimensionInfo> dimensions = new ArrayList<>();
 
     @Schema(title = "授权权限", description = "如授权访问指定的权限等.")
-    private List<Permit> permissions;
+    private List<Permit> permissions = new ArrayList<>();
 
     // 预留,权限分组
     @Schema(title = "分组", hidden = true)
-    private List<String> groups;
+    private List<String> groups = new ArrayList<>();
+
+    /**
+     * @see Authentication#getAttributes()
+     */
+    private Map<String, Object> attributes = new HashMap<>();
 
     public GrantScope() {
+    }
+
+    public boolean isEmpty() {
+        return CollectionUtils.isEmpty(dimensions)
+            && CollectionUtils.isEmpty(permissions)
+            && CollectionUtils.isEmpty(groups);
+    }
+
+    public GrantScope addDimension(String type, String id) {
+        return addDimension(type, id, null);
+    }
+
+    public GrantScope addDimension(String type, String id, Map<String, Object> options) {
+        dimensions.add(new DimensionInfo(type, id, options));
+        return this;
+    }
+
+
+    public GrantScope addPermission(String id, String... action) {
+        permissions.add(Permit.of(id, action));
+        return this;
+    }
+
+    public GrantScope addAttribute(String key, String value) {
+        attributes.put(key,value);
+        return this;
     }
 
     @Getter
