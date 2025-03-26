@@ -19,19 +19,19 @@ import java.util.*;
 public class GrantScope implements Externalizable {
 
     @Schema(title = "授权维度", description = "如授权访问指定的组织,角色等.")
-    private List<DimensionInfo> dimensions = new ArrayList<>();
+    private List<DimensionInfo> dimensions;
 
     @Schema(title = "授权权限", description = "如授权访问指定的权限等.")
-    private List<Permit> permissions = new ArrayList<>();
+    private List<Permit> permissions;
 
     // 预留,权限分组
     @Schema(title = "分组", hidden = true)
-    private List<String> groups = new ArrayList<>();
+    private List<String> groups;
 
     /**
      * @see Authentication#getAttributes()
      */
-    private Map<String, Object> attributes = new HashMap<>();
+    private Map<String, Object> attributes;
 
     public GrantScope() {
     }
@@ -47,17 +47,26 @@ public class GrantScope implements Externalizable {
     }
 
     public GrantScope addDimension(String type, String id, Map<String, Object> options) {
+        if (dimensions == null) {
+            dimensions = new ArrayList<>();
+        }
         dimensions.add(new DimensionInfo(type, id, options));
         return this;
     }
 
 
     public GrantScope addPermission(String id, String... action) {
+        if (permissions == null) {
+            permissions = new ArrayList<>();
+        }
         permissions.add(Permit.of(id, action));
         return this;
     }
 
     public GrantScope addAttribute(String key, String value) {
+        if (attributes == null) {
+            attributes = new HashMap<>();
+        }
         attributes.put(key,value);
         return this;
     }
