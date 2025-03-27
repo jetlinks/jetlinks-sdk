@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class GrantScope implements Externalizable {
     public GrantScope() {
     }
 
+    @JsonIgnore
     public boolean isEmpty() {
         return CollectionUtils.isEmpty(dimensions)
             && CollectionUtils.isEmpty(permissions)
