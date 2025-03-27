@@ -14,6 +14,13 @@ import java.util.function.Function;
 @Schema(description = "批量创建数据并激活")
 public class SaveAndEnableCommand<T> extends BatchDataCommand<T, SaveAndEnableCommand<T>> {
 
+    /**
+     * 请使用{@link SaveAndEnableCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public SaveAndEnableCommand() {
+    }
+
     public static <T> SaveAndEnableCommand<T> of(Function<Object, T> converter) {
         return new SaveAndEnableCommand<T>().withConverter(converter);
     }

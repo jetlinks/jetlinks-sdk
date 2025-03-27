@@ -23,6 +23,27 @@ import java.util.function.Function;
 @Schema(title = "根据ID查询")
 public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdCommand<T>> {
 
+
+    /**
+     * 请使用{@link DeleteByIdCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public QueryByIdCommand() {
+    }
+
+    /**
+     * 使用指定的类型创建命令,执行命令后会将执行结果转换为指定类型
+     *
+     * @param type 类型
+     * @param <T>  类型
+     * @return AddCommand
+     */
+    public static <T> QueryByIdCommand<T> of(Class<T> type) {
+        return new QueryByIdCommand<T>()
+            .withConverter(CommandUtils.createConverter(ResolvableType.forType(type)));
+    }
+
+
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
         //QueryById

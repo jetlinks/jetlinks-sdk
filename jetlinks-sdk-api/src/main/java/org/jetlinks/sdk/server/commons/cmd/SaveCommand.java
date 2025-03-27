@@ -15,6 +15,20 @@ import java.util.function.Function;
 @Schema(title = "保存数据", description = "ID对应的数据不存在则新增，否则为修改。支持批量保存。", example = "{\"data\":[  ]}")
 public class SaveCommand<T> extends BatchDataCommand<T, SaveCommand<T>> {
 
+    /**
+     * 请使用{@link SaveCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public SaveCommand() {
+    }
+
+    public static <T> SaveCommand<T> of(Class<T> type) {
+        return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
+    public static <T> SaveCommand<T> of(Function<Object, T> converter) {
+        return new SaveCommand<T>().withConverter(converter);
+    }
 
     public static FunctionMetadata metadata(Class<?> dataType) {
         return metadata(ResolvableType.forClass(dataType));

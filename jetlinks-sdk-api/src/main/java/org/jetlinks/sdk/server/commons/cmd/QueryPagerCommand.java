@@ -37,6 +37,13 @@ import java.util.stream.Collectors;
 public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, QueryPagerCommand<T>> {
 
 
+    /**
+     * 请使用{@link QueryPagerCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public QueryPagerCommand() {
+    }
+
     public static FunctionMetadata metadata(Class<?> dataType) {
         return metadata(ResolvableType.forClass(dataType));
     }

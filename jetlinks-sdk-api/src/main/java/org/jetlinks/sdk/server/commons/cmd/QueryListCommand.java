@@ -31,7 +31,7 @@ import java.util.function.Function;
 public class QueryListCommand<T> extends QueryCommand<Flux<T>, QueryListCommand<T>> {
 
     /**
-     * visible for reflection
+     * 请使用{@link QueryListCommand#of(Class)}创建命令
      *
      * @see QueryListCommand#of(Class)
      * @see QueryListCommand#of(Function)
