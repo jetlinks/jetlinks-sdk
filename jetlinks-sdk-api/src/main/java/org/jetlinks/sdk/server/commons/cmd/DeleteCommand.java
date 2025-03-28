@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.hswebframework.ezorm.core.dsl.Delete;
 import org.hswebframework.ezorm.core.param.Param;
 import org.hswebframework.ezorm.core.param.Term;
@@ -31,6 +32,7 @@ import java.util.function.Function;
  * }
  * }</pre>
  */
+@Schema(title = "根据条件删除", example = "{ \"terms\":[ { \"column\":\"id\",\"value\":\"data-1\" } ] }")
 public class DeleteCommand extends AbstractCommand<Mono<Integer>, DeleteCommand> {
 
     public static final String PARAMETER_TERMS = "terms";
@@ -68,6 +70,7 @@ public class DeleteCommand extends AbstractCommand<Mono<Integer>, DeleteCommand>
         return param;
     }
 
+    @Schema(title = "删除条件")
     public List<Term> getTerms() {
         Object terms = readable().get(PARAMETER_TERMS);
         return ConverterUtils.convertTerms(terms);
@@ -92,17 +95,17 @@ public class DeleteCommand extends AbstractCommand<Mono<Integer>, DeleteCommand>
 
 
         return CommandHandler.of(
-                () -> {
-                    SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
-                    //Delete
-                    metadata.setId(CommandUtils.getCommandIdByType(DeleteCommand.class));
-                    metadata.setName("删除数据");
-                    metadata.setDescription("根据条件删除对应数据");
-                    custom.accept(metadata);
-                    return metadata;
-                },
-                (cmd, ignore) -> handler.apply(cmd),
-                DeleteCommand::new
+            () -> {
+                SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
+                //Delete
+                metadata.setId(CommandUtils.getCommandIdByType(DeleteCommand.class));
+                metadata.setName("删除数据");
+                metadata.setDescription("根据条件删除对应数据");
+                custom.accept(metadata);
+                return metadata;
+            },
+            (cmd, ignore) -> handler.apply(cmd),
+            DeleteCommand::new
         );
 
     }

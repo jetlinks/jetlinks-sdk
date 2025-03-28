@@ -22,7 +22,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.25.0</version>
+            <version>1.26.0</version>
         </dependency>
 
         <dependency>
@@ -65,6 +65,13 @@
             <artifactId>lombok</artifactId>
             <version>1.18.28</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.maven/maven-model -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>3.9.6</version>
         </dependency>
 
 

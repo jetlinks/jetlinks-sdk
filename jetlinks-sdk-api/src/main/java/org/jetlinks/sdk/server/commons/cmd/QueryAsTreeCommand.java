@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.PropertyMetadata;
@@ -25,9 +27,20 @@ import java.util.function.Function;
  * @see QueryCommand
  * @since 2.1
  */
+@Schema(title = "查询树结构数据列表")
 public class QueryAsTreeCommand<T> extends QueryCommand<Flux<T>, QueryAsTreeCommand<T>> {
 
 
+    public static FunctionMetadata metadata(Class<?> elementType) {
+        return CommandMetadataResolver.resolve(QueryAsTreeCommand.class, elementType);
+    }
+
+    public static <T> QueryAsTreeCommand<T> of(Class<?> elementType){
+        return new QueryAsTreeCommand<T>()
+            .withConverter(CommandUtils.createConverter(ResolvableType.forClass(elementType)));
+    }
+
+    @Deprecated
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
         //QueryAsTree
@@ -79,6 +92,12 @@ public class QueryAsTreeCommand<T> extends QueryCommand<Flux<T>, QueryAsTreeComm
                     .addProperty("order", "排序方式,如:asc,desc", StringType.GLOBAL)
             ))
         );
+    }
+
+
+    protected static class InputSpec extends QueryCommand.InputSpec {
+
+
     }
 
 }

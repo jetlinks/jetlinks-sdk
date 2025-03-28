@@ -2,8 +2,12 @@ package org.jetlinks.sdk.server.media;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetlinks.core.utils.SerializeUtils;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,5 +27,19 @@ public class MediaStreamInfo extends MediaInfo {
             others = new HashMap<>();
         }
         others.put(key, value);
+    }
+
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
+        SerializeUtils.writeNullableUTF(ssrc,out);
+        SerializeUtils.writeObject(others,out);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
+        ssrc = SerializeUtils.readNullableUTF(in);
+        others = (Map<String, Object>)SerializeUtils.readObject(in);
     }
 }

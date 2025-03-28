@@ -23,4 +23,11 @@ public interface SdkServices {
      */
     String authService = "authService";
 
+    /**
+     * @see org.jetlinks.sdk.server.ai.AiCommandSupports
+     * @see org.jetlinks.sdk.server.ai.cv.PushMediaStreamCommand
+     * @see org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand
+     */
+    String aiService = "aiService";
+
 }

@@ -33,6 +33,10 @@ public class DeviceInfo implements Externalizable, Jsonable {
 
     private DeviceState state;
 
+    private String parentId;
+
+    private String describe;
+
     @Override
     public JSONObject toJson() {
         JSONObject jsonObject = Jsonable.super.toJson();
@@ -52,6 +56,7 @@ public class DeviceInfo implements Externalizable, Jsonable {
         SerializeUtils.writeKeyValue(configuration, out);
         SerializeUtils.writeNullableUTF(creatorId, out);
         SerializeUtils.writeObject(createTime, out);
+        SerializeUtils.writeNullableUTF(parentId, out);
         out.writeByte(state == null ? -1 : state.ordinal());
     }
 
@@ -65,6 +70,7 @@ public class DeviceInfo implements Externalizable, Jsonable {
         configuration = SerializeUtils.readMap(in, LinkedHashMap::new);
         creatorId = SerializeUtils.readNullableUTF(in);
         createTime = (Long) SerializeUtils.readObject(in);
+        parentId = SerializeUtils.readNullableUTF(in);
         byte state = in.readByte();
         if (state >= 0) {
             this.state = DeviceState.values()[state];

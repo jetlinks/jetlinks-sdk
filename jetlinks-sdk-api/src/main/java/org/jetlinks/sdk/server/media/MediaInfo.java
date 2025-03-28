@@ -9,6 +9,9 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,26 +19,51 @@ public class MediaInfo implements Externalizable {
     @Schema(description = "流ID")
     private String streamId;
 
-    @Schema(description = "rtsp播放地址")
+    @Schema(description = "rtsp地址")
     private String rtsp;
 
-    @Schema(description = "rtmp播放地址")
+    @Schema(description = "rtmp地址")
     private String rtmp;
 
-    @Schema(description = "flv播放地址")
+    @Schema(description = "flv地址")
     private String flv;
 
-    @Schema(description = "mp4播放地址")
+    @Schema(description = "mp4地址")
     private String mp4;
+
+    @Schema(description = "rtc地址")
+    private String rtc;
+
+
+    public List<URI> toUriList() {
+        List<URI> list = new ArrayList<>(5);
+        if (rtsp != null) {
+            list.add(URI.create(rtsp));
+        }
+        if (rtmp != null) {
+            list.add(URI.create(rtmp));
+        }
+        if (flv != null) {
+            list.add(URI.create(flv));
+        }
+        if (mp4 != null) {
+            list.add(URI.create(mp4));
+        }
+        if (rtc != null) {
+            list.add(URI.create(rtc));
+        }
+        return list;
+
+    }
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(streamId,out);
-        SerializeUtils.writeNullableUTF(rtsp,out);
-        SerializeUtils.writeNullableUTF(rtmp,out);
-        SerializeUtils.writeNullableUTF(flv,out);
-        SerializeUtils.writeNullableUTF(mp4,out);
-
+        SerializeUtils.writeNullableUTF(streamId, out);
+        SerializeUtils.writeNullableUTF(rtsp, out);
+        SerializeUtils.writeNullableUTF(rtmp, out);
+        SerializeUtils.writeNullableUTF(flv, out);
+        SerializeUtils.writeNullableUTF(mp4, out);
+        SerializeUtils.writeNullableUTF(rtc, out);
     }
 
     @Override
@@ -45,5 +73,6 @@ public class MediaInfo implements Externalizable {
         rtmp = SerializeUtils.readNullableUTF(in);
         flv = SerializeUtils.readNullableUTF(in);
         mp4 = SerializeUtils.readNullableUTF(in);
+        rtc = SerializeUtils.readNullableUTF(in);
     }
 }

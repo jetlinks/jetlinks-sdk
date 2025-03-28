@@ -2,26 +2,17 @@ package org.jetlinks.sdk.server.file;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.Unpooled;
-import io.netty.util.ReferenceCountUtil;
 import lombok.SneakyThrows;
-import org.hswebframework.web.id.IDGenerator;
-import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.AbstractStreamCommand;
 import org.jetlinks.core.command.CommandSupport;
-import org.jetlinks.core.utils.ConverterUtils;
-import org.jetlinks.sdk.server.utils.ByteBufUtils;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
-import org.springframework.util.Base64Utils;
-import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.InputStream;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
@@ -70,6 +61,28 @@ public class StreamUploadFileCommand extends AbstractStreamCommand<ByteBuf, File
      */
     public StreamUploadFileCommand withFileName(String name) {
         return with("fileName", name);
+    }
+
+
+    /**
+     * 获取文件id,有值时按照已预存文件信息做上传处理
+     *
+     * @return 文件id
+     * @see PrepareUploadCommand
+     */
+    public String getFileId() {
+        return getOrNull("id", String.class);
+    }
+
+    /**
+     * 设置文件id,此时可不传其余文件基础信息
+     *
+     * @param id 文件id
+     * @return this
+     * @see PrepareUploadCommand
+     */
+    public StreamUploadFileCommand withFileId(String id) {
+        return with("id", id);
     }
 
     /**

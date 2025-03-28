@@ -1,9 +1,12 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.web.api.crud.entity.PagerResult;
+import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.CommandHandler;
+import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.*;
 import org.jetlinks.core.metadata.types.ArrayType;
@@ -18,6 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 分页查询数据指令
@@ -29,8 +33,27 @@ import java.util.function.Function;
  */
 @Getter
 @Setter
+@Schema(title = "分页查询")
 public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, QueryPagerCommand<T>> {
 
+
+    /**
+     * 请使用{@link QueryPagerCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public QueryPagerCommand() {
+    }
+
+    public static FunctionMetadata metadata(Class<?> dataType) {
+        return metadata(ResolvableType.forClass(dataType));
+    }
+
+    public static FunctionMetadata metadata(ResolvableType dataType) {
+        return CommandMetadataResolver
+            .resolve(ResolvableType.forClassWithGenerics(QueryPagerCommand.class, dataType));
+    }
+
+    @Deprecated
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();
         //QueryPager
@@ -88,22 +111,60 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
                 .elementType(type));
     }
 
+    public static <T> QueryPagerCommand<T> of(Function<Object, PagerResult<T>> converter) {
+        return new QueryPagerCommand<T>().withConverter(converter);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> QueryPagerCommand<T> of(Class<T> type) {
+        Function<Object, PagerResult<T>> converter;
+        if (type.isAssignableFrom(Void.class)) {
+            converter = val -> val instanceof PagerResult
+                ? (PagerResult<T>) val
+                : FastBeanCopier.copy(val, new PagerResult<T>());
+        } else {
+            converter = value -> {
+                PagerResult<Object> pagerResult = value instanceof PagerResult
+                    ? (PagerResult<Object>) value
+                    : FastBeanCopier.copy(value, new PagerResult<>());
+                List<T> data = pagerResult
+                    .getData()
+                    .stream()
+                    .map(d -> (T) CommandUtils.convertData(ResolvableType.forClass(type), d))
+                    .collect(Collectors.toList());
+                PagerResult<T> result = new PagerResult<T>(pagerResult.getTotal(), data);
+                result.setPageIndex(pagerResult.getPageIndex());
+                result.setPageSize(pagerResult.getPageSize());
+                return result;
+            };
+        }
+        return of(converter);
+    }
+
     public static List<PropertyMetadata> getQueryParamMetadata() {
-        return Arrays.asList(
-            SimplePropertyMetadata.of("pageIndex", "页码,从0开始.", IntType.GLOBAL),
-            SimplePropertyMetadata.of("pageSize", "每页数量", IntType.GLOBAL),
-            SimplePropertyMetadata.of("terms", "查询条件", new ArrayType().elementType(
-                new ObjectType()
-                    .addProperty("column", "列名(属性名)", StringType.GLOBAL)
-                    .addProperty("termType", "条件类型,如:like,gt,lt", StringType.GLOBAL)
-                    .addProperty("value", "条件值", new ObjectType())
-            )),
-            SimplePropertyMetadata.of("sorts", "排序", new ArrayType().elementType(
-                new ObjectType()
-                    .addProperty("name", "列名(属性名)", StringType.GLOBAL)
-                    .addProperty("order", "排序方式,如:asc,desc", StringType.GLOBAL)
-            ))
-        );
+        return CommandMetadataResolver.resolveInputs(ResolvableType.forClass(InputSpec.class));
+    }
+
+    @Getter
+    @Setter
+    public abstract static class OutputSpec<T> {
+        @Schema(title = "总数")
+        private Integer total;
+
+        @Schema(title = "数据")
+        private List<T> data;
+    }
+
+    @Getter
+    @Setter
+    protected static class InputSpec extends QueryCommand.InputSpec {
+
+        @Schema(title = "页码", description = "从0开始", defaultValue = "0")
+        private Integer pageIndex;
+
+        @Schema(title = "每页数量", defaultValue = "25")
+        private Integer pageSize;
+
     }
 
 }
