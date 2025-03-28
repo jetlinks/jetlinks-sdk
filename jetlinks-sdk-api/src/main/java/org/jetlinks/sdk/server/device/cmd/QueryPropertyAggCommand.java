@@ -34,15 +34,18 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
 
     private static final long serialVersionUID = 1L;
 
+    private static final String DEVICE_ID = "deviceId";
+
     @DeviceSelector
     @NotBlank
     @Schema(title = "设备ID")
     public String getDeviceId() {
-        return super.getId();
+        return getOrNull(DEVICE_ID, String.class);
     }
 
     public QueryPropertyAggCommand withDeviceId(String deviceId) {
-        return withId(deviceId);
+        writable().put(DEVICE_ID, deviceId);
+        return this;
     }
 
     static Type columnsType = ResolvableType
