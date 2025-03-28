@@ -10,6 +10,7 @@ import org.jetlinks.core.message.MessageType;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
+import javax.validation.constraints.NotBlank;
 import java.util.Map;
 
 /**
@@ -76,6 +77,7 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
     protected static class Message {
 
         @DeviceSelector
+        @NotBlank
         @Schema(title = "设备id")
         private String deviceId;
 

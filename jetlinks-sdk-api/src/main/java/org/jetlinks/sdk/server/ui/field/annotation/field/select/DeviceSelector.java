@@ -7,13 +7,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.*;
 
 /**
  * 设备选择器
  */
-@Target({FIELD, METHOD})
+@Target({FIELD, METHOD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Selector(type = "device")
 public @interface DeviceSelector {

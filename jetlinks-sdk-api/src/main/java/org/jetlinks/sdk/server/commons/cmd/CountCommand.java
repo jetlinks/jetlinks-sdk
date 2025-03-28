@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.command.CommandHandler;
@@ -21,6 +22,7 @@ import java.util.function.Function;
  */
 @Getter
 @Setter
+@Schema(title = "查询数量", description = "查询符合条件的数据数量")
 public class CountCommand extends QueryCommand<Mono<Integer>, CountCommand> {
 
 
