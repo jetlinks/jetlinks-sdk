@@ -6,6 +6,7 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.commons.cmd.UnboundedResponseCommand;
 import org.jetlinks.sdk.server.device.DeviceProperty;
+import org.jetlinks.sdk.server.ui.field.annotation.field.MetadataOrder;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DevicePropertySelector;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.ProductSelector;
@@ -23,6 +24,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
     public static final String PROPERTY_ID = "propertyIds";
 
     @DeviceSelector(multiple = true)
+    @MetadataOrder(order = 1)
     @Schema(title = "设备ID集合",description = "为空订阅所有设备")
     public List<String> getDeviceIds() {
         return ConverterUtils
@@ -40,6 +42,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
 
     @ProductSelector
     @Schema(title = "产品ID")
+    @MetadataOrder
     public String getProductId() {
         return getOrNull(PRODUCT_ID, String.class);
     }
@@ -51,6 +54,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
 
     @DevicePropertySelector(multiple = true, deviceIdKey = DEVICE_IDS, productIdKey = PRODUCT_ID)
     @Schema(title = "属性ID集合", description = "为空订阅所有属性")
+    @MetadataOrder(order = 2)
     public List<String> getPropertyIds() {
         return ConverterUtils
             .convertToList(readable().get(PROPERTY_ID), String::valueOf);
