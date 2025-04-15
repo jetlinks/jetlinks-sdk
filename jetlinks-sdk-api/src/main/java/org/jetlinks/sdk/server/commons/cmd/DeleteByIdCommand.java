@@ -6,13 +6,9 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
-import org.jetlinks.core.metadata.SimplePropertyMetadata;
-import org.jetlinks.core.metadata.types.StringType;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
 
-import javax.activation.CommandMap;
-import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
 

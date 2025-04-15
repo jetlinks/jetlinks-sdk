@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 @Schema(title = "AI对话命令", description = "发起AI对话,获取对话结果")
 public class ChatCommand extends AbstractCommand<Flux<ChatResponse>, ChatCommand> {
 
-    @Schema(description = "对话ID")
+    @Schema(title = "对话ID")
     public String getChatId() {
         return getOrNull("chatId", String.class);
     }
@@ -16,7 +16,7 @@ public class ChatCommand extends AbstractCommand<Flux<ChatResponse>, ChatCommand
         return with("chatId", chatId);
     }
 
-    @Schema(description = "对话消息")
+    @Schema(title = "对话消息")
     public ChatMessage getMessage() {
         return getOrNull("message", ChatMessage.class);
     }
@@ -25,4 +25,12 @@ public class ChatCommand extends AbstractCommand<Flux<ChatResponse>, ChatCommand
         return with("message", message);
     }
 
+    @Schema(title = "是否流式输出")
+    public boolean isStream(){
+        return Boolean.TRUE.equals(getOrNull("stream", Boolean.class));
+    }
+
+    public ChatCommand setStream(boolean stream) {
+        return with("stream", stream);
+    }
 }
