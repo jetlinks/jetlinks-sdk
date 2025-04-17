@@ -25,7 +25,7 @@ public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdComman
 
 
     /**
-     * 请使用{@link DeleteByIdCommand#of(Class)}创建命令
+     * 请使用{@link QueryByIdCommand#of(Class)}创建命令
      */
     @Deprecated
     public QueryByIdCommand() {

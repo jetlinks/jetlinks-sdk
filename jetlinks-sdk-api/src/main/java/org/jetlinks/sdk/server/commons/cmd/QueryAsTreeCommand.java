@@ -31,6 +31,13 @@ import java.util.function.Function;
 public class QueryAsTreeCommand<T> extends QueryCommand<Flux<T>, QueryAsTreeCommand<T>> {
 
 
+    /**
+     * 请使用{@link QueryAsTreeCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public QueryAsTreeCommand() {
+    }
+
     public static FunctionMetadata metadata(Class<?> elementType) {
         return CommandMetadataResolver.resolve(QueryAsTreeCommand.class, elementType);
     }
