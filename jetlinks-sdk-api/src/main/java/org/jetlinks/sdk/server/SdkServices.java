@@ -35,4 +35,9 @@ public interface SdkServices {
      */
     String aiAgentService = "aiAgentService";
 
+    /**
+     * @see org.jetlinks.sdk.server.notify.cmd.SendNotifyCommand
+     */
+    String notifyService = "notifyService";
+
 }
