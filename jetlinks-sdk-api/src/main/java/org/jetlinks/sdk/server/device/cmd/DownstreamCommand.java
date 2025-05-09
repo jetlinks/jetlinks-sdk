@@ -18,16 +18,32 @@ import java.util.Map;
 /**
  * 发送消息给设备
  *
- * @see org.jetlinks.core.message.DeviceMessage
- * @see org.jetlinks.core.message.DeviceMessageReply
+ * @see DeviceMessage
+ * @see DeviceMessageReply
  */
 @Schema(title = "发送消息给设备")
 public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageReply>
         extends AbstractConvertCommand<Flux<R>, DownstreamCommand<T, R>> {
 
+    @SuppressWarnings("all")
+    public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of(Class<R> replyClass) {
+        DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
+        return downstreamCommand.withConverter(r -> {
+            if (replyClass.isInstance(r)) {
+                return ((R) r);
+            }
+            return FastBeanCopier.copy(r, replyClass);
+        });
+    }
+
     public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of() {
         DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
-        return downstreamCommand.withConverter(r -> downstreamCommand.convertMessage(FastBeanCopier.copy(r, new HashMap<>())));
+        return downstreamCommand.withConverter(r -> {
+            if(r instanceof DeviceMessageReply){
+                return r;
+            }
+            return downstreamCommand.convertMessage(FastBeanCopier.copy(r, new HashMap<>()));
+        });
     }
 
     @SuppressWarnings("all")
