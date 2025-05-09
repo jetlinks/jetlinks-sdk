@@ -3,7 +3,8 @@ package org.jetlinks.sdk.server.device.cmd;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.core.command.AbstractCommand;
+import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
@@ -11,17 +12,43 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
 import javax.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 发送消息给设备
  *
- * @see org.jetlinks.core.message.DeviceMessage
- * @see org.jetlinks.core.message.DeviceMessageReply
+ * @see DeviceMessage
+ * @see DeviceMessageReply
  */
 @Schema(title = "发送消息给设备")
 public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageReply>
-        extends AbstractCommand<Flux<R>, DownstreamCommand<T, R>> {
+        extends AbstractConvertCommand<Flux<R>, DownstreamCommand<T, R>> {
+
+    @SuppressWarnings("all")
+    public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of(Class<R> replyClass) {
+        DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
+        return downstreamCommand.withConverter(r -> {
+            if (replyClass.isInstance(r)) {
+                return ((R) r);
+            }
+            return FastBeanCopier.copy(r, replyClass);
+        });
+    }
+
+    @SuppressWarnings("all")
+    public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of() {
+        DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
+        return downstreamCommand.withConverter(r -> {
+            if (r instanceof DeviceMessageReply) {
+                return r;
+            }
+            if (r instanceof Map) {
+                return downstreamCommand.convertMessage((Map<String, Object>) r);
+            }
+            return downstreamCommand.convertMessage(FastBeanCopier.copy(r, new HashMap<>()));
+        });
+    }
 
     @SuppressWarnings("all")
     public T getMessage() {
