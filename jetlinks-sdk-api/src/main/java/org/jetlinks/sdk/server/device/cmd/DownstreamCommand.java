@@ -36,11 +36,15 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
         });
     }
 
+    @SuppressWarnings("all")
     public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of() {
         DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
         return downstreamCommand.withConverter(r -> {
-            if(r instanceof DeviceMessageReply){
+            if (r instanceof DeviceMessageReply) {
                 return r;
+            }
+            if (r instanceof Map) {
+                return downstreamCommand.convertMessage((Map<String, Object>) r);
             }
             return downstreamCommand.convertMessage(FastBeanCopier.copy(r, new HashMap<>()));
         });
