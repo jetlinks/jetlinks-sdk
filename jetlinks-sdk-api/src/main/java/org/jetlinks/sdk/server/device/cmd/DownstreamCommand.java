@@ -3,7 +3,8 @@ package org.jetlinks.sdk.server.device.cmd;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetlinks.core.command.AbstractCommand;
+import org.hswebframework.web.bean.FastBeanCopier;
+import org.jetlinks.core.command.AbstractConvertCommand;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
@@ -11,6 +12,7 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
 import javax.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,7 +23,12 @@ import java.util.Map;
  */
 @Schema(title = "发送消息给设备")
 public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageReply>
-        extends AbstractCommand<Flux<R>, DownstreamCommand<T, R>> {
+        extends AbstractConvertCommand<Flux<R>, DownstreamCommand<T, R>> {
+
+    public static <T extends DeviceMessage, R extends DeviceMessageReply> DownstreamCommand<T, R> of() {
+        DownstreamCommand<T, R> downstreamCommand = new DownstreamCommand<>();
+        return downstreamCommand.withConverter(r -> downstreamCommand.convertMessage(FastBeanCopier.copy(r, new HashMap<>())));
+    }
 
     @SuppressWarnings("all")
     public T getMessage() {
