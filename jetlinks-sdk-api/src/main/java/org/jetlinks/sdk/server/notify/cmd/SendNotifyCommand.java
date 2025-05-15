@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Schema(title = "发送消息通知")
-public class SendNotifyCommand extends AbstractCommand<Mono<Void>, SendNotifyCommand> {
+public class SendNotifyCommand extends AbstractCommand<Mono<NotifyResult>, SendNotifyCommand> {
 
     @Schema(title = "通知配置ID")
     public String getNotifierId() {
@@ -42,6 +42,23 @@ public class SendNotifyCommand extends AbstractCommand<Mono<Void>, SendNotifyCom
     public String getDescription() {
         return getOrNull("description", String.class);
     }
+
+    @Schema(title = "是否开启重试")
+    public boolean isRetryEnabled() {
+        Boolean enabled = getOrNull("retryEnabled", Boolean.class);
+        return enabled == null || enabled;
+    }
+
+    public SendNotifyCommand enableRetry() {
+        writable().put("retryEnabled", true);
+        return castSelf();
+    }
+
+    public SendNotifyCommand disableRetry() {
+        writable().put("retryEnabled", false);
+        return castSelf();
+    }
+
 
     @Schema(title = "业务拓展信息")
     @SuppressWarnings("all")
