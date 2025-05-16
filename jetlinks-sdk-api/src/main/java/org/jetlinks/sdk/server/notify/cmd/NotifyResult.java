@@ -50,6 +50,11 @@ public class NotifyResult implements Externalizable {
     private List<String> receiver;
 
     /**
+     * 发送的消息内容
+     */
+    private String message;
+
+    /**
      * 其他自定义参数
      */
     private Map<String, Object> others;
@@ -58,7 +63,8 @@ public class NotifyResult implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(state);
         SerializeUtils.writeNullableUTF(callId, out);
-        SerializeUtils.writeObject(receiver,out);
+        SerializeUtils.writeObject(receiver, out);
+        SerializeUtils.writeNullableUTF(message, out);
         SerializeUtils.writeKeyValue(others, out);
     }
 
@@ -67,6 +73,7 @@ public class NotifyResult implements Externalizable {
         state = in.read();
         callId = SerializeUtils.readNullableUTF(in);
         receiver = SerializeUtils.readObjectAs(in);
+        message = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
     }
 }
