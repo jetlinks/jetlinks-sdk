@@ -15,7 +15,14 @@ import java.util.Map;
 @Setter
 public class NotifyResult implements Externalizable {
 
+    /**
+     * 通知发送成功
+     */
     public static final int STATE_SUCCESS = 0;
+
+    /**
+     * 通知已经加入队列,等待发送.
+     */
     public static final int STATE_QUEUED = 1;
 
     public static NotifyResult ok() {

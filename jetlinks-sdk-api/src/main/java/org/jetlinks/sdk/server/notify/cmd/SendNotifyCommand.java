@@ -2,6 +2,7 @@ package org.jetlinks.sdk.server.notify.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractCommand;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
@@ -9,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Schema(title = "发送消息通知")
-public class SendNotifyCommand extends AbstractCommand<Mono<NotifyResult>, SendNotifyCommand> {
+public class SendNotifyCommand extends AbstractCommand<Flux<NotifyResult>, SendNotifyCommand> {
 
     @Schema(title = "通知配置ID")
     public String getNotifierId() {
@@ -43,7 +44,7 @@ public class SendNotifyCommand extends AbstractCommand<Mono<NotifyResult>, SendN
         return getOrNull("description", String.class);
     }
 
-    @Schema(title = "是否开启重试")
+    @Schema(title = "是否开启重试", description = "默认开启,发送通知会进入队列,无法立即获取到通知结果.")
     public boolean isRetryEnabled() {
         Boolean enabled = getOrNull("retryEnabled", Boolean.class);
         return enabled == null || enabled;
