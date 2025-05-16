@@ -9,6 +9,8 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -43,6 +45,11 @@ public class NotifyResult implements Externalizable {
     private String callId;
 
     /**
+     * 消息接收者
+     */
+    private List<String> receiver;
+
+    /**
      * 其他自定义参数
      */
     private Map<String, Object> others;
@@ -51,6 +58,7 @@ public class NotifyResult implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(state);
         SerializeUtils.writeNullableUTF(callId, out);
+        SerializeUtils.writeObject(receiver,out);
         SerializeUtils.writeKeyValue(others, out);
     }
 
@@ -58,6 +66,7 @@ public class NotifyResult implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         state = in.read();
         callId = SerializeUtils.readNullableUTF(in);
+        receiver = SerializeUtils.readObjectAs(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
     }
 }
