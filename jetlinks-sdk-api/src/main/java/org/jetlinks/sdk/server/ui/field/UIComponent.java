@@ -1,12 +1,5 @@
 package org.jetlinks.sdk.server.ui.field;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.jetlinks.sdk.server.ui.field.annotation.field.Select;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-
-import java.lang.annotation.Annotation;
-
 public interface UIComponent {
     /**
      * 文本框
@@ -87,6 +80,16 @@ public interface UIComponent {
      * 下拉选择
      */
     String SELECT = "select";
+
+    /**
+     * 日期时间选择
+     */
+    String DATE_TIME = "dateTime";
+
+    /**
+     * 日期时间返回选择
+     */
+    String DATE_TIME_RANGE = "dateTimeRange";
 
 
 }
