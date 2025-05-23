@@ -10,7 +10,7 @@ import java.util.Map;
 @Setter
 public abstract class FormComponentSpec {
 
-    private final String key = "formComponent";
+    private final static String key = "formComponent";
 
     protected abstract String getComponentType();
 
