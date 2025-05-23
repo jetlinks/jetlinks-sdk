@@ -31,6 +31,7 @@ public class QueryComponentSpec extends FormComponentSpec {
     protected void appendComponentConfig(Map<String, Object> component) {
         component.put("fields", fields);
         component.put("key", key);
+        component.put("property", key);
     }
 }
 
