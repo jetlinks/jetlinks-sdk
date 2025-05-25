@@ -44,6 +44,7 @@ public class GetDimensionUserBindCommand extends AbstractConvertCommand<Flux<Dim
     public GetDimensionUserBindCommand withDimension(String type, String id) {
         Collection<DimensionUserBindRequest> dimensions = ((Collection) readable().getOrDefault("dimensions", new CopyOnWriteArrayList<>()));
         dimensions.add(new DimensionUserBindRequest(type, id));
+        withDimensions(dimensions);
         return this;
     }
 
