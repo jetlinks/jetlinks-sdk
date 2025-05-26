@@ -206,6 +206,13 @@
                 <version>${jetlinks.core.version}</version>
             </dependency>
 
+
+            <dependency>
+                <groupId>org.jetlinks</groupId>
+                <artifactId>jetlinks-supports</artifactId>
+                <version>${jetlinks.core.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
