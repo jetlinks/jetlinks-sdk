@@ -34,7 +34,7 @@ import java.util.function.Consumer;
  *   return UploadFileCommand.execute(fileService,
  *         //文件内容
  *         filePayload,
- *         //缓存大小
+ *         //分片大小
  *         512*1024,
  *         //设置文件名等信息
  *         command -> command.withFileName("face.jpg"))

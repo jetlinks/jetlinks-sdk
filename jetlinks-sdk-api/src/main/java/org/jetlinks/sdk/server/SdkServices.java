@@ -30,4 +30,14 @@ public interface SdkServices {
      */
     String aiService = "aiService";
 
+    /**
+     * @see org.jetlinks.sdk.server.ai.llm.chat.ChatMessage
+     */
+    String aiAgentService = "aiAgentService";
+
+    /**
+     * @see org.jetlinks.sdk.server.notify.cmd.SendNotifyCommand
+     */
+    String notifyService = "notifyService";
+
 }

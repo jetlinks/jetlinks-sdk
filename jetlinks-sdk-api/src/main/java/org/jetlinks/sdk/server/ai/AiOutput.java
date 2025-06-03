@@ -21,6 +21,12 @@ import java.util.Map;
  * @since 1.0.1
  */
 public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Self>, Externalizable, Jsonable {
+    /**
+     * 数据源ID
+     *有关图像处理中用拉流id作为数据源ID
+     */
+    String getSourceId();
+
 
     /**
      * 获取数据ID
@@ -83,6 +89,20 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
      */
     default List<Map<String, Object>> lightWeighFlat() {
         return flat();
+    }
+
+
+    /**
+     * 释放资源
+     */
+    default void release() {
+        List<? extends FileData> files = files();
+        if (files != null) {
+            for (FileData file : files) {
+                file.release();
+            }
+        }
+
     }
 
 

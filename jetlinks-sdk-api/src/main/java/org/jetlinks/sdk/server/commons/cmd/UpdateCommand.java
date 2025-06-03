@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.hswebframework.ezorm.core.dsl.Update;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.ezorm.core.param.UpdateParam;
@@ -41,6 +42,7 @@ import java.util.function.Function;
  * @author zhouhao
  * @since 2.1
  */
+@Schema(title = "更新数据", description = "按条件更新数据,更新条件不得为空")
 public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateCommand<T>> {
 
     public static final String PARAMETER_DATA = "data";

@@ -13,6 +13,8 @@ import org.hswebframework.web.bean.FastBeanCopier;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.NettyDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
@@ -181,7 +183,8 @@ public class ConverterUtils {
         return factory.wrap(convertNettyBuffer(obj));
     }
 
-    public static ByteBuf convertNettyBuffer(Object obj) {
+    public static <T> ByteBuf convertNettyBuffer(T obj,
+                                                 Function<T, ByteBuf> fallback) {
         if (obj == null) {
             return null;
         }
@@ -232,8 +235,34 @@ public class ConverterUtils {
             return Unpooled.wrappedBuffer(strBytes);
         }
 
-        return Unpooled.wrappedBuffer(String.valueOf(obj).getBytes());
+        return fallback.apply(obj);
     }
+
+    public static ByteBuf convertNettyBuffer(Object obj) {
+        return convertNettyBuffer(obj, val -> Unpooled.wrappedBuffer(String.valueOf(val).getBytes()));
+    }
+
+
+    @SuppressWarnings("all")
+    public static HttpHeaders convertHttpHeaders(Object headers) {
+        if (headers instanceof HttpHeaders) {
+            return (HttpHeaders) headers;
+        }
+        if (headers instanceof MultiValueMap) {
+            return new HttpHeaders((MultiValueMap) headers);
+        }
+        if (headers instanceof Map<?, ?>) {
+            Map<?, ?> httpHeaders = (Map<?, ?>) headers;
+            HttpHeaders newHeader = new HttpHeaders();
+            for (Map.Entry<?, ?> entry : httpHeaders.entrySet()) {
+                newHeader.put(String.valueOf(entry.getKey()),
+                              convertToList(entry.getValue(), String::valueOf));
+            }
+            return newHeader;
+        }
+        return org.jetlinks.core.utils.ConverterUtils.convert(headers,HttpHeaders.class);
+    }
+
 
 
 }

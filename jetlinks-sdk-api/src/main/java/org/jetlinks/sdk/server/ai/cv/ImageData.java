@@ -2,12 +2,15 @@ package org.jetlinks.sdk.server.ai.cv;
 
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
+import org.springframework.util.ObjectUtils;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -33,7 +36,9 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public String name() {
-        return (String) others.getOrDefault("name", "image.jpg");
+        return ObjectUtils.isEmpty(this.others) ?
+            "image.jpg" : (String)this.others.getOrDefault("name", "image.jpg");
+
     }
 
     public ImageData withName(String key, String value) {
@@ -66,9 +71,13 @@ public class ImageData implements FileData, Externalizable {
         type = Type.ALL[in.readByte()];
     }
 
+    public ByteBuf getData() {
+        return body();
+    }
+
     @Override
     public ByteBuf body() {
-        return data;
+        return data == null? null : Unpooled.unreleasableBuffer(data);
     }
 
     @Override
@@ -79,6 +88,11 @@ public class ImageData implements FileData, Externalizable {
     @Override
     public String getUrl() {
         return others == null ? null : (String) others.get("url");
+    }
+
+    @Override
+    public void release() {
+        ReferenceCountUtil.safeRelease(data);
     }
 
     @Getter

@@ -4,8 +4,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ui.field.annotation.field.DateTime;
 
-import java.io.*;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 @Getter
 @Setter
@@ -39,9 +43,11 @@ public class DeviceProperty implements Externalizable {
     @Schema(description = "单位")
     private String unit;
 
+    @DateTime(timestamp = true)
     @Schema(description = "时间戳")
     private long timestamp;
 
+    @DateTime(timestamp = true)
     @Schema(description = "创建时间")
     private long createTime;
 

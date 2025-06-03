@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -19,7 +20,29 @@ import java.util.function.Function;
  * @author zhouhao
  * @since 2.1
  */
+@Schema(title = "根据ID查询")
 public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdCommand<T>> {
+
+
+    /**
+     * 请使用{@link QueryByIdCommand#of(Class)}创建命令
+     */
+    @Deprecated
+    public QueryByIdCommand() {
+    }
+
+    /**
+     * 使用指定的类型创建命令,执行命令后会将执行结果转换为指定类型
+     *
+     * @param type 类型
+     * @param <T>  类型
+     * @return AddCommand
+     */
+    public static <T> QueryByIdCommand<T> of(Class<T> type) {
+        return new QueryByIdCommand<T>()
+            .withConverter(CommandUtils.createConverter(ResolvableType.forType(type)));
+    }
+
 
     public static FunctionMetadata metadata(Consumer<SimpleFunctionMetadata> custom) {
         SimpleFunctionMetadata metadata = new SimpleFunctionMetadata();

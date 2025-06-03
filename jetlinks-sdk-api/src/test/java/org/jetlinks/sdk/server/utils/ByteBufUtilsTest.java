@@ -68,7 +68,7 @@ class ByteBufUtilsTest {
                     .map(i -> ByteBufAllocator.DEFAULT.buffer().writeBytes(bytes)),
                 2048
             )
-            .doOnNext(buf -> System.out.println(buf + " " + buf.refCnt() + "=> \n" + Arrays.toString(ByteBufUtil.getBytes(buf))))
+           // .doOnNext(buf -> System.out.println(buf + " " + buf.refCnt() + "=> \n" + Arrays.toString(ByteBufUtil.getBytes(buf))))
             .as(StepVerifier::create)
             .expectNextCount(17)
             .verifyComplete();
@@ -121,7 +121,7 @@ class ByteBufUtilsTest {
                 return bytes;
             })
             .collectList()
-            .doOnNext(e -> System.out.printf("total:%s,each:%s,parts:%s\n", total, each, e))
+          //  .doOnNext(e -> System.out.printf("total:%s,each:%s,parts:%s\n", total, each, e))
             .map(list -> list.stream().mapToInt(Integer::intValue).sum())
             .as(StepVerifier::create)
             .expectNext(total)

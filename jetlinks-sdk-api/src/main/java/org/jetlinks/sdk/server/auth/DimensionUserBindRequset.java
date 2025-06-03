@@ -13,12 +13,15 @@ import java.util.Map;
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString
-public class DimensionUserBindRequset implements Serializable {
-    private String type;
-    private String id;
+@Deprecated
+public class DimensionUserBindRequset extends DimensionUserBindRequest {
+
+    public DimensionUserBindRequset() {
+    }
+
+    public DimensionUserBindRequset(String type, String id) {
+        super(type, id);
+    }
 
     @SuppressWarnings("all")
     public static DimensionUserBindRequset of(Object object) {

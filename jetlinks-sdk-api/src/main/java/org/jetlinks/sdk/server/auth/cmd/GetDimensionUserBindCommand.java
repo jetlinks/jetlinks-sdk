@@ -8,7 +8,7 @@ import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.auth.DimensionUserBindInfo;
-import org.jetlinks.sdk.server.auth.DimensionUserBindRequset;
+import org.jetlinks.sdk.server.auth.DimensionUserBindRequest;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
@@ -31,19 +31,20 @@ public class GetDimensionUserBindCommand extends AbstractConvertCommand<Flux<Dim
     private static final long serialVersionUID = 1L;
 
 
-    public List<DimensionUserBindRequset> getDimensions() {
-        return ConverterUtils.convertToList(readable().get("dimensions"), DimensionUserBindRequset::of);
+    public List<DimensionUserBindRequest> getDimensions() {
+        return ConverterUtils.convertToList(readable().get("dimensions"), DimensionUserBindRequest::of);
     }
 
-    public GetDimensionUserBindCommand withDimensions(Collection<DimensionUserBindRequset> dimensions) {
+    public GetDimensionUserBindCommand withDimensions(Collection<DimensionUserBindRequest> dimensions) {
         writable().put("dimensions", dimensions);
         return this;
     }
 
     @SuppressWarnings("all")
     public GetDimensionUserBindCommand withDimension(String type, String id) {
-        Collection<DimensionUserBindRequset> dimensions = ((Collection) readable().getOrDefault("dimensions", new CopyOnWriteArrayList<>()));
-        dimensions.add(new DimensionUserBindRequset(type, id));
+        Collection<DimensionUserBindRequest> dimensions = ((Collection) readable().getOrDefault("dimensions", new CopyOnWriteArrayList<>()));
+        dimensions.add(new DimensionUserBindRequest(type, id));
+        withDimensions(dimensions);
         return this;
     }
 
