@@ -154,6 +154,39 @@ public class ObjectMappers {
     }
 
     /**
+     * 从 JSON 数据流中提取指定字段的值流
+     *
+     * @param stream 数据流
+     * @param fieldPath 字段路径，支持嵌套字段如 "data" 或 "result.items"
+     * @param valueType 字段值类型
+     * @param <T> 字段值类型
+     * @return 字段值流
+     */
+    public static <T> Flux<T> parseJsonStreamField(Flux<DataBuffer> stream,
+                                                   String fieldPath,
+                                                   Class<T> valueType) {
+        return parseJsonStreamField(stream, fieldPath, valueType, JSON_MAPPER);
+    }
+
+    /**
+     * 从 JSON 数据流中提取指定字段的值流
+     *
+     * @param stream 数据流
+     * @param fieldPath 字段路径，支持嵌套字段如 "data" 或 "result.items"
+     * @param valueType 字段值类型
+     * @param mapper json转换器
+     * @param <T> 字段值类型
+     * @return 字段值流
+     */
+    public static <T> Flux<T> parseJsonStreamField(Flux<DataBuffer> stream,
+                                                   String fieldPath,
+                                                   Class<T> valueType,
+                                                   ObjectMapper mapper) {
+        JsonFieldExtractor extractor = new JsonFieldExtractor(fieldPath, mapper);
+        return extractor.extractField(stream, valueType);
+    }
+
+    /**
      * 转换数据流为json字节流
      *
      * @param objectStream 数据流
