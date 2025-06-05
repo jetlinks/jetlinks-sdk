@@ -6,11 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.PooledDataBuffer;
 import reactor.core.publisher.Flux;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,16 +42,18 @@ public class JsonFieldExtractor {
     public <T> Flux<T> extractField(Flux<DataBuffer> stream, Class<T> valueType) {
         return DataBufferUtils
             .join(stream)
-            .flatMapMany(bytes -> Flux.create(sink -> {
-                try (JsonParser parser = mapper
-                    .getFactory()
-                    .createParser(bytes.asInputStream(true))) {
-                    parseJsonStreamForField(parser, pathSegments, 0, sink, valueType);
-                    sink.complete();
-                } catch (Exception e) {
-                    sink.error(e);
-                }
-            }));
+            .<T>flatMapMany(bytes -> Flux
+                .create(sink -> {
+                    try (JsonParser parser = mapper
+                        .getFactory()
+                        .createParser(bytes.asInputStream(true))) {
+                        parseJsonStreamForField(parser, pathSegments, 0, sink, valueType);
+                        sink.complete();
+                    } catch (Exception e) {
+                        sink.error(e);
+                    }
+                }))
+            .doOnDiscard(PooledDataBuffer.class, DataBufferUtils::release);
     }
 
     /**
@@ -118,7 +118,7 @@ public class JsonFieldExtractor {
     @SneakyThrows
     private <T> void extractArrayValuesEfficiently(JsonParser parser, reactor.core.publisher.FluxSink<T> sink, Class<T> valueType) {
         JsonToken token;
-        while ((token = parser.nextToken()) != null && token != JsonToken.END_ARRAY) {
+        while ((token = parser.nextToken()) != null && token != JsonToken.END_ARRAY && !sink.isCancelled()) {
             if (token != JsonToken.VALUE_NULL) {
                 try {
                     T value = mapper.readValue(parser, valueType);
