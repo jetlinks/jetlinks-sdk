@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.ai.llm.chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.cv.UploadFileInfo;
 import org.jetlinks.sdk.server.ai.cv.ImageData;
 
 import java.io.Externalizable;
@@ -19,6 +20,9 @@ public class ChatMessage implements Externalizable {
 
     @Schema(title = "消息图片",description = "对话图片消息内容")
     private List<ImageData> images;
+
+    @Schema(title = "上传文件信息列表", description = "对话上传文件内容")
+    public List<UploadFileInfo> fileInfos;
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
