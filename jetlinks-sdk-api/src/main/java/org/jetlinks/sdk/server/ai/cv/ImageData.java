@@ -41,7 +41,14 @@ public class ImageData implements FileData, Externalizable {
 
     }
 
+    @Deprecated
     public ImageData withName(String key, String value) {
+        withOther("name", value);
+        return this;
+    }
+
+
+    public ImageData withName(String value) {
         withOther("name", value);
         return this;
     }
