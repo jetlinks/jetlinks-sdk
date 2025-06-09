@@ -9,6 +9,7 @@ import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.DeviceMessageReply;
 import org.jetlinks.core.message.MessageType;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
+import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Flux;
 
 import javax.validation.constraints.NotBlank;
@@ -106,6 +107,7 @@ public class DownstreamCommand<T extends DeviceMessage, R extends DeviceMessageR
         @DeviceSelector
         @NotBlank
         @Schema(title = "设备id")
+        @Order(0)
         private String deviceId;
 
         @Schema(title = "消息头")

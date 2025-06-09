@@ -3,6 +3,8 @@ package org.jetlinks.sdk.server.device.cmd;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetlinks.core.annotation.Attr;
+import org.jetlinks.core.annotation.Expands;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.device.DeviceOperator;
@@ -12,6 +14,7 @@ import org.jetlinks.core.message.function.FunctionInvokeMessage;
 import org.jetlinks.core.message.function.FunctionInvokeMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.FunctionSelector;
+import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Flux;
 
 import javax.validation.constraints.NotBlank;
@@ -76,8 +79,10 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
         @FunctionSelector(deviceIdKey = "deviceId")
         @NotBlank
         @Schema(title = "功能id")
+        @Order(1)
         private String functionId;
 
+        @Expands({@Attr(key = "type", value = "function")})
         @Schema(title = "参数")
         private Inputs[] inputs;
     }
