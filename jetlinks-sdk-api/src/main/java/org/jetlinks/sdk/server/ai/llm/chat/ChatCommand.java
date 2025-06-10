@@ -33,4 +33,13 @@ public class ChatCommand extends AbstractCommand<Flux<ChatResponse>, ChatCommand
     public ChatCommand setStream(boolean stream) {
         return with("stream", stream);
     }
+
+    @Schema(title = "用户标识")
+    public String getUser() {
+        return getOrNull("user", String.class);
+    }
+
+    public ChatCommand setUser(String user) {
+        return with("user", user);
+    }
 }
