@@ -11,6 +11,7 @@ import org.jetlinks.core.message.MessageType;
 import org.jetlinks.core.message.property.ReadPropertyMessage;
 import org.jetlinks.core.message.property.ReadPropertyMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.ui.field.annotation.field.ui.DeviceDownStreamComponent;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.function.Function;
  * @since 1.0.1
  */
 @Schema(title = "获取设备属性", description = "获取设备属性")
+@DeviceDownStreamComponent(type = MessageType.READ_PROPERTY)
 public class ReadPropertyCommand extends DownstreamCommand<ReadPropertyMessage, ReadPropertyMessageReply> {
 
     @Override

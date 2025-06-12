@@ -12,6 +12,8 @@ import org.jetlinks.core.message.function.FunctionInvokeMessage;
 import org.jetlinks.core.message.function.FunctionInvokeMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.FunctionSelector;
+import org.jetlinks.sdk.server.ui.field.annotation.field.ui.DeviceDownStreamComponent;
+import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Flux;
 
 import javax.validation.constraints.NotBlank;
@@ -27,6 +29,7 @@ import java.util.function.Function;
  * @since 1.0.1
  */
 @Schema(title = "调用设备功能", description = "向设备发送调用设备功能消息")
+@DeviceDownStreamComponent(type = MessageType.INVOKE_FUNCTION)
 public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessage, FunctionInvokeMessageReply> {
 
     @Override
@@ -76,6 +79,7 @@ public class FunctionInvokeCommand extends DownstreamCommand<FunctionInvokeMessa
         @FunctionSelector(deviceIdKey = "deviceId")
         @NotBlank
         @Schema(title = "功能id")
+        @Order(1)
         private String functionId;
 
         @Schema(title = "参数")
