@@ -11,6 +11,7 @@ import org.jetlinks.core.message.MessageType;
 import org.jetlinks.core.message.property.WritePropertyMessage;
 import org.jetlinks.core.message.property.WritePropertyMessageReply;
 import org.jetlinks.core.metadata.FunctionMetadata;
+import org.jetlinks.sdk.server.ui.field.annotation.field.ui.DeviceDownStreamComponent;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.function.Function;
  * @since 1.0.1
  */
 @Schema(title = "设置设备属性", description = "设置设备属性")
+@DeviceDownStreamComponent(type = MessageType.WRITE_PROPERTY)
 public class WritePropertyCommand extends DownstreamCommand<WritePropertyMessage, WritePropertyMessageReply> {
 
     @Override
