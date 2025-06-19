@@ -42,6 +42,12 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         return super.getId();
     }
 
+    @Schema(hidden = true)
+    @Override
+    public List<Object> getIdList() {
+        return super.getIdList();
+    }
+
     static Type columnsType = ResolvableType
         .forClassWithGenerics(List.class, DevicePropertyAggregation.class)
         .getType();
