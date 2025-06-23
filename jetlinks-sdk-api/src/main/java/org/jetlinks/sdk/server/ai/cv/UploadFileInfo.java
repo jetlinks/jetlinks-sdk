@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.ai.cv;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,24 +37,32 @@ public class UploadFileInfo implements FileData, Externalizable {
     @Schema(description = "文件ID，传递方式为上传文件时使用")
     private String fileId;
 
+    @Schema(description = "文件数据，传递方式为直接传输时使用")
+    private ByteBuf data;
+
     @Schema(description = "文件后缀")
     private String extension;
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeObject(mediaType, out);
+        SerializeUtils.writeNullableUTF(mediaType.getType(), out);
+        SerializeUtils.writeNullableUTF(mediaType.getSubtype(), out);
         SerializeUtils.writeNullableUTF(fileName, out);
         SerializeUtils.writeNullableUTF(url, out);
         SerializeUtils.writeNullableUTF(fileId, out);
+        SerializeUtils.writeObject(data, out);
         SerializeUtils.writeNullableUTF(extension, out);
     }
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        mediaType = (MediaType)SerializeUtils.readObject(in);
+        String type = SerializeUtils.readNullableUTF(in);
+        String subtype = SerializeUtils.readNullableUTF(in);
+        mediaType = new MediaType(type, subtype);
         fileName = SerializeUtils.readNullableUTF(in);
         url = SerializeUtils.readNullableUTF(in);
         fileId = SerializeUtils.readNullableUTF(in);
+        data = (ByteBuf) SerializeUtils.readObject(in);
         extension = SerializeUtils.readNullableUTF(in);
     }
 
@@ -72,12 +82,12 @@ public class UploadFileInfo implements FileData, Externalizable {
 
     @Override
     public ByteBuf body() {
-        return null;
+        return data == null? null : Unpooled.unreleasableBuffer(data);
     }
 
     @Override
     public void release() {
-
+        ReferenceCountUtil.safeRelease(data);
     }
 
 }
