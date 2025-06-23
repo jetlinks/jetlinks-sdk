@@ -25,8 +25,11 @@ import java.io.ObjectOutput;
 @Setter
 public class UploadFileInfo implements FileData, Externalizable {
 
+    /**
+     * @see MediaType#toString()
+     */
     @Schema(description = "文件类型")
-    private MediaType mediaType;
+    private String mediaType;
 
     @Schema(description = "文件名")
     private String fileName;
@@ -45,8 +48,7 @@ public class UploadFileInfo implements FileData, Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(mediaType.getType(), out);
-        SerializeUtils.writeNullableUTF(mediaType.getSubtype(), out);
+        SerializeUtils.writeNullableUTF(mediaType, out);
         SerializeUtils.writeNullableUTF(fileName, out);
         SerializeUtils.writeNullableUTF(url, out);
         SerializeUtils.writeNullableUTF(fileId, out);
@@ -56,9 +58,7 @@ public class UploadFileInfo implements FileData, Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        String type = SerializeUtils.readNullableUTF(in);
-        String subtype = SerializeUtils.readNullableUTF(in);
-        mediaType = new MediaType(type, subtype);
+        mediaType = SerializeUtils.readNullableUTF(in);
         fileName = SerializeUtils.readNullableUTF(in);
         url = SerializeUtils.readNullableUTF(in);
         fileId = SerializeUtils.readNullableUTF(in);
