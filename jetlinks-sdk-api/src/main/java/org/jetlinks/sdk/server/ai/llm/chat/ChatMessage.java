@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.ai.llm.chat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.cv.UploadFileInfo;
 import org.jetlinks.sdk.server.ai.cv.ImageData;
 
 import java.io.Externalizable;
@@ -20,6 +21,9 @@ public class ChatMessage implements Externalizable {
     @Schema(title = "消息图片",description = "对话图片消息内容")
     private List<ImageData> images;
 
+    @Schema(title = "上传文件信息列表", description = "对话上传文件内容")
+    public List<UploadFileInfo> files;
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         //ver
@@ -33,6 +37,15 @@ public class ChatMessage implements Externalizable {
             out.writeInt(size);
             for (ImageData image : images) {
                 image.writeExternal(out);
+            }
+        }
+        if (files == null) {
+            out.writeInt(0);
+        } else {
+            int size = files.size();
+            out.writeInt(size);
+            for (UploadFileInfo file : files) {
+                file.writeExternal(out);
             }
         }
     }
@@ -50,6 +63,15 @@ public class ChatMessage implements Externalizable {
                 ImageData image = new ImageData();
                 image.readExternal(in);
                 images.add(image);
+            }
+        }
+        size = in.readInt();
+        if (size > 0) {
+            files = new java.util.ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                UploadFileInfo file = new UploadFileInfo();
+                file.readExternal(in);
+                files.add(file);
             }
         }
     }
