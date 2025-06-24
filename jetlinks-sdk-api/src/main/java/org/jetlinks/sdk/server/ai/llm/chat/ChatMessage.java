@@ -22,7 +22,7 @@ public class ChatMessage implements Externalizable {
     private List<ImageData> images;
 
     @Schema(title = "上传文件信息列表", description = "对话上传文件内容")
-    public List<UploadFileInfo> fileInfos;
+    public List<UploadFileInfo> files;
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
