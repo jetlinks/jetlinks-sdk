@@ -39,6 +39,15 @@ public class ChatMessage implements Externalizable {
                 image.writeExternal(out);
             }
         }
+        if (files == null) {
+            out.writeInt(0);
+        } else {
+            int size = files.size();
+            out.writeInt(size);
+            for (UploadFileInfo file : files) {
+                file.writeExternal(out);
+            }
+        }
     }
 
     @Override
@@ -54,6 +63,15 @@ public class ChatMessage implements Externalizable {
                 ImageData image = new ImageData();
                 image.readExternal(in);
                 images.add(image);
+            }
+        }
+        size = in.readInt();
+        if (size > 0) {
+            files = new java.util.ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                UploadFileInfo file = new UploadFileInfo();
+                file.readExternal(in);
+                files.add(file);
             }
         }
     }
