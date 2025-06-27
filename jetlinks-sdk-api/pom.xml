@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>jetlinks-sdk-api</artifactId>
-
+    <name>JetLinks SDK Api</name>
     <properties>
 
     </properties>
