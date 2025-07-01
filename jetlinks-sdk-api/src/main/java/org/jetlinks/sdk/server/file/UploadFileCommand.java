@@ -13,13 +13,13 @@ import org.jetlinks.sdk.server.utils.ByteBufUtils;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.NettyDataBuffer;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
-import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.InputStream;
+import java.util.Base64;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
@@ -105,7 +105,7 @@ public class UploadFileCommand extends AbstractCommand<Mono<FileInfo>, UploadFil
             return Unpooled.wrappedBuffer(((byte[]) content));
         }
         if (content instanceof String) {
-            return Unpooled.wrappedBuffer(Base64Utils.decodeFromString(((String) content)));
+            return Unpooled.wrappedBuffer(Base64.getDecoder().decode(((String) content)));
         }
 
         throw new UnsupportedOperationException("unsupported file content " + content);

@@ -12,7 +12,7 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Flux;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -9,7 +9,7 @@ import org.jetlinks.sdk.server.device.DeviceProperty;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import reactor.core.publisher.Flux;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.function.Function;
 

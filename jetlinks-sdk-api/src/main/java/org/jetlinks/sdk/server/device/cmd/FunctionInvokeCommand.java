@@ -16,7 +16,7 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.ui.DeviceDownStreamComp
 import org.springframework.core.annotation.Order;
 import reactor.core.publisher.Flux;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 import java.util.function.Function;
 

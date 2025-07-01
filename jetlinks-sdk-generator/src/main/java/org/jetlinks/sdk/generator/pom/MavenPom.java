@@ -1,12 +1,12 @@
 package org.jetlinks.sdk.generator.pom;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.jetlinks.sdk.generator.core.Dependency;
 import org.jetlinks.sdk.generator.core.Project;
 
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 

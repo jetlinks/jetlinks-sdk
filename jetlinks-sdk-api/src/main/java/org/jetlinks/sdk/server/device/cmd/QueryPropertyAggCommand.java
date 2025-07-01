@@ -17,7 +17,7 @@ import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
