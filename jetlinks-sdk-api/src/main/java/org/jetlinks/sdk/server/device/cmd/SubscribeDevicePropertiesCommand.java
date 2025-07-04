@@ -62,6 +62,9 @@ public class SubscribeDevicePropertiesCommand extends AbstractCommand<Flux<Devic
 
     @Schema(title = "历史数据", description = "为空默认为0")
     public Integer getHistory() {
-        return Integer.parseInt(readable().getOrDefault(HISTORY, 0).toString());
+        return org.jetlinks.core.utils.ConverterUtils.convert(
+                readable().getOrDefault(HISTORY, 0),
+                Integer.class
+        );
     }
 }
