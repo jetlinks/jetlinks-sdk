@@ -22,6 +22,7 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
     public static final String DEVICE_IDS = "deviceIds";
     public static final String PRODUCT_ID = "productId";
     public static final String PROPERTY_ID = "propertyIds";
+    public static final String HISTORY = "history";
 
     @DeviceSelector(multiple = true)
     @Order(1)
@@ -62,5 +63,10 @@ public class SubscribeDevicePropertyCommand extends AbstractCommand<Flux<DeviceP
 
     public SubscribeDevicePropertyCommand setPropertyIds(List<String> propertyIds) {
         return with(PROPERTY_ID, propertyIds);
+    }
+
+    @Schema(title = "历史数据", description = "为空默认为0")
+    public Integer getHistory() {
+        return Integer.parseInt(readable().getOrDefault(HISTORY, 0).toString());
     }
 }
