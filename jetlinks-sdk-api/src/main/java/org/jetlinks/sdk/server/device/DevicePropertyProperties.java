@@ -1,7 +1,6 @@
 package org.jetlinks.sdk.server.device;
 
 import com.google.common.collect.Maps;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.jetlinks.core.message.DeviceMessage;
 import org.jetlinks.core.message.property.PropertyMessage;
@@ -31,6 +30,12 @@ public class DevicePropertyProperties extends HashMap<String, Object> {
             }
         }
 
+        return this;
+    }
+
+    public DevicePropertyProperties with(DeviceProperty property) {
+        setDeviceId(property.getDeviceId());
+        this.put(property.getProperty(), property.getValue());
         return this;
     }
 
