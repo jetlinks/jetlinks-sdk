@@ -22,7 +22,7 @@ public class QueryGeoLocationCommand extends AbstractConvertCommand<Mono<ReGeoIn
         return getOrNull("lat", Double.class);
     }
 
-    public QueryGeoLocationCommand setKey(double lat) {
+    public QueryGeoLocationCommand setLat(double lat) {
         return with("lat", lat);
     }
 
