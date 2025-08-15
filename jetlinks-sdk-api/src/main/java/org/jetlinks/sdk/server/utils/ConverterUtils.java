@@ -17,8 +17,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.util.MultiValueMap;
 
 import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
+import java.nio.*;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -204,8 +207,13 @@ public class ConverterUtils {
             return Unpooled.wrappedBuffer(((DataBuffer) obj).asByteBuffer());
         }
 
-        if (obj instanceof ByteBuffer) {
-            return Unpooled.wrappedBuffer(((ByteBuffer) obj));
+//        if (obj instanceof ByteBuffer) {
+//            return Unpooled.wrappedBuffer(((ByteBuffer) obj));
+//        }
+        if (obj instanceof Buffer) {
+            return convertNioBufferToNettyBuf(((Buffer) obj),
+                                              ignore -> {
+                                              });
         }
 
         if (obj instanceof String) {
@@ -242,6 +250,83 @@ public class ConverterUtils {
         return convertNettyBuffer(obj, val -> Unpooled.wrappedBuffer(String.valueOf(val).getBytes()));
     }
 
+    private static <T extends Buffer> ByteBuf convertNioBufferToNettyBuf0(T nioBuffer,
+                                                                          int bit,
+                                                                          Consumer<ByteBuffer> init,
+                                                                          BiConsumer<ByteBuffer, T> consumer) {
+        nioBuffer.mark();
+
+        ByteBuffer buffer = nioBuffer.isDirect()
+            ? ByteBuffer.allocateDirect(nioBuffer.remaining() * bit)
+            : ByteBuffer.allocate(nioBuffer.remaining() * bit);
+
+        init.accept(buffer);
+
+        consumer.accept(buffer, nioBuffer);
+
+        nioBuffer.reset();
+
+        return Unpooled.wrappedBuffer(buffer);
+    }
+
+    public static ByteBuf convertNioBufferToNettyBuf(Buffer buffer, Consumer<ByteBuffer> init) {
+        if (buffer instanceof ByteBuffer) {
+            init.accept((ByteBuffer) buffer);
+            return Unpooled.wrappedBuffer((ByteBuffer) buffer);
+        }
+
+        if (buffer instanceof ShortBuffer) {
+
+            return convertNioBufferToNettyBuf0(
+                (ShortBuffer) buffer,
+                2,
+                init,
+                (buf, nioBuffer) -> buf.asShortBuffer().put(nioBuffer));
+        }
+
+        if (buffer instanceof IntBuffer) {
+            return convertNioBufferToNettyBuf0(
+                (IntBuffer) buffer,
+                4,
+                init,
+                (buf, nioBuffer) -> buf.asIntBuffer().put(nioBuffer));
+        }
+
+        if (buffer instanceof LongBuffer) {
+            return convertNioBufferToNettyBuf0(
+                (LongBuffer) buffer,
+                8,
+                init,
+                (buf, nioBuffer) -> buf.asLongBuffer().put(nioBuffer));
+        }
+
+        if (buffer instanceof FloatBuffer) {
+            return convertNioBufferToNettyBuf0(
+                (FloatBuffer) buffer,
+                4,
+                init,
+                (buf, nioBuffer) -> buf.asFloatBuffer().put(nioBuffer));
+        }
+
+        if (buffer instanceof DoubleBuffer) {
+            return convertNioBufferToNettyBuf0(
+                (DoubleBuffer) buffer,
+                8,
+                init,
+                (buf, nioBuffer) -> buf.asDoubleBuffer().put(nioBuffer));
+        }
+
+        if (buffer instanceof CharBuffer) {
+            return convertNioBufferToNettyBuf0(
+                (CharBuffer) buffer,
+                2,
+                init,
+                (buf, nioBuffer) -> buf.asCharBuffer().put(nioBuffer));
+        }
+
+
+        throw new UnsupportedOperationException("unsupported buffer type:" + buffer.getClass());
+    }
 
     @SuppressWarnings("all")
     public static HttpHeaders convertHttpHeaders(Object headers) {
