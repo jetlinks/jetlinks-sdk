@@ -27,6 +27,10 @@ public class DeleteByIdCommand<T> extends OperationByIdCommand<T, DeleteByIdComm
     public DeleteByIdCommand() {
     }
 
+    public DeleteByIdCommand(Class<T> type) {
+        withConverter(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
     /**
      * 使用指定的类型创建命令,执行命令后会将执行结果转换为指定类型
      *

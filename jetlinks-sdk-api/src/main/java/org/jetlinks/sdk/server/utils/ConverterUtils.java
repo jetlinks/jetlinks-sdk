@@ -2,23 +2,15 @@ package org.jetlinks.sdk.server.utils;
 
 import com.fasterxml.jackson.databind.ObjectReader;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
-import org.apache.commons.collections4.MapUtils;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.web.api.crud.entity.TermExpressionParser;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.NettyDataBuffer;
-import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.Array;
-import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,11 +24,7 @@ public class ConverterUtils {
      * @return 转换结果
      */
     public static Object tryConvertToList(Object value, Function<Object, Object> converter) {
-        List<Object> list = convertToList(value, converter);
-        if (list.size() == 1) {
-            return converter.apply(list.get(0));
-        }
-        return list;
+        return org.jetlinks.core.utils.ConverterUtils.tryConvertToList(value, converter);
     }
 
     /**
@@ -48,40 +36,7 @@ public class ConverterUtils {
      * @return 转换后的List
      */
     public static <T> List<T> convertToList(Object value, Function<Object, T> converter) {
-        if (value == null) {
-            return Collections.emptyList();
-        }
-
-        if (value instanceof String) {
-            String[] arr = ((String) value).split(",");
-            if (arr.length == 1) {
-                return Collections.singletonList(converter.apply(arr[0]));
-            }
-            List<T> list = new ArrayList<>(arr.length);
-            for (String s : arr) {
-                list.add(converter.apply(s));
-            }
-            return list;
-        }
-
-        if (value instanceof Collection) {
-            List<T> list = new ArrayList<>(((Collection<?>) value).size());
-            for (Object o : ((Collection<?>) value)) {
-                list.add(converter.apply(o));
-            }
-            return list;
-        }
-
-        if (value.getClass().isArray()) {
-            int len = Array.getLength(value);
-            List<T> list = new ArrayList<>(len);
-            for (int i = 0; i < len; i++) {
-                list.add(converter.apply(Array.get(value, i)));
-            }
-            return list;
-        }
-
-        return Collections.singletonList(converter.apply(value));
+        return org.jetlinks.core.utils.ConverterUtils.convertToList(value, converter);
     }
 
     /**
@@ -106,28 +61,7 @@ public class ConverterUtils {
      */
     @SneakyThrows
     public static String[] convertMapToTags(Map<String, Object> map) {
-        if (MapUtils.isEmpty(map)) {
-            return new String[0];
-        }
-        String[] tags = new String[map.size() * 2];
-        int index = 0;
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            if (value == null) {
-                continue;
-            }
-            String strValue = value instanceof String
-                ? String.valueOf(value)
-                : ObjectMappers.JSON_MAPPER.writeValueAsString(value);
-
-            tags[index++] = key;
-            tags[index++] = strValue;
-        }
-        if (tags.length > index) {
-            return Arrays.copyOf(tags, index);
-        }
-        return tags;
+        return org.jetlinks.core.utils.ConverterUtils.convertMapToTags(map);
     }
 
     static final ObjectReader termReader = ObjectMappers.JSON_MAPPER.readerForListOf(Term.class);
@@ -171,98 +105,24 @@ public class ConverterUtils {
         }
     }
 
-    private static final NettyDataBufferFactory factory = new NettyDataBufferFactory(ByteBufAllocator.DEFAULT);
-
     public static DataBuffer convertDataBuffer(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        if (obj instanceof DataBuffer) {
-            return ((DataBuffer) obj);
-        }
-        return factory.wrap(convertNettyBuffer(obj));
+        return org.jetlinks.core.utils.ConverterUtils.convertDataBuffer(obj);
     }
 
     public static <T> ByteBuf convertNettyBuffer(T obj,
                                                  Function<T, ByteBuf> fallback) {
-        if (obj == null) {
-            return null;
-        }
-        if (obj instanceof ByteBuf) {
-            return ((ByteBuf) obj);
-        }
-
-        if (obj instanceof byte[]) {
-            return Unpooled.wrappedBuffer(((byte[]) obj));
-        }
-
-        if (obj instanceof NettyDataBuffer) {
-            return ((NettyDataBuffer) obj).getNativeBuffer();
-        }
-
-        if (obj instanceof DataBuffer) {
-            return Unpooled.wrappedBuffer(((DataBuffer) obj).asByteBuffer());
-        }
-
-        if (obj instanceof ByteBuffer) {
-            return Unpooled.wrappedBuffer(((ByteBuffer) obj));
-        }
-
-        if (obj instanceof String) {
-            String str = String.valueOf(obj);
-            // hex
-            if (str.startsWith("0x")) {
-                return Unpooled.wrappedBuffer(ByteBufUtil.decodeHexDump(str, 2, str.length() - 2));
-            }
-            //data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA
-            if (str.startsWith("data:")) {
-                return Unpooled.wrappedBuffer(
-                    Base64
-                        .getDecoder()
-                        .decode(str.substring(str.indexOf(",") + 1)));
-            }
-            // base64
-            byte[] strBytes = str.getBytes();
-            if (org.apache.commons.codec.binary.Base64.isBase64(strBytes)) {
-                try {
-                    return Unpooled.wrappedBuffer(
-                        Base64
-                            .getDecoder()
-                            .decode(strBytes));
-                } catch (Throwable ignore) {
-                }
-            }
-            return Unpooled.wrappedBuffer(strBytes);
-        }
-
-        return fallback.apply(obj);
+        return org.jetlinks.core.utils.ConverterUtils.convertNettyBuffer(obj, fallback);
     }
 
     public static ByteBuf convertNettyBuffer(Object obj) {
-        return convertNettyBuffer(obj, val -> Unpooled.wrappedBuffer(String.valueOf(val).getBytes()));
+        return org.jetlinks.core.utils.ConverterUtils.convertNettyBuffer(obj);
     }
 
 
     @SuppressWarnings("all")
     public static HttpHeaders convertHttpHeaders(Object headers) {
-        if (headers instanceof HttpHeaders) {
-            return (HttpHeaders) headers;
-        }
-        if (headers instanceof MultiValueMap) {
-            return new HttpHeaders((MultiValueMap) headers);
-        }
-        if (headers instanceof Map<?, ?>) {
-            Map<?, ?> httpHeaders = (Map<?, ?>) headers;
-            HttpHeaders newHeader = new HttpHeaders();
-            for (Map.Entry<?, ?> entry : httpHeaders.entrySet()) {
-                newHeader.put(String.valueOf(entry.getKey()),
-                              convertToList(entry.getValue(), String::valueOf));
-            }
-            return newHeader;
-        }
-        return org.jetlinks.core.utils.ConverterUtils.convert(headers,HttpHeaders.class);
+        return org.jetlinks.core.utils.ConverterUtils.convertHttpHeaders(headers);
     }
-
 
 
 }
