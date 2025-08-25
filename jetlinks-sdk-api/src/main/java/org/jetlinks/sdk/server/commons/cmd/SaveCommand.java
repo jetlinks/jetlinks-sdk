@@ -22,6 +22,14 @@ public class SaveCommand<T> extends BatchDataCommand<T, SaveCommand<T>> {
     public SaveCommand() {
     }
 
+    public SaveCommand(Class<T> type) {
+        withConverter(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
+    public SaveCommand(Function<Object, T> converter) {
+        withConverter(converter);
+    }
+
     public static <T> SaveCommand<T> of(Class<T> type) {
         return of(CommandUtils.createConverter(ResolvableType.forClass(type)));
     }

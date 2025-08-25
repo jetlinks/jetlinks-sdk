@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.template;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.util.function.Function;
  * @since 1.0.1
  */
 @Slf4j
+@Schema(title = "根据模板保存数据")
 public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTemplateResult>, SaveByTemplateCommand> {
 
 
@@ -41,14 +43,21 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
         return castSelf();
     }
 
-    public final List<EntityTemplateInfo> templateList() {
+    @Schema(title = "模板数据")
+    public final List<EntityTemplateInfo> getData() {
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), EntityTemplateInfo::of);
+    }
+
+    @Deprecated
+    public final List<EntityTemplateInfo> templateList() {
+        return getData();
     }
 
     public final <E> List<E> templateList(Function<EntityTemplateInfo, E> converter) {
         return ConverterUtils.convertToList(readable().get(PARAMETER_KEY), f -> converter.apply(EntityTemplateInfo.of(f)));
     }
 
+    @Schema(title = "是否抛出错误")
     public boolean isThrowError() {
         return CastUtils.castBoolean(readable().getOrDefault("throwError", true));
     }
@@ -100,7 +109,7 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
                                                   Function<Flux<DataContext<T>>, Mono<Void>> handler,
                                                   int converterParallel) {
         return Flux
-            .fromIterable(templateList())
+            .fromIterable(getData())
             .flatMap(info -> converter
                 .apply(info)
                 .map(data -> DataContext.simple(info, data))
