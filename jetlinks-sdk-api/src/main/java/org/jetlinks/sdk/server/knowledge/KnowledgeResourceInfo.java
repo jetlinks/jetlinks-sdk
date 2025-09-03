@@ -15,6 +15,7 @@ import java.util.Set;
 @Setter
 public class KnowledgeResourceInfo {
 
+    @Schema(title = "id")
     private String id;
 
     @Schema(title = "名称")
