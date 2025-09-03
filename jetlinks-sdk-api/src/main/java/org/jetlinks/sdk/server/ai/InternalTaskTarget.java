@@ -23,6 +23,7 @@ public enum InternalTaskTarget implements TaskTarget {
     SpeechRecognition("语音识别"),
     TextGeneration("文本生成"),
     LLM("大语言模型"),
+    LLMAgent("大语言模型智能体"),
     /* =- 语音处理 -= */
     SpeechSynthesis("语音合成"),
     SpeechTranslation("语音翻译"),

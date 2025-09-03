@@ -2,9 +2,12 @@ package org.jetlinks.sdk.server.ai.llm.chat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ai.cv.UploadFileInfo;
 import org.jetlinks.sdk.server.ai.cv.ImageData;
+import org.jetlinks.sdk.server.ai.llm.LlmMessage;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -12,8 +15,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.List;
 
-@Data
-public class ChatMessage implements Externalizable {
+@Getter
+@Setter
+public class ChatMessage extends LlmMessage<ChatMessage> implements Externalizable {
 
     @Schema(title = "消息内容",description = "对话文本消息内容")
     private String content;
@@ -26,6 +30,7 @@ public class ChatMessage implements Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        super.writeExternal(out);
         //ver
         out.writeByte(0x01);
 
@@ -52,6 +57,7 @@ public class ChatMessage implements Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        super.readExternal(in);
         //ver
         int ignore = in.readByte();
 
