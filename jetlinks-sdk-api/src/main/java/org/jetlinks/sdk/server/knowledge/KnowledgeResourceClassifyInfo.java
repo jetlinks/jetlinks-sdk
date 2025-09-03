@@ -20,4 +20,7 @@ public class KnowledgeResourceClassifyInfo {
     @Schema(title = "描述")
     private String description;
 
+    @Schema(title = "状态")
+    private ResourceStatus status;
+
 }
