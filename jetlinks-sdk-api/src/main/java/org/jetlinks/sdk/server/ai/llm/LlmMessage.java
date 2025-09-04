@@ -1,5 +1,7 @@
 package org.jetlinks.sdk.server.ai.llm;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import lombok.Getter;
 import lombok.Setter;
 import org.hswebframework.ezorm.core.Extendable;
@@ -21,11 +23,13 @@ public class LlmMessage<SELF extends LlmMessage<SELF>> extends GenericHeaderSupp
     private volatile Map<String, Object> extensions;
 
     @Override
+    @JsonAnyGetter
     public Map<String, Object> extensions() {
         return extensions;
     }
 
     @Override
+    @JsonAnySetter
     public void setExtension(String property, Object value) {
         if (extensions == null) {
             synchronized (this) {

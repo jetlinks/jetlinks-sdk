@@ -26,6 +26,7 @@ import java.util.function.Function;
 public class CountCommand extends QueryCommand<Mono<Integer>, CountCommand> {
 
 
+    @Deprecated
     public static CommandHandler<CountCommand, Mono<Integer>> createHandler(Consumer<SimpleFunctionMetadata> custom,
                                                                             Function<CountCommand, Mono<Integer>> handler) {
 
