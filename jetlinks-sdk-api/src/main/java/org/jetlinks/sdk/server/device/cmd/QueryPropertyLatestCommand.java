@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -28,7 +29,8 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     @Schema(name = PARAMETER_KEY_ID, title = "ID")
     @NotBlank
     public String getId() {
-        return super.getId();
+        return Optional.ofNullable(super.getId())
+                .orElseThrow(() -> new IllegalArgumentException("设备ID不能为空"));
     }
 
     @Schema(hidden = true)
