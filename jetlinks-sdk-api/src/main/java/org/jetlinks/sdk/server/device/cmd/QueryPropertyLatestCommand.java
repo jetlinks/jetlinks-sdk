@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.device.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hswebframework.web.exception.ValidationException;
+import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -30,7 +32,7 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     @NotBlank
     public String getId() {
         return Optional.ofNullable(super.getId())
-                .orElseThrow(() -> new IllegalArgumentException("设备ID不能为空"));
+                .orElseThrow(() -> new ValidationException.NoStackTrace(LocaleUtils.resolveMessage("device.queryPropertyLatestCommand.param.error")));
     }
 
     @Schema(hidden = true)
