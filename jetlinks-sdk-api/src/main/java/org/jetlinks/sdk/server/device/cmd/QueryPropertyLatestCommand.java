@@ -32,7 +32,7 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     @NotBlank
     public String getId() {
         return Optional.ofNullable(super.getId())
-                .orElseThrow(() -> new ValidationException.NoStackTrace(LocaleUtils.resolveMessage("device.queryPropertyLatestCommand.param.error")));
+                .orElseThrow(() -> new ValidationException.NoStackTrace("id", LocaleUtils.resolveMessage("validation.NotNull.deviceId")));
     }
 
     @Schema(hidden = true)
