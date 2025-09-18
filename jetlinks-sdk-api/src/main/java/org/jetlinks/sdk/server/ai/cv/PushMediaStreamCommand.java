@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
  *
  * @author zhouhao
  * @since 2.2
+ * @see GetTaskMediaStreamCommand
  */
 @Schema(title = "推送任务视频流")
 public class PushMediaStreamCommand extends AbstractCommand<Mono<Void>, PushMediaStreamCommand> {

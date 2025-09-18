@@ -18,6 +18,7 @@ import java.util.function.Function;
 public class ImageRecognitionCommand
     extends ComputerVisionCommand<ObjectDetectionResult, ImageRecognitionCommand> {
 
+    @Deprecated
     public static AICommandHandler<ImageRecognitionCommand, Flux<ObjectDetectionResult>> createHandler
         (Function<ImageRecognitionCommand, Flux<ObjectDetectionResult>> executor) {
         return AICommandHandler.of(ImageRecognitionCommand::metadata,

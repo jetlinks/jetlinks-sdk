@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.media;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -21,20 +22,34 @@ import java.util.Arrays;
  */
 public class ProxyMediaStreamCommand extends AbstractCommand<Mono<MediaInfo>, ProxyMediaStreamCommand> {
 
+    @Schema(title = "流ID")
     public String getStreamId() {
         return (String) readable().get("streamId");
     }
 
+    @Schema(title = "视频源地址")
     public String getSource() {
         return (String) readable().get("source");
     }
 
+    @Schema(title = "目标地址",description = "为空表示不转发流")
     public String getTarget() {
         return (String) readable().get("target");
     }
 
+    @Schema(title = "是否为本地播放",description = "用于内网访问时设置为true")
     public boolean isLocalPlayer() {
         return CastUtils.castBoolean(readable().get("localPlayer"));
+    }
+
+    @Schema(title = "所属应用",description = "代理后的流的所属应用")
+    public String getApp(){
+        return getOrNull("app",String.class);
+    }
+
+    public ProxyMediaStreamCommand withApp(String app) {
+        with("app", app);
+        return this;
     }
 
     public ProxyMediaStreamCommand withStreamId(String streamId) {

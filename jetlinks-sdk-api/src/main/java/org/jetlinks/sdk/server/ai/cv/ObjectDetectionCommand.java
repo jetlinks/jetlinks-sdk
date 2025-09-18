@@ -18,6 +18,7 @@ import java.util.function.Function;
 @Schema(title = "目标检测")
 public class ObjectDetectionCommand extends ComputerVisionCommand<ObjectDetectionResult, ObjectDetectionCommand> {
 
+    @Deprecated
     public static AICommandHandler<ObjectDetectionCommand, Flux<ObjectDetectionResult>> createHandler
         (Function<ObjectDetectionCommand, Flux<ObjectDetectionResult>> executor) {
         return AICommandHandler.of(ObjectDetectionCommand::metadata,
