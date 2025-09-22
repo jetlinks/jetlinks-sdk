@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 @Setter
 public class PersonalToken implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public PersonalToken() {

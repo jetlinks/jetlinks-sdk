@@ -3,13 +3,16 @@ package org.jetlinks.sdk.server.auth;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.ezorm.core.DefaultExtendable;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
 @Getter
 @Setter
-public class MenuInfo implements Serializable {
+public class MenuInfo extends DefaultExtendable implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String id;

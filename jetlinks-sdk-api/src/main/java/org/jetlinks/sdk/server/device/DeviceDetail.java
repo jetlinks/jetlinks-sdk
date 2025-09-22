@@ -3,7 +3,9 @@ package org.jetlinks.sdk.server.device;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.ezorm.core.DefaultExtendable;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -14,7 +16,8 @@ import java.util.Map;
  */
 @Getter
 @Setter
-public class DeviceDetail implements Serializable {
+public class DeviceDetail extends DefaultExtendable implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "设备ID")

@@ -4,13 +4,11 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.ezorm.core.DefaultExtendable;
 import org.jetlinks.core.metadata.Jsonable;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 /**
  * 产品信息.
@@ -19,7 +17,8 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class ProductInfo implements Externalizable, Jsonable {
+public class ProductInfo extends DefaultExtendable implements Serializable, Jsonable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "产品ID")
@@ -73,42 +72,4 @@ public class ProductInfo implements Externalizable, Jsonable {
         return jsonObject;
     }
 
-    @Override
-    public void writeExternal(ObjectOutput out) throws IOException {
-        SerializeUtils.writeNullableUTF(id, out);
-        SerializeUtils.writeNullableUTF(name, out);
-        SerializeUtils.writeNullableUTF(classifiedId, out);
-        SerializeUtils.writeNullableUTF(classifiedName, out);
-        SerializeUtils.writeNullableUTF(photoUrl, out);
-        SerializeUtils.writeNullableUTF(describe, out);
-        SerializeUtils.writeNullableUTF(metadata, out);
-        SerializeUtils.writeNullableUTF(accessId, out);
-        SerializeUtils.writeNullableUTF(accessProvider, out);
-        SerializeUtils.writeNullableUTF(accessName, out);
-        SerializeUtils.writeNullableUTF(creatorId, out);
-        SerializeUtils.writeObject(createTime, out);
-        out.writeByte(state);
-        out.writeByte(deviceType == null ? -1 : deviceType.ordinal());
-    }
-
-    @Override
-    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        id = SerializeUtils.readNullableUTF(in);
-        name = SerializeUtils.readNullableUTF(in);
-        classifiedId = SerializeUtils.readNullableUTF(in);
-        classifiedName = SerializeUtils.readNullableUTF(in);
-        photoUrl = SerializeUtils.readNullableUTF(in);
-        describe = SerializeUtils.readNullableUTF(in);
-        metadata = SerializeUtils.readNullableUTF(in);
-        accessId = SerializeUtils.readNullableUTF(in);
-        accessProvider = SerializeUtils.readNullableUTF(in);
-        accessName = SerializeUtils.readNullableUTF(in);
-        creatorId = SerializeUtils.readNullableUTF(in);
-        createTime = (Long) SerializeUtils.readObject(in);
-        state = in.readByte();
-        byte deviceType = in.readByte();
-        if (deviceType >= 0) {
-            this.deviceType = DeviceType.values()[deviceType];
-        }
-    }
 }

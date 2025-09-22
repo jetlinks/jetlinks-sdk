@@ -3,7 +3,9 @@ package org.jetlinks.sdk.server.device;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.ezorm.core.DefaultExtendable;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,8 +16,9 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-public class FirmwareInfo implements Serializable {
+public class FirmwareInfo extends DefaultExtendable implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1566508792298506679L;
 
     @Schema(description = "ID")

@@ -17,6 +17,7 @@ import java.io.*;
 @Setter
 public class FirmwareUpgradeHistoryInfo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -2316792031470364965L;
 
     @Schema(description = "ID")

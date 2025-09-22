@@ -6,14 +6,12 @@ import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ui.field.annotation.field.DateTime;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
+import java.io.*;
 
 @Getter
 @Setter
 public class DeviceProperty implements Externalizable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "设备ID")
