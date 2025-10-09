@@ -32,3 +32,4 @@ dev
 /dist/data/
 bootstrap-local.yml
 application-local.yml
+.java-version
