@@ -11,7 +11,12 @@ import reactor.util.context.Context;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+
+import reactor.util.concurrent.Queues;
+import reactor.core.publisher.Operators;
 
 public class ByteBufUtils {
     /**
@@ -75,9 +80,7 @@ public class ByteBufUtils {
      */
     public static Flux<ByteBuf> balanceBuffer(Flux<ByteBuf> buffer, int fixedLength) {
 
-        return new ByteBufBalancer(fixedLength, buffer)
-            .onBackpressureBuffer()
-            .doOnDiscard(ByteBuf.class, ReferenceCountUtil::safeRelease);
+        return new ByteBufBalancer(fixedLength, buffer);
 
     }
 
@@ -98,20 +101,34 @@ public class ByteBufUtils {
         }
     }
 
-    static class ByteBufBalancerSubscriber extends BaseSubscriber<ByteBuf> {
-        static final AtomicIntegerFieldUpdater<ByteBufBalancerSubscriber> COUNT = AtomicIntegerFieldUpdater
-            .newUpdater(ByteBufBalancerSubscriber.class, "count");
+    static class ByteBufBalancerSubscriber implements CoreSubscriber<ByteBuf>, Subscription {
+        static final AtomicIntegerFieldUpdater<ByteBufBalancerSubscriber> WIP = AtomicIntegerFieldUpdater
+            .newUpdater(ByteBufBalancerSubscriber.class, "wip");
+        static final AtomicLongFieldUpdater<ByteBufBalancerSubscriber> REQUESTED = AtomicLongFieldUpdater
+            .newUpdater(ByteBufBalancerSubscriber.class, "requested");
 
         private final int fixedLength;
 
-        private volatile int count;
-        private final List<ByteBuf> buffer = new ArrayList<>(16);
-
         private final CoreSubscriber<? super ByteBuf> actual;
+
+        private volatile long requested;
+        private volatile int wip;
+
+        private volatile boolean done;
+        private Throwable error;
+        private volatile boolean cancelled;
+
+        private Subscription s;
+
+        private final Queue<ByteBuf> queue = Queues.<ByteBuf>unboundedMultiproducer().get();
+
+        private final List<ByteBuf> aggregate = new ArrayList<>(16);
+        private int remaining = 0;
 
         ByteBufBalancerSubscriber(int fixedLength, CoreSubscriber<? super ByteBuf> actual) {
             this.actual = actual;
-            this.fixedLength = count = fixedLength;
+            this.fixedLength = fixedLength;
+            this.remaining = fixedLength;
         }
 
         @Override
@@ -121,105 +138,203 @@ public class ByteBufUtils {
         }
 
         @Override
-        protected void hookOnSubscribe(@Nonnull Subscription subscription) {
+        public void onSubscribe(@Nonnull Subscription subscription) {
+            if (this.s != null) {
+                subscription.cancel();
+                return;
+            }
+            this.s = subscription;
             actual.onSubscribe(this);
+            //subscription.request(1);
         }
 
         @Override
-        protected void hookOnNext(@Nonnull ByteBuf buf) {
-            int readableBytes = buf.readableBytes();
+        public void onNext(@Nonnull ByteBuf buf) {
+            if (done || cancelled) {
+                ReferenceCountUtil.safeRelease(buf);
+                return;
+            }
+            queue.offer(buf);
+            drain();
+        }
 
-            //实际大于预期,则分片
-            if (readableBytes > fixedLength) {
-                try {
-                    int chunk = readableBytes / fixedLength;
-                    int remainder = readableBytes % fixedLength;
+        @Override
+        public void onError(@Nonnull Throwable t) {
+            error = t;
+            done = true;
+            drain();
+        }
 
-                    for (int i = 0; i < chunk; i++) {
-                        hookOnNext0(buf.retainedSlice(i * fixedLength, fixedLength));
-                    }
+        @Override
+        public void onComplete() {
+            done = true;
+            drain();
+        }
 
-                    if (remainder > 0) {
-                        hookOnNext0(buf.retainedSlice(readableBytes - remainder, remainder));
-                    }
-                } finally {
-                    request(1);
-                    ReferenceCountUtil.safeRelease(buf);
+        @Override
+        public void request(long n) {
+            if (n <= 0) {
+                return;
+            }
+            Operators.addCap(REQUESTED, this, n);
+            drain();
+        }
+
+        @Override
+        public void cancel() {
+            cancelled = true;
+            drain();
+        }
+
+        void drain() {
+            if (WIP.getAndIncrement(this) != 0) {
+                return;
+            }
+            int missed = 1;
+            final CoreSubscriber<? super ByteBuf> a = this.actual;
+
+            for (; ; ) {
+                if (cancelled) {
+                    cleanup();
+                    return;
                 }
-                return;
+
+                long r = requested;
+                long e = 0L;
+
+                while (e != r) {
+                    if (cancelled) {
+                        cleanup();
+                        return;
+                    }
+                    boolean d = done;
+                    ByteBuf buf = queue.poll();
+                    boolean empty = buf == null;
+
+                    if (d && empty) {
+                        Throwable ex = error;
+                        if (ex != null) {
+                            cleanup();
+                            a.onError(ex);
+                        } else {
+                            if (!aggregate.isEmpty()) {
+                                emitAggregate(a);
+                            }
+                            a.onComplete();
+                        }
+                        return;
+                    }
+
+                    if (empty) {
+                        break;
+                    }
+
+                    int readable = buf.readableBytes();
+                    int offset = 0;
+                    for (; ; ) {
+                        if (cancelled) {
+                            ReferenceCountUtil.safeRelease(buf);
+                            cleanup();
+                            return;
+                        }
+                        int need = remaining;
+                        if (readable - offset >= need) {
+                            if (need > 0) {
+                                aggregate.add(buf.retainedSlice(offset, need));
+                            }
+                            offset += need;
+                            readable = buf.readableBytes();
+                            emitAggregate(a);
+                            e++;
+                            r = requested; // refresh possibly increased demand
+                            if (e == r) {
+                                // if we've met demand, break processing further outputs now
+                                // any remainder from buf will be handled on next drain
+                                if (offset < buf.readableBytes()) {
+                                    queue.offer(buf.retainedSlice(offset, buf.readableBytes() - offset));
+                                }
+                                ReferenceCountUtil.safeRelease(buf);
+                                break;
+                            }
+                            if (offset == buf.readableBytes()) {
+                                ReferenceCountUtil.safeRelease(buf);
+                                break;
+                            }
+                            // continue to produce next chunk from the same buf
+                            continue;
+                        } else {
+                            int len = readable - offset;
+                            if (len > 0) {
+                                aggregate.add(buf.retainedSlice(offset, len));
+                                remaining -= len;
+                            }
+                            ReferenceCountUtil.safeRelease(buf);
+                            break;
+                        }
+                    }
+
+                }
+
+                if (e != 0L) {
+                    Operators.produced(REQUESTED, this, e);
+                }
+
+                if (cancelled) {
+                    cleanup();
+                    return;
+                }
+
+                if (done && queue.isEmpty()) {
+                    Throwable ex = error;
+                    if (ex != null) {
+                        cleanup();
+                        a.onError(ex);
+                    } else {
+                        if (!aggregate.isEmpty()) {
+                            emitAggregate(a);
+                        }
+                        a.onComplete();
+                    }
+                    return;
+                }
+
+                missed = WIP.addAndGet(this, -missed);
+                if (missed == 0) {
+                    break;
+                }
             }
 
-            hookOnNext0(buf);
-            request(1);
+            if (requested > 0) {
+                this.s.request(1);
+            }
         }
 
-
-        protected void hookOnNext0(ByteBuf buf) {
-
-            int readableBytes = buf.readableBytes();
-
-            int remainder = COUNT.addAndGet(this, -readableBytes);
-            if (remainder > 0) {
-                buffer.add(buf);
+        void emitAggregate(CoreSubscriber<? super ByteBuf> a) {
+            int size = aggregate.size();
+            if (size == 0) {
+                remaining = fixedLength;
                 return;
             }
-            List<ByteBuf> _temp = new ArrayList<>(buffer);
-            buffer.clear();
-            int sliceBytes = readableBytes + remainder;
-
-            if (sliceBytes > 0) {
-                _temp.add(buf.retainedSlice(0, sliceBytes));
-            }
-
-            int remainderLen = readableBytes - sliceBytes;
-            if (remainderLen > 0) {
-                ByteBuf remainderBuf = buf.retainedSlice(sliceBytes, remainderLen);
-                buffer.add(remainderBuf);
-            }
-
-            COUNT.set(this, fixedLength - remainderLen);
-            try {
-                next(_temp);
-            } finally {
-                buf.release();
-            }
-        }
-
-        protected void next(List<ByteBuf> buffers) {
-            int size = buffers.size();
+            ByteBuf out;
             if (size == 1) {
-                actual.onNext(buffers.get(0));
-            } else if (size > 1) {
-                actual.onNext(
-                    Unpooled
-                        .compositeBuffer(buffers.size())
-                        .addComponents(true, buffers)
-                );
+                out = aggregate.get(0);
+            } else {
+                out = Unpooled.compositeBuffer(size).addComponents(true, new ArrayList<>(aggregate));
             }
+            aggregate.clear();
+            remaining = fixedLength;
+            a.onNext(out);
         }
 
-        @Override
-        protected void hookFinally(@Nonnull SignalType type) {
-            if (!buffer.isEmpty()) {
-                for (ByteBuf byteBuf : buffer) {
-                    ReferenceCountUtil.safeRelease(byteBuf);
-                }
-                buffer.clear();
+        void cleanup() {
+            for (ByteBuf b : aggregate) {
+                ReferenceCountUtil.safeRelease(b);
             }
-        }
-
-        @Override
-        protected void hookOnComplete() {
-            if (!buffer.isEmpty()) {
-                next(new ArrayList<>(buffer));
-                buffer.clear();
+            aggregate.clear();
+            ByteBuf b;
+            while ((b = queue.poll()) != null) {
+                ReferenceCountUtil.safeRelease(b);
             }
-            actual.onComplete();
-        }
-
-        @Override
-        protected void hookOnError(@Nonnull Throwable throwable) {
-            actual.onError(throwable);
         }
     }
 }
