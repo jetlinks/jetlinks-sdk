@@ -145,7 +145,7 @@ public class ByteBufUtils {
             }
             this.s = subscription;
             actual.onSubscribe(this);
-            subscription.request(1);
+            //subscription.request(1);
         }
 
         @Override
@@ -229,60 +229,50 @@ public class ByteBufUtils {
                         break;
                     }
 
-                    // process this buf, possibly produce multiple outputs
-                    boolean requestMoreAfter = true;
-                    try {
-                        int readable = buf.readableBytes();
-                        int offset = 0;
-                        for (; ; ) {
-                            if (cancelled) {
-                                ReferenceCountUtil.safeRelease(buf);
-                                cleanup();
-                                return;
+                    int readable = buf.readableBytes();
+                    int offset = 0;
+                    for (; ; ) {
+                        if (cancelled) {
+                            ReferenceCountUtil.safeRelease(buf);
+                            cleanup();
+                            return;
+                        }
+                        int need = remaining;
+                        if (readable - offset >= need) {
+                            if (need > 0) {
+                                aggregate.add(buf.retainedSlice(offset, need));
                             }
-                            int need = remaining;
-                            if (readable - offset >= need) {
-                                if (need > 0) {
-                                    aggregate.add(buf.retainedSlice(offset, need));
-                                }
-                                offset += need;
-                                readable = buf.readableBytes();
-                                emitAggregate(a);
-                                e++;
-                                r = requested; // refresh possibly increased demand
-                                if (e == r) {
-                                    // if we've met demand, break processing further outputs now
-                                    // any remainder from buf will be handled on next drain
-                                    if (offset < buf.readableBytes()) {
-                                        queue.offer(buf.retainedSlice(offset, buf.readableBytes() - offset));
-                                    }
-                                    ReferenceCountUtil.safeRelease(buf);
-                                    requestMoreAfter = false; // do not over request when demand is satisfied
-                                    break;
-                                }
-                                if (offset == buf.readableBytes()) {
-                                    ReferenceCountUtil.safeRelease(buf);
-                                    break;
-                                }
-                                // continue to produce next chunk from the same buf
-                                continue;
-                            } else {
-                                int len = readable - offset;
-                                if (len > 0) {
-                                    aggregate.add(buf.retainedSlice(offset, len));
-                                    remaining -= len;
+                            offset += need;
+                            readable = buf.readableBytes();
+                            emitAggregate(a);
+                            e++;
+                            r = requested; // refresh possibly increased demand
+                            if (e == r) {
+                                // if we've met demand, break processing further outputs now
+                                // any remainder from buf will be handled on next drain
+                                if (offset < buf.readableBytes()) {
+                                    queue.offer(buf.retainedSlice(offset, buf.readableBytes() - offset));
                                 }
                                 ReferenceCountUtil.safeRelease(buf);
                                 break;
                             }
-                        }
-                    } finally {
-                        // request next upstream item for each polled element
-                        Subscription up = this.s;
-                        if (up != null && requestMoreAfter) {
-                            up.request(1);
+                            if (offset == buf.readableBytes()) {
+                                ReferenceCountUtil.safeRelease(buf);
+                                break;
+                            }
+                            // continue to produce next chunk from the same buf
+                            continue;
+                        } else {
+                            int len = readable - offset;
+                            if (len > 0) {
+                                aggregate.add(buf.retainedSlice(offset, len));
+                                remaining -= len;
+                            }
+                            ReferenceCountUtil.safeRelease(buf);
+                            break;
                         }
                     }
+
                 }
 
                 if (e != 0L) {
@@ -312,6 +302,10 @@ public class ByteBufUtils {
                 if (missed == 0) {
                     break;
                 }
+            }
+
+            if (requested > 0) {
+                this.s.request(1);
             }
         }
 
