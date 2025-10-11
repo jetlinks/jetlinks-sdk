@@ -4,12 +4,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.GenericHeaderSupport;
+import org.jetlinks.core.message.ThingMessage;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ai.cv.AiCommandResult;
+import org.jetlinks.sdk.server.ai.message.CommonAiMessage;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Map;
 
 /**
  * 通用AI输出结果
@@ -58,5 +61,10 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         errorCode = SerializeUtils.readNullableUTF(in);
         timestamp = in.readLong();
         SerializeUtils.readKeyValue(in, this::addHeader);
+    }
+
+    @Override
+    public ThingMessage covertThingMessage(String taskId, String modelId, Map<String,Object> configuration) {
+        return new CommonAiMessage<>();
     }
 }

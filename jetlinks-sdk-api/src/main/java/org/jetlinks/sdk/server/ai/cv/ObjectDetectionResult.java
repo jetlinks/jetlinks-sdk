@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.GenericHeaderSupport;
+import org.jetlinks.core.message.ThingMessage;
 import org.jetlinks.core.utils.SerializeUtils;
+import org.jetlinks.sdk.server.ai.message.AiDietedMessage;
 import org.jetlinks.sdk.server.file.FileData;
 
 import java.io.Externalizable;
@@ -32,6 +34,18 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Schema(title = "其他信息")
     private Map<String, Object> others;
+
+    @Override
+    public ThingMessage covertThingMessage(String taskId, String modelId,Map<String,Object> configuration) {
+        AiDietedMessage message = new AiDietedMessage();
+        message.setMessageId(modelId+"_"+taskId);
+        message.setTaskId(taskId);
+        message.setModelId(modelId);
+        message.setTimestamp(System.currentTimeMillis());
+        message.setData(this);
+        message.setConfiguration(configuration);
+        return message;
+    }
 
     @Override
     public List<? extends FileData> files() {

@@ -2,6 +2,7 @@ package org.jetlinks.sdk.server.ai;
 
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.HeaderSupport;
+import org.jetlinks.core.message.ThingMessage;
 import org.jetlinks.core.metadata.Jsonable;
 import org.jetlinks.sdk.server.file.FileData;
 
@@ -105,5 +106,11 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
 
     }
 
+    /**
+     * @param taskId  任务ID
+     * @param modelId 模型ID
+     * 将ai输出结果转为ThingMessage
+     */
+    ThingMessage covertThingMessage(String taskId, String modelId, Map<String,Object> configuration);
 
 }
