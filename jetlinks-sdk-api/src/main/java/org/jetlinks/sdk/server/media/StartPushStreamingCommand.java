@@ -99,6 +99,25 @@ public class StartPushStreamingCommand extends AbstractCommand<Mono<MediaStreamI
         return getOrNull("downloadSpeed", Integer.class);
     }
 
+
+    @Schema(description = "流所属应用")
+    public String getApp() {
+        return getOrNull("app", String.class);
+    }
+
+    public StartPushStreamingCommand setApp(String app) {
+        return with("app", app);
+    }
+
+    @Schema(description = "是否为云端录像")
+    public boolean isServerRecord() {
+        return CastUtils.castBoolean(readable().get("serverRecord"));
+    }
+
+    public StartPushStreamingCommand setServerRecord(boolean serverRecord) {
+        return with("serverRecord", serverRecord);
+    }
+
     public StartPushStreamingCommand setDownloadSpeed(Integer downloadSpeed) {
         return with("downloadSpeed", downloadSpeed);
     }
