@@ -22,6 +22,16 @@ public class RequestPersonalTokenCommand extends AbstractCommand<Mono<PersonalTo
         return with("sourceType", sourceType);
     }
 
+
+    @Schema(title = "源类型名称", description = "用于描述业务类型")
+    public String getSourceTypeName() {
+        return getOrNull("sourceTypeName", String.class);
+    }
+
+    public RequestPersonalTokenCommand setSourceTypeName(String sourceTypeName) {
+        return with("sourceTypeName", sourceTypeName);
+    }
+
     @Schema(title = "源ID", description = "用于标识业务ID,如: 大屏ID 等.")
     public String getSourceId() {
         return getOrNull("sourceId", String.class);
