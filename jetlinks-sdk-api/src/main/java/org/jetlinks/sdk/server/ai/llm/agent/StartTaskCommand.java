@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 import java.util.Optional;
 
 @Schema(title = "任务命令")
-public class TaskCommand extends AbstractCommand<Flux<TaskResponse>, TaskCommand> {
+public class StartTaskCommand extends AbstractCommand<Flux<TaskResponse>, StartTaskCommand> {
 
 
     @Schema(title = "是否异步执行")
@@ -15,7 +15,7 @@ public class TaskCommand extends AbstractCommand<Flux<TaskResponse>, TaskCommand
         return Optional.ofNullable(getOrNull("async", Boolean.class)).orElse(true);
     }
 
-    public TaskCommand setAsync(boolean async) {
+    public StartTaskCommand setAsync(boolean async) {
         return with("async", async);
     }
 
