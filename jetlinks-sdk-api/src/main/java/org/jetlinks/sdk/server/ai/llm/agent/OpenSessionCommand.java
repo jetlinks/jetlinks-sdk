@@ -74,4 +74,16 @@ public class OpenSessionCommand extends AbstractStreamCommand<LlmMessage<?>, Llm
         return with("tools", tools);
     }
 
+    @Schema(title = "额外配置", description = "智能体运行所需的额外配置")
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getExpands() {
+        Map<String, Object> params = getOrNull("expands", Map.class);
+
+        return params == null ? Collections.emptyMap() : params;
+    }
+
+    public OpenSessionCommand setExpands(Map<String, Object> expands) {
+        return with("expands", expands);
+    }
+
 }
