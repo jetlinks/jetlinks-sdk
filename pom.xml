@@ -7,7 +7,7 @@
     <groupId>org.jetlinks.sdk</groupId>
     <artifactId>jetlinks-sdk</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.3</version>
+    <version>1.0.4-SNAPSHOT</version>
 
     <modules>
         <module>jetlinks-sdk-api</module>
