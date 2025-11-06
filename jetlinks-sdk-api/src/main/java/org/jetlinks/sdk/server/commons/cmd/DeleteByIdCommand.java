@@ -6,9 +6,11 @@ import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
+import org.jetlinks.core.utils.ConverterUtils;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -27,8 +29,31 @@ public class DeleteByIdCommand<T> extends OperationByIdCommand<T, DeleteByIdComm
     public DeleteByIdCommand() {
     }
 
+    @Deprecated
     public DeleteByIdCommand(Class<T> type) {
         withConverter(CommandUtils.createConverter(ResolvableType.forClass(type)));
+    }
+
+    /**
+     * 创建删除指定ID的数据命令,并返回被删除的数据量.
+     *
+     * @return DeleteByIdCommand
+     */
+    public static DeleteByIdCommand<Mono<Integer>> create(String id) {
+        return new DeleteByIdCommand<Mono<Integer>>()
+            .withId(id)
+            .withConverter(val -> ConverterUtils.convert(val, Integer.class));
+    }
+
+    /**
+     * 创建删除指定ID的数据命令,并返回被删除的数据量.
+     *
+     * @return DeleteByIdCommand
+     */
+    public static DeleteByIdCommand<Mono<Integer>> create(List<String> id) {
+        return new DeleteByIdCommand<Mono<Integer>>()
+            .withIdList(id)
+            .withConverter(val -> ConverterUtils.convert(val, Integer.class));
     }
 
     /**
@@ -38,6 +63,7 @@ public class DeleteByIdCommand<T> extends OperationByIdCommand<T, DeleteByIdComm
      * @param <T>  类型
      * @return AddCommand
      */
+    @Deprecated
     public static <T> DeleteByIdCommand<T> of(Class<T> type) {
         return new DeleteByIdCommand<T>()
             .withConverter(CommandUtils.createConverter(ResolvableType.forType(type)));
