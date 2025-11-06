@@ -21,6 +21,10 @@ import java.util.function.Function;
 @Schema(title = "根据ID删除")
 public class DeleteByIdCommand<T> extends OperationByIdCommand<T, DeleteByIdCommand<T>> {
 
+    @Override
+    public ResolvableType responseType() {
+        return INTEGER_RESPONSE_TYPE;
+    }
 
     /**
      * 请使用{@link DeleteByIdCommand#of(Class)}创建命令
@@ -110,6 +114,5 @@ public class DeleteByIdCommand<T> extends OperationByIdCommand<T, DeleteByIdComm
         );
 
     }
-
 
 }
