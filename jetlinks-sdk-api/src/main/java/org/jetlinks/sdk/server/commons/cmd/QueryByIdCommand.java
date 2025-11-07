@@ -7,6 +7,7 @@ import org.jetlinks.core.metadata.FunctionMetadata;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.StringType;
+import org.jetlinks.core.utils.ConverterUtils;
 import org.springframework.core.ResolvableType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,11 +26,44 @@ public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdComman
 
 
     /**
-     * 请使用{@link QueryByIdCommand#of(Class)}创建命令
+     * 请使用{@link QueryByIdCommand#create(Class, List)}创建命令
      */
     @Deprecated
     public QueryByIdCommand() {
     }
+
+    /**
+     * 创建删除指定ID的数据命令,并返回被删除的数据量.
+     *
+     * @return DeleteByIdCommand
+     */
+    public static <T> QueryByIdCommand<Mono<T>> create(Class<T> type, String id) {
+        return create(ResolvableType.forType(type), id);
+    }
+
+    public static <T> QueryByIdCommand<Mono<T>> create(ResolvableType type, String id) {
+        return new QueryByIdCommand<Mono<T>>()
+            .withId(id)
+            .withConverter(CommandUtils.createConverter(type))
+            .withResponseType(ResolvableType.forClassWithGenerics(Mono.class, type));
+    }
+
+    /**
+     * 创建删除指定ID的数据命令,并返回被删除的数据量.
+     *
+     * @return DeleteByIdCommand
+     */
+    public static <T> QueryByIdCommand<Flux<T>> create(Class<T> type, List<?> id) {
+        return create(ResolvableType.forType(type), id);
+    }
+
+    public static <T> QueryByIdCommand<Flux<T>> create(ResolvableType type, List<?> id) {
+        return new QueryByIdCommand<Flux<T>>()
+            .withIdList(id)
+            .withConverter(CommandUtils.createConverter(type))
+            .withResponseType(ResolvableType.forClassWithGenerics(Flux.class, type));
+    }
+
 
     /**
      * 使用指定的类型创建命令,执行命令后会将执行结果转换为指定类型
@@ -38,6 +72,7 @@ public class QueryByIdCommand<T> extends OperationByIdCommand<T, QueryByIdComman
      * @param <T>  类型
      * @return AddCommand
      */
+    @Deprecated
     public static <T> QueryByIdCommand<T> of(Class<T> type) {
         return new QueryByIdCommand<T>()
             .withConverter(CommandUtils.createConverter(ResolvableType.forType(type)));

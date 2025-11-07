@@ -27,12 +27,11 @@ implements GenericInputCommand<T> {
 
     public static final String PARAMETER_KEY = "data";
 
-    @SafeVarargs
-    public final Self withData(T... entityInstances) {
+    public final Self withData(Object... entityInstances) {
         return withData(Arrays.asList(entityInstances));
     }
 
-    public final Self withData(List<? extends T> entityInstances) {
+    public final Self withData(List<?> entityInstances) {
 
         writable().put(PARAMETER_KEY, entityInstances);
 

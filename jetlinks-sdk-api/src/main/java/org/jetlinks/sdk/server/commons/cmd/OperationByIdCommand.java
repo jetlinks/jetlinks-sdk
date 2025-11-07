@@ -57,7 +57,7 @@ public abstract class OperationByIdCommand<T, Self extends OperationByIdCommand<
      * @param id ID
      * @return this
      */
-    public Self withIdList(List<String> id) {
+    public Self withIdList(List<?> id) {
         return with(PARAMETER_KEY_ID, id);
     }
 
