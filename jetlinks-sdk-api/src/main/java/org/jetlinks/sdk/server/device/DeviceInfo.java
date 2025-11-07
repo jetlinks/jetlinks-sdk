@@ -34,6 +34,9 @@ public class DeviceInfo extends DefaultExtendable implements Serializable, Jsona
     @Schema(title = "配置信息")
     private Map<String, Object> configuration;
 
+    @Schema(description = "设备类型")
+    private DeviceType deviceType;
+
     @Schema(title = "创建人ID")
     private String creatorId;
 
@@ -54,6 +57,9 @@ public class DeviceInfo extends DefaultExtendable implements Serializable, Jsona
         JSONObject jsonObject = Jsonable.super.toJson();
         if (state != null) {
             jsonObject.put("state", state.name());
+        }
+        if (deviceType != null) {
+            jsonObject.put("deviceType", deviceType.name());
         }
         return jsonObject;
     }
