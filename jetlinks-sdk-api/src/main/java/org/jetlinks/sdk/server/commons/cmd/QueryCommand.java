@@ -110,7 +110,7 @@ public abstract class QueryCommand<T, Self extends QueryCommand<T, Self>> extend
 
     @Getter
     @Setter
-    protected static abstract class InputSpec extends QueryParamSpec {
+    public static abstract class InputSpec extends QueryParamSpec {
 
     }
 

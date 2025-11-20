@@ -157,7 +157,7 @@ public class QueryPagerCommand<T> extends QueryCommand<Mono<PagerResult<T>>, Que
 
     @Getter
     @Setter
-    protected static class InputSpec extends QueryCommand.InputSpec {
+    public static class InputSpec extends QueryCommand.InputSpec {
 
         @Schema(title = "页码", description = "从0开始", defaultValue = "0")
         private Integer pageIndex;
