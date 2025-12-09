@@ -2,7 +2,11 @@ package org.jetlinks.sdk.server.ai;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetlinks.sdk.server.ai.cv.ImageRecognitionCommand;
+import org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand;
 import org.jetlinks.sdk.server.ai.cv.ObjectDetectionResult;
+
+import javax.annotation.Nullable;
 
 @AllArgsConstructor
 @Getter
@@ -14,9 +18,9 @@ public enum InternalTaskTarget implements TaskTarget {
      * @see ObjectDetectionResult
      * @see org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand
      */
-    ObjectDetection("目标检测"),
+    ObjectDetection("目标检测", new ObjectDetectionCommand(), ObjectDetectionCommand.aiOutputMetadata),
 
-    ImageRecognition("图像识别"),
+    ImageRecognition("图像识别", new ImageRecognitionCommand(), ObjectDetectionCommand.aiOutputMetadata),
 
     /* =- 自然语言处理 -= */
     TextClassification("文本分类"),
@@ -30,6 +34,16 @@ public enum InternalTaskTarget implements TaskTarget {
 
     ;
     private final String text;
+    @Nullable
+    private final AiCommand<?> command;
+    private final AiOutputMetadata aiOutputMetadata;
+
+    InternalTaskTarget(String text) {
+        this.text = text;
+        this.command = null;
+        this.aiOutputMetadata = null;
+    }
+
 
     @Override
     public String getValue() {

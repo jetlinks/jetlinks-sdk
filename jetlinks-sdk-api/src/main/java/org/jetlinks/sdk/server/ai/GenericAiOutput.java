@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.ai;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ai.cv.AiCommandResult;
@@ -28,6 +29,15 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
     @Schema(title = "数据id")
     private String id;
 
+    @Schema(title = "来源id")
+    private String owner;
+
+    @Schema(title = "来源名称")
+    private String ownerName;
+
+    @Schema(title = "来源类型")
+    private String ownerType;
+
     @Schema(title = "是否成功响应")
     private boolean success;
 
@@ -48,6 +58,10 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         SerializeUtils.writeNullableUTF(errorCode, out);
         out.writeLong(timestamp);
         SerializeUtils.writeKeyValue(getHeaders(), out);
+        SerializeUtils.writeNullableUTF(sourceId, out);
+        SerializeUtils.writeNullableUTF(owner, out);
+        SerializeUtils.writeNullableUTF(ownerName, out);
+        SerializeUtils.writeNullableUTF(ownerType, out);
     }
 
     @Override
@@ -58,5 +72,9 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         errorCode = SerializeUtils.readNullableUTF(in);
         timestamp = in.readLong();
         SerializeUtils.readKeyValue(in, this::addHeader);
+        sourceId = SerializeUtils.readNullableUTF(in);
+        owner = SerializeUtils.readNullableUTF(in);
+        ownerName = SerializeUtils.readNullableUTF(in);
+        ownerType = SerializeUtils.readNullableUTF(in);
     }
 }
