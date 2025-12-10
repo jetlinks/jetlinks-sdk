@@ -29,15 +29,6 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
     @Schema(title = "数据id")
     private String id;
 
-    @Schema(title = "来源id")
-    private String owner;
-
-    @Schema(title = "来源名称")
-    private String ownerName;
-
-    @Schema(title = "来源类型")
-    private String ownerType;
-
     @Schema(title = "是否成功响应")
     private boolean success;
 
@@ -59,9 +50,6 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         out.writeLong(timestamp);
         SerializeUtils.writeKeyValue(getHeaders(), out);
         SerializeUtils.writeNullableUTF(sourceId, out);
-        SerializeUtils.writeNullableUTF(owner, out);
-        SerializeUtils.writeNullableUTF(ownerName, out);
-        SerializeUtils.writeNullableUTF(ownerType, out);
     }
 
     @Override
@@ -73,8 +61,5 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         timestamp = in.readLong();
         SerializeUtils.readKeyValue(in, this::addHeader);
         sourceId = SerializeUtils.readNullableUTF(in);
-        owner = SerializeUtils.readNullableUTF(in);
-        ownerName = SerializeUtils.readNullableUTF(in);
-        ownerType = SerializeUtils.readNullableUTF(in);
     }
 }

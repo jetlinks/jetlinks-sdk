@@ -34,22 +34,6 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     String getId();
 
     /**
-     * 获取来源ID
-     */
-    String getOwner();
-
-
-    /**
-     * 获取来源名称
-     */
-    String getOwnerName();
-
-    /**
-     * 获取来源类型
-     */
-    String getOwnerType();
-
-    /**
      * 是否成功
      *
      * @return 是否成功

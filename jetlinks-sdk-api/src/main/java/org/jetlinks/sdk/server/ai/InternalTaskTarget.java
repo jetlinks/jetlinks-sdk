@@ -7,6 +7,7 @@ import org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand;
 import org.jetlinks.sdk.server.ai.cv.ObjectDetectionResult;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 @Getter
@@ -18,9 +19,9 @@ public enum InternalTaskTarget implements TaskTarget {
      * @see ObjectDetectionResult
      * @see org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand
      */
-    ObjectDetection("目标检测", new ObjectDetectionCommand(), ObjectDetectionCommand.aiOutputMetadata),
+    ObjectDetection("目标检测", ObjectDetectionCommand::new, ObjectDetectionCommand.aiOutputMetadata),
 
-    ImageRecognition("图像识别", new ImageRecognitionCommand(), ObjectDetectionCommand.aiOutputMetadata),
+    ImageRecognition("图像识别", ImageRecognitionCommand::new, ObjectDetectionCommand.aiOutputMetadata),
 
     /* =- 自然语言处理 -= */
     TextClassification("文本分类"),
@@ -35,7 +36,8 @@ public enum InternalTaskTarget implements TaskTarget {
     ;
     private final String text;
     @Nullable
-    private final AiCommand<?> command;
+    private final Supplier<AiCommand<?>> command;
+    @Nullable
     private final AiOutputMetadata aiOutputMetadata;
 
     InternalTaskTarget(String text) {
