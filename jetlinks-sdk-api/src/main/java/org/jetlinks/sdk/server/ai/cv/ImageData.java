@@ -22,6 +22,9 @@ import java.util.Map;
 @Getter
 public class ImageData implements FileData, Externalizable {
 
+    @Schema(description = "图片源id,例如视频源id")
+    private String id;
+
     @Schema(description = "图片数据")
     private ByteBuf data;
 
@@ -61,6 +64,7 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
+        SerializeUtils.writeNullableUTF(id, out);
         SerializeUtils.writeKeyValue(others, out);
         SerializeUtils.writeObject(data, out);
         out.writeByte(type.ordinal());
@@ -68,6 +72,7 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         data = (ByteBuf) SerializeUtils.readObject(in);
         type = Type.ALL[in.readByte()];

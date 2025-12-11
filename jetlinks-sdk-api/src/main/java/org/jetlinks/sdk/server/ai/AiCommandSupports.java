@@ -21,4 +21,19 @@ public interface AiCommandSupports {
      */
     String taskManager = "taskManager";
 
+    /**
+     * 复判任务管理支持
+     */
+    String aiReviewManager = "aiReviewManager";
+
+    /**
+     * 复判数据管理支持
+     */
+    String aiReviewDataManager = "aiReviewDataManager";
+
+    /**
+     * 复判记录管理支持
+     */
+    String aiReviewRecordManager = "aiReviewRecordManager";
+
 }
