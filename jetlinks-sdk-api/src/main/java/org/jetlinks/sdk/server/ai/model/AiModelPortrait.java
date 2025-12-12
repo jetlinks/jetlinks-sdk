@@ -29,10 +29,6 @@ public class AiModelPortrait implements Externalizable {
     @Schema(description = "出参")
     private DataType output;
 
-    @Nullable
-    @Schema(title = "内容")
-    private Map<String, Object> content;
-
     private Map<String, Object> others;
 
 
@@ -42,7 +38,6 @@ public class AiModelPortrait implements Externalizable {
         SerializeUtils.writeObject(input, out);
         SerializeUtils.writeObject(output, out);
         SerializeUtils.writeKeyValue(others, out);
-        SerializeUtils.writeKeyValue(content, out);
     }
 
     @Override
@@ -52,7 +47,6 @@ public class AiModelPortrait implements Externalizable {
             input = (ConfigMetadata) SerializeUtils.readObject(in);
             output = (DataType) SerializeUtils.readObject(in);
             others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
-            content = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         }
     }
 }
