@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.ai;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.ai.cv.AiCommandResult;
@@ -48,6 +49,7 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         SerializeUtils.writeNullableUTF(errorCode, out);
         out.writeLong(timestamp);
         SerializeUtils.writeKeyValue(getHeaders(), out);
+        SerializeUtils.writeNullableUTF(sourceId, out);
     }
 
     @Override
@@ -58,5 +60,6 @@ public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends Generic
         errorCode = SerializeUtils.readNullableUTF(in);
         timestamp = in.readLong();
         SerializeUtils.readKeyValue(in, this::addHeader);
+        sourceId = SerializeUtils.readNullableUTF(in);
     }
 }

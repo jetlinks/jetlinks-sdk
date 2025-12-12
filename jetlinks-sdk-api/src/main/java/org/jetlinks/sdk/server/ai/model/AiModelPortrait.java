@@ -8,7 +8,11 @@ import org.jetlinks.core.metadata.ConfigMetadata;
 import org.jetlinks.core.metadata.DataType;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.*;
+import javax.annotation.Nullable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.Map;
 
 /**
@@ -21,6 +25,7 @@ public class AiModelPortrait implements Externalizable {
     @Schema(description = "入参及文档")
     private ConfigMetadata input;
 
+    @Deprecated
     @Schema(description = "出参")
     private DataType output;
 

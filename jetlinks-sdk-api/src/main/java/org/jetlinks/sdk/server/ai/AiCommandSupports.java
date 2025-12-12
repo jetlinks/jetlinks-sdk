@@ -1,5 +1,9 @@
 package org.jetlinks.sdk.server.ai;
 
+/**
+ * @deprecated {@link org.jetlinks.pro.ai.cmd.AiServices}
+ */
+@Deprecated
 public interface AiCommandSupports {
 
     /**

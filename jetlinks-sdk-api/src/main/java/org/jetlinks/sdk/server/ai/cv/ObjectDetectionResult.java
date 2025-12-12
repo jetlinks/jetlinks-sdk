@@ -21,8 +21,7 @@ import java.util.*;
 @Schema(title = "目标检测结果")
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
-    @Schema(description = "目标检测源id,例如视频源id")
-    private String sourceId;
+    public static final String IMAGES = "images";
 
     @Schema(title = "图像数据")
     private List<ImageData> images;
@@ -40,8 +39,8 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Override
     public Map<String, Object> toLightWeighMap() {
-        Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), "images");
-        map.put("images", imagesToSimpleMap());
+        Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), IMAGES);
+        map.put(IMAGES, imagesToSimpleMap());
         return map;
     }
 
@@ -54,12 +53,12 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
             for (DetectedObject object : objects) {
                 FlatData from = FlatData.from(this, object);
                 Map<String, Object> data = FastBeanCopier.copy(from, new HashMap<>());
-                data.put("images", _images);
+                data.put(IMAGES, _images);
                 maps.add(data);
             }
         } else {
-            Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), "images", "objects");
-            copy.put("images", _images);
+            Map<String, Object> copy = FastBeanCopier.copy(this, new HashMap<>(), IMAGES, "objects");
+            copy.put(IMAGES, _images);
             maps = Collections.singletonList(copy);
         }
         return maps;
@@ -139,7 +138,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         super.writeExternal(out);
-        SerializeUtils.writeNullableUTF(sourceId, out);
         if (CollectionUtils.isEmpty(images)) {
             out.writeInt(0);
         } else {
@@ -164,7 +162,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Override
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         super.readExternal(in);
-        sourceId = SerializeUtils.readNullableUTF(in);
         int sizeImg = in.readInt();
         if (sizeImg > 0) {
             images = new ArrayList<>(sizeImg);

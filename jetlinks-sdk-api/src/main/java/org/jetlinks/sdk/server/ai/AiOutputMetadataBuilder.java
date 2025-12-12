@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  * <pre>
  * 将模型的输出属性模型转换为指定格式模型，如：
  * 原有结构为
- * {@code
  * {
  *     "a": 1,
  *     "map": {
@@ -39,9 +38,7 @@ import java.util.stream.Collectors;
  *         }
  *     ]
  * }
- * }
  * 1.配置{@code flatProperty("list").keepProperties(true)}则数据模型结构为
- * {@code
  * {
  *     "a": 1,
  *     "map": {
@@ -51,21 +48,16 @@ import java.util.stream.Collectors;
  *     "d": 4，
  *     "e": 5
  * }
- * }
  * 2.配置{@code includes("a")}则数据模型结构为
- * {@code
  * {
  *     "a": 1
  * }
- * }
  * 3.配置{@code excludes("map.b").excludes("list")}则数据模型结构为
- * {@code
  * {
  *     "a": 1,
  *     "map": {
  *         "c": 3
  *     }
- * }
  * }
  *
  * </pre>
