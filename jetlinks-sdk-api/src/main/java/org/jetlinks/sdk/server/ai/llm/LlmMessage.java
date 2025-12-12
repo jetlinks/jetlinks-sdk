@@ -12,6 +12,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,7 +26,7 @@ public class LlmMessage<SELF extends LlmMessage<SELF>> extends GenericHeaderSupp
     @Override
     @JsonAnyGetter
     public Map<String, Object> extensions() {
-        return extensions;
+        return extensions == null ? Collections.emptyMap() : extensions;
     }
 
     @Override
