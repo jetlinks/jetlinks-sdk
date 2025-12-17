@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.commons.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.Setter;
 import org.hswebframework.ezorm.core.dsl.Update;
 import org.hswebframework.ezorm.core.param.Term;
 import org.hswebframework.ezorm.core.param.UpdateParam;
@@ -10,8 +12,11 @@ import org.hswebframework.web.exception.BusinessException;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandUtils;
+import org.jetlinks.core.command.GenericInputCommand;
 import org.jetlinks.core.metadata.SimpleFunctionMetadata;
 import org.jetlinks.core.metadata.types.IntType;
+import org.jetlinks.sdk.server.commons.cmd.metadata.QueryParamSpec;
+import org.jetlinks.sdk.server.commons.cmd.metadata.TermSpec;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
@@ -43,7 +48,7 @@ import java.util.function.Function;
  * @since 2.1
  */
 @Schema(title = "更新数据", description = "按条件更新数据,更新条件不得为空")
-public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateCommand<T>> {
+public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateCommand<T>> implements GenericInputCommand<T> {
 
     public static final String PARAMETER_DATA = "data";
 
@@ -140,5 +145,18 @@ public class UpdateCommand<T> extends AbstractCommand<Mono<Integer>, UpdateComma
 
     }
 
+
+    @Getter
+    @Setter
+    public static abstract class InputSpec<T> implements GenericInputCommand.InputSpec<T> {
+
+        @Schema(title = "数据内容")
+        private T data;
+
+        @Schema(title = "动态条件",
+            example = "[{\"column\":\"id\",\"termType\":\"is\",\"value\":\"data-id\"}]")
+        private List<TermSpec> terms;
+
+    }
 
 }
