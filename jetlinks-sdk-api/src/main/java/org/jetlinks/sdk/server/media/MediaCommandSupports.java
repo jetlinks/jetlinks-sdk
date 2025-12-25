@@ -19,4 +19,11 @@ public interface MediaCommandSupports {
      */
     String record = "record";
 
+
+    /**
+     * 流媒体服务相关命令支持
+     * mediaService:media
+     */
+    String media = "media";
+
 }
