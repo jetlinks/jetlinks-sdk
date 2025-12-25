@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.media;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.core.command.CommandUtils;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -8,8 +9,6 @@ import org.jetlinks.core.metadata.SimplePropertyMetadata;
 import org.jetlinks.core.metadata.types.StringType;
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -27,6 +26,16 @@ public class StopProxyMediaStreamCommand extends AbstractCommand<Mono<Void>, Sto
 
     public StopProxyMediaStreamCommand withStreamId(String streamId) {
         with("streamId", streamId);
+        return this;
+    }
+
+    @Schema(title = "所属应用",description = "代理后的流的所属应用")
+    public String getApp(){
+        return getOrNull("app",String.class);
+    }
+
+    public StopProxyMediaStreamCommand withApp(String app) {
+        with("app", app);
         return this;
     }
 
