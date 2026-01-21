@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.ai;
 
+import com.alibaba.fastjson.JSONObject;
 import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.HeaderSupport;
 import org.jetlinks.core.metadata.Jsonable;
@@ -68,6 +69,10 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
      */
     default List<? extends FileData> files() {
         return Collections.emptyList();
+    }
+
+    default JSONObject toJson() {
+        return new JSONObject(toLightWeighMap());
     }
 
     /**

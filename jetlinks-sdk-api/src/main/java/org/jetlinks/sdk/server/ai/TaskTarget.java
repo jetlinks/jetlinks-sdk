@@ -1,15 +1,28 @@
 package org.jetlinks.sdk.server.ai;
 
-import org.hswebframework.web.dict.EnumDict;
+import reactor.core.publisher.Mono;
+
+import java.util.function.Supplier;
 
 /**
  * AI 任务目标
  *
- * @see InternalTaskTarget
+ * @see InternalCVTaskTarget
  * @see AiCommand
  * @since 1.0.1
  */
-public interface TaskTarget extends EnumDict<String> {
+public interface TaskTarget {
 
+    String getValue();
+
+    String getText();
+
+    String getDescription();
+
+    Supplier<? extends AiOutput<?>> getAiOutputInstance();
+
+    default Mono<AiOutputMetadata> getAiOutputMetadata() {
+        return Mono.empty();
+    }
 
 }

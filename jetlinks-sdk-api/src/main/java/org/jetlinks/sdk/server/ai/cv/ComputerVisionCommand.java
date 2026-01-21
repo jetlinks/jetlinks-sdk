@@ -5,9 +5,9 @@ import org.hswebframework.web.bean.FastBeanCopier;
 import org.jetlinks.core.command.AbstractCommand;
 import org.jetlinks.sdk.server.ai.AiCommand;
 import org.jetlinks.sdk.server.ai.AiOutput;
+import org.jetlinks.sdk.server.ai.InternalCVTaskTarget;
 import org.jetlinks.sdk.server.ai.model.AiModelInfo;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
-import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -18,8 +18,8 @@ import java.util.List;
  * @param <R>    命令返回类型
  * @param <Self> 自身类型
  * @author zhouhao
- * @see org.jetlinks.sdk.server.ai.InternalTaskTarget#ObjectDetection
- * @see org.jetlinks.sdk.server.ai.InternalTaskTarget#ImageRecognition
+ * @see InternalCVTaskTarget#ObjectDetection
+ * @see InternalCVTaskTarget#ImageRecognition
  * @since 1.0.1
  */
 public abstract class ComputerVisionCommand<R extends AiOutput<R>, Self extends ComputerVisionCommand<R, Self>>
