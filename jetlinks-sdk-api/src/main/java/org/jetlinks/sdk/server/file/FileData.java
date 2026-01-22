@@ -2,6 +2,8 @@ package org.jetlinks.sdk.server.file;
 
 import io.netty.buffer.ByteBuf;
 
+import javax.annotation.Nullable;
+
 /**
  * 文件数据信息
  *
@@ -22,6 +24,7 @@ public interface FileData {
      *
      * @return 文件内容
      */
+    @Nullable
     ByteBuf body();
 
     /**

@@ -6,6 +6,7 @@ import org.jetlinks.core.HeaderSupport;
 import org.jetlinks.core.metadata.Jsonable;
 import org.jetlinks.sdk.server.file.FileData;
 
+import javax.annotation.Nullable;
 import java.io.Externalizable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,12 +64,41 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     long getTimestamp();
 
     /**
-     * 获取AI输出的文件信息
+     * 获取AI输出的文件型数据
      *
      * @return 文件列表
      */
     default List<? extends FileData> files() {
         return Collections.emptyList();
+    }
+
+    /**
+     * 获取AI输出的文本型数据
+     */
+    default String text(){
+        return null;
+    }
+
+    /**
+     * 获取AI输出的结构型数据
+     */
+    default Map<String,Object> schemaMap(){
+        return toLightWeighMap();
+    }
+
+    /**
+     * 获取AI输出的数值型数据
+     * @return
+     */
+    default @Nullable Double numberValue(){
+        return null;
+    }
+
+    /**
+     * 获取AI输出的判断型结果
+     */
+    default @Nullable Integer hitValue(){
+        return null;
     }
 
     default JSONObject toJson() {
