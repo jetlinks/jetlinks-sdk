@@ -28,12 +28,16 @@ public class MediaSource implements Externalizable {
     @Schema(description = "其他信息")
     private Map<String, Object> others;
 
+    @Schema(description = "模型参数")
+    private Map<String, Object> params;
+
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {
         SerializeUtils.writeNullableUTF(id, out);
         SerializeUtils.writeNullableUTF(rtsp, out);
         SerializeUtils.writeNullableUTF(rtmp, out);
         SerializeUtils.writeKeyValue(others, out);
+        SerializeUtils.writeKeyValue(params, out);
     }
 
     @Override
@@ -42,5 +46,6 @@ public class MediaSource implements Externalizable {
         rtsp = SerializeUtils.readNullableUTF(in);
         rtmp = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
+        params = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
     }
 }

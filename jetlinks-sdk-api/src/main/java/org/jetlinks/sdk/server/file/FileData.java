@@ -2,13 +2,18 @@ package org.jetlinks.sdk.server.file;
 
 import io.netty.buffer.ByteBuf;
 
+import javax.annotation.Nullable;
+import java.io.Externalizable;
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * 文件数据信息
  *
  * @author zhouhao
  * @since 2.3
  */
-public interface FileData {
+public interface FileData extends Externalizable {
 
     /**
      * 文件名
@@ -22,6 +27,7 @@ public interface FileData {
      *
      * @return 文件内容
      */
+    @Nullable
     ByteBuf body();
 
     /**
@@ -35,6 +41,10 @@ public interface FileData {
      * @return 获取文件访问地址
      */
     String getUrl();
+
+    default Map<String, Object> getOthers() {
+        return Collections.emptyMap();
+    }
 
     /**
      * 释放文件资源

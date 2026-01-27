@@ -3,10 +3,8 @@ package org.jetlinks.sdk.server.ai;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.core.GenericHeaderSupport;
 import org.jetlinks.core.utils.SerializeUtils;
-import org.jetlinks.sdk.server.ai.cv.AiCommandResult;
 
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -21,7 +19,7 @@ import java.io.ObjectOutput;
  */
 @Getter
 @Setter
-public class GenericAiOutput<SELF extends AiCommandResult<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput<SELF> {
+public class GenericAiOutput<SELF extends GenericAiOutput<SELF>> extends GenericHeaderSupport<SELF> implements AiOutput<SELF> {
 
     @Schema(title = "源数据id")
     private String sourceId;

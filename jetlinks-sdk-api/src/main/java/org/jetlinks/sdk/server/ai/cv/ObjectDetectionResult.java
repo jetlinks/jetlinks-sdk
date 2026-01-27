@@ -38,6 +38,11 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     }
 
     @Override
+    public Map<String, Object> schemaMap() {
+        return Collections.singletonMap("objects", objects);
+    }
+
+    @Override
     public Map<String, Object> toLightWeighMap() {
         Map<String, Object> map = FastBeanCopier.copy(this, new HashMap<>(), IMAGES);
         map.put(IMAGES, imagesToSimpleMap());
