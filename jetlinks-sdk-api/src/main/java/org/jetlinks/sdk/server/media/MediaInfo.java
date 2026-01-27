@@ -12,6 +12,7 @@ import java.io.ObjectOutput;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Getter
 @Setter
@@ -31,9 +32,31 @@ public class MediaInfo implements Externalizable {
     @Schema(description = "mp4地址")
     private String mp4;
 
+    @Schema(description = "hls播放地址")
+    private String hls;
+
     @Schema(description = "rtc地址")
     private String rtc;
 
+    public String getPlayUrl(String format) {
+        switch (format.toLowerCase(Locale.ROOT)) {
+            case "mp4":
+                return mp4;
+            case "flv":
+                return flv;
+            case "hls":
+            case "m3u8":
+                return hls;
+            case "rtsp":
+                return rtsp;
+            case "rtmp":
+                return rtmp;
+            case "webrtc":
+            case "rtc":
+                return rtc;
+        }
+        throw new UnsupportedOperationException("unsupported format:" + format);
+    }
 
     public List<URI> toUriList() {
         List<URI> list = new ArrayList<>(5);

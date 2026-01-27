@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -25,32 +24,48 @@ public class ImageData implements FileData, Externalizable {
     @Schema(description = "图片源id,例如视频源id")
     private String id;
 
+    @Schema(description = "文件名称，需携带后缀")
+    private String name;
+
     @Schema(description = "图片数据")
     private ByteBuf data;
 
     @Schema(description = "图片类型")
     private Type type;
 
+    @Schema(description = "图片url")
+    private String url;
+
     @Schema(description = "其他信息")
     private Map<String, Object> others;
 
     @Override
     public String name() {
-        return ObjectUtils.isEmpty(this.others) ?
-            "image.jpg" : (String)this.others.getOrDefault("name", "image.jpg");
-
+        return name == null ? "image.jpg" : name;
     }
 
-    @Deprecated
-    public ImageData withName(String key, String value) {
-        withOther("name", value);
-        return this;
+    @Override
+    public Map<String, Object> getOthers() {
+        if (type != null) {
+            othersWriter().put("type", type);
+        }
+        if (id != null) {
+            othersWriter().put("id", id);
+        }
+        return others;
     }
 
-
-    public ImageData withName(String value) {
-        withOther("name", value);
-        return this;
+    public Type getType() {
+        if (type == null && others != null) {
+            Object _type = others.get("type");
+            if (_type instanceof Type) {
+                type = (Type) _type;
+            }
+            if (_type instanceof String) {
+                type = Type.valueOf(_type.toString());
+            }
+        }
+        return type;
     }
 
     public ImageData withOther(String key, Object value) {
@@ -67,7 +82,7 @@ public class ImageData implements FileData, Externalizable {
         SerializeUtils.writeNullableUTF(id, out);
         SerializeUtils.writeKeyValue(others, out);
         SerializeUtils.writeObject(data, out);
-        out.writeByte(type.ordinal());
+        out.writeByte(getType().ordinal());
     }
 
     @Override
@@ -85,16 +100,6 @@ public class ImageData implements FileData, Externalizable {
     @Override
     public ByteBuf body() {
         return data == null? null : Unpooled.unreleasableBuffer(data);
-    }
-
-    @Override
-    public void setUrl(String url) {
-        withOther("url", url);
-    }
-
-    @Override
-    public String getUrl() {
-        return others == null ? null : (String) others.get("url");
     }
 
     @Override
