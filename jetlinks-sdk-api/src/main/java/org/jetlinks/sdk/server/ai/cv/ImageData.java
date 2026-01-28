@@ -83,6 +83,8 @@ public class ImageData implements FileData, Externalizable {
         SerializeUtils.writeKeyValue(others, out);
         SerializeUtils.writeObject(data, out);
         out.writeByte(getType().ordinal());
+        SerializeUtils.writeNullableUTF(name, out);
+        SerializeUtils.writeNullableUTF(url, out);
     }
 
     @Override
@@ -91,6 +93,8 @@ public class ImageData implements FileData, Externalizable {
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         data = (ByteBuf) SerializeUtils.readObject(in);
         type = Type.ALL[in.readByte()];
+        name = SerializeUtils.readNullableUTF(in);
+        url = SerializeUtils.readNullableUTF(in);
     }
 
     public ByteBuf getData() {

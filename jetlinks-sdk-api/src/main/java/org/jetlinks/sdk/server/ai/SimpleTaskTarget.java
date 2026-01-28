@@ -24,4 +24,9 @@ public class SimpleTaskTarget implements TaskTarget {
     public Supplier<? extends AiOutput<?>> getAiOutputInstance() {
         return GenericAiOutput::new;
     }
+
+    @Override
+    public Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
+        return GenericAiOutput::new;
+    }
 }
