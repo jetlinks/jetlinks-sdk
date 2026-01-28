@@ -21,6 +21,8 @@ public interface TaskTarget {
 
     Supplier<? extends AiOutput<?>> getAiOutputInstance();
 
+    Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance();
+
     default Mono<AiOutputMetadata> getAiOutputMetadata() {
         return Mono.empty();
     }
