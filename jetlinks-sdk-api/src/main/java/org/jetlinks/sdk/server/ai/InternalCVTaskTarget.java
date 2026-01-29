@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.ai;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.sdk.server.ai.cv.ComputerVisionCommand;
 import org.jetlinks.sdk.server.ai.cv.ObjectDetectionCommand;
@@ -87,6 +88,7 @@ public enum InternalCVTaskTarget implements TaskTarget {
         return new SimpleComputerVisionCommand(target.getValue());
     }
 
+    @Setter
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor

@@ -8,7 +8,6 @@ import org.jetlinks.core.metadata.ConfigMetadata;
 import org.jetlinks.core.metadata.DataType;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import javax.annotation.Nullable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -25,6 +24,9 @@ public class AiModelPortrait implements Externalizable {
     @Schema(description = "入参及文档")
     private ConfigMetadata input;
 
+    @Schema(description = "测试入参及文档")
+    private ConfigMetadata testInput;
+
     @Deprecated
     @Schema(description = "出参")
     private DataType output;
@@ -36,6 +38,7 @@ public class AiModelPortrait implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeByte(1);
         SerializeUtils.writeObject(input, out);
+        SerializeUtils.writeObject(testInput, out);
         SerializeUtils.writeObject(output, out);
         SerializeUtils.writeKeyValue(others, out);
     }
@@ -45,6 +48,7 @@ public class AiModelPortrait implements Externalizable {
         byte version = in.readByte();
         if (version == 1) {
             input = (ConfigMetadata) SerializeUtils.readObject(in);
+            testInput = (ConfigMetadata) SerializeUtils.readObject(in);
             output = (DataType) SerializeUtils.readObject(in);
             others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
         }

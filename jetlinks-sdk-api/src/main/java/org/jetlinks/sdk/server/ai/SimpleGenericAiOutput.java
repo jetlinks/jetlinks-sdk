@@ -2,7 +2,6 @@ package org.jetlinks.sdk.server.ai;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
@@ -19,7 +18,7 @@ import java.util.function.Supplier;
 
 @Getter
 @Setter
-public abstract class SimpleGenericAiOutput<T extends FileData> extends GenericAiOutput<SimpleGenericAiOutput<T>> {
+public abstract class SimpleGenericAiOutput<T extends FileData, SELF extends SimpleGenericAiOutput<T, SELF>> extends GenericAiOutput<SELF> {
 
     private Integer hitValue;
 
@@ -83,7 +82,7 @@ public abstract class SimpleGenericAiOutput<T extends FileData> extends GenericA
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException,ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         hitValue = readNullable(in, () -> {
             try {
                 return in.readInt();

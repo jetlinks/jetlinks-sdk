@@ -5,7 +5,7 @@ import org.jetlinks.sdk.server.ai.cv.ImageData;
 import java.util.function.Supplier;
 
 
-public class SimpleImageGenericAiOutput extends SimpleGenericAiOutput<ImageData> {
+public class SimpleImageGenericAiOutput extends SimpleGenericAiOutput<ImageData, SimpleImageGenericAiOutput> {
 
     public Supplier<ImageData> newFileDataSupplier() {
         return ImageData::new;
