@@ -22,6 +22,7 @@ import java.util.*;
 public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult> {
 
     public static final String IMAGES = "images";
+    public static final String OBJECTS = "objects";
 
     @Schema(title = "图像数据")
     private List<ImageData> images;
@@ -39,7 +40,7 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
     @Override
     public Map<String, Object> schemaMap() {
-        return Collections.singletonMap("objects", objects);
+        return Collections.singletonMap(OBJECTS, objects);
     }
 
     @Override
