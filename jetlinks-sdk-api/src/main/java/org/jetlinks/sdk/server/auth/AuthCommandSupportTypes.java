@@ -17,5 +17,8 @@ public interface AuthCommandSupportTypes {
     // 菜单
     String menu = "menu";
 
+    // 身份模块
+    String identity = "identity";
+
 
 }

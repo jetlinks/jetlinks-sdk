@@ -34,9 +34,18 @@ public class SendNotifyCommand extends AbstractCommand<Flux<NotifyResult>, SendN
         return getOrNull("bizType", String.class);
     }
 
+    public SendNotifyCommand withBizType(String bizType) {
+        return with("bizType",bizType);
+    }
+
+
     @Schema(title = "业务ID")
     public String getBizId() {
         return getOrNull("bizId", String.class);
+    }
+
+    public SendNotifyCommand withBizId(String bizId) {
+        return with("bizId",bizId);
     }
 
     @Schema(title = "描述")
