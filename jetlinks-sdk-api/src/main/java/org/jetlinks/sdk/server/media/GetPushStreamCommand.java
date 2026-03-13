@@ -86,4 +86,13 @@ public class GetPushStreamCommand extends AbstractCommand<Mono<MediaStreamPushIn
     public static FunctionMetadata metadata() {
         return CommandMetadataResolver.resolve(ResolvableType.forType(GetPushStreamCommand.class));
     }
+
+    @Schema(title = "地址有效期")
+    public Long getExpires(){
+        return getOrNull("expires",Long.class);
+    }
+
+    public GetPushStreamCommand setExpires(Long expires){
+        return with("expires",expires);
+    }
 }
