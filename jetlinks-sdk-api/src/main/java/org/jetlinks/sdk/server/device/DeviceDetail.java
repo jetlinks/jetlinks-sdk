@@ -7,6 +7,8 @@ import org.hswebframework.ezorm.core.DefaultExtendable;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -112,5 +114,8 @@ public class DeviceDetail extends DefaultExtendable implements Serializable {
 
     @Schema(description = "产品所属分类名称")
     private String classifiedName;
+
+    @Schema(description = "标签信息")
+    private List<DeviceTagsInfo> tags = new ArrayList<>();
 
 }
