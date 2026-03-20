@@ -17,17 +17,11 @@ public class DeviceTagsInfo implements Serializable {
     @Schema(description = "设备ID")
     private String deviceId;
 
-    @Schema(description = "设备名称")
+    @Schema(description = "标签标识")
     private String key;
 
-    @Schema(description = "设备名称")
+    @Schema(description = "标签名称")
     private String name;
-
-    @Schema(description = "标签值")
-    private String type;
-
-    @Schema(description = "标签值")
-    private DataType dataType;
 
     @Schema(description = "时间戳")
     private Long timestamp;
