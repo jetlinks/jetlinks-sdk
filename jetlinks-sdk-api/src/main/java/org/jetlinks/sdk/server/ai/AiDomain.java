@@ -14,11 +14,6 @@ public enum AiDomain implements I18nEnumDict<String> {
     ComputerVision("计算机视觉") {
 
         @Override
-        public TaskTarget createSimpleTaskTarget() {
-            return new SimpleComputerVisionTaskTarget();
-        }
-
-        @Override
         public TaskTarget createSimpleTaskTarget(String value, String text, String description) {
             return SimpleComputerVisionTaskTarget.of(value, text, description);
         }
@@ -29,10 +24,6 @@ public enum AiDomain implements I18nEnumDict<String> {
     LLM("大语言模型");
 
     private final String text;
-
-    public TaskTarget createSimpleTaskTarget() {
-        return new SimpleTaskTarget();
-    }
 
     public TaskTarget createSimpleTaskTarget(String value, String text, String description) {
         return SimpleTaskTarget.of(value, text, description);
