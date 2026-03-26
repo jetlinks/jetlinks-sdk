@@ -27,14 +27,4 @@ public class SimpleTaskTarget implements TaskTarget {
     public static TaskTarget of(String value, String text) {
         return new SimpleTaskTarget(value, text, text);
     }
-
-    @Override
-    public Supplier<? extends AiOutput<?>> getAiOutputInstance() {
-        return GenericAiOutput::new;
-    }
-
-    @Override
-    public Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
-        return GenericAiOutput::new;
-    }
 }
