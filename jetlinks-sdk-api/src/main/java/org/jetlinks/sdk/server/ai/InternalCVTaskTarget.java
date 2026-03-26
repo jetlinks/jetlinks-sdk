@@ -61,16 +61,6 @@ public enum InternalCVTaskTarget implements TaskTarget {
     }
 
     @Override
-    public Supplier<? extends AiOutput<?>> getAiOutputInstance() {
-        return ObjectDetectionResult::new;
-    }
-
-    @Override
-    public Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
-        return SimpleImageGenericAiOutput::new;
-    }
-
-    @Override
     public Mono<AiOutputMetadata> getAiOutputMetadata() {
         return Mono.just(ObjectDetectionCommand.aiOutputMetadata);
     }
