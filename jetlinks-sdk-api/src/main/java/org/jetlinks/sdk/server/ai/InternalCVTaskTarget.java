@@ -36,6 +36,7 @@ public enum InternalCVTaskTarget implements TaskTarget {
     VehicleReverseDrivingDetection,
     IllegalParkingDetection,
     HumanVehicleMixingDetection,
+    HumanPoseDetection,
 
     ;
     private final String text;
