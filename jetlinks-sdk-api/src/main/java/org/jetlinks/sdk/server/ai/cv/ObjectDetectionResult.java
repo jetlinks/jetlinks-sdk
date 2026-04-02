@@ -83,32 +83,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         return null;
     }
 
-    @Getter
-    @Setter
-    public static class Keypoint implements Externalizable {
-        @Schema(title = "X坐标")
-        private float x;
-
-        @Schema(title = "Y坐标")
-        private float y;
-
-        @Schema(title = "置信度")
-        private float conf;
-
-        @Override
-        public void writeExternal(ObjectOutput out) throws IOException {
-            out.writeFloat(x);
-            out.writeFloat(y);
-            out.writeFloat(conf);
-        }
-
-        @Override
-        public void readExternal(ObjectInput in) throws IOException {
-            x = in.readFloat();
-            y = in.readFloat();
-            conf = in.readFloat();
-        }
-    }
 
     @Getter
     @Setter
@@ -130,9 +104,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         @Schema(title = "边框")
         private float[] box;
 
-        @Schema(title = "关键点列表(姿势识别)")
-        private List<Keypoint> keypoints;
-
         @Schema(title = "标注信息")
         private Map<String, Object> annotations;
 
@@ -150,14 +121,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
                     out.writeFloat(v);
                 }
             }
-            if (CollectionUtils.isEmpty(keypoints)) {
-                out.writeInt(0);
-            } else {
-                out.writeInt(keypoints.size());
-                for (Keypoint kp : keypoints) {
-                    kp.writeExternal(out);
-                }
-            }
             SerializeUtils.writeKeyValue(annotations, out);
             SerializeUtils.writeKeyValue(others, out);
 
@@ -172,17 +135,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
             box = new float[size];
             for (int i = 0; i < size; i++) {
                 box[i] = in.readFloat();
-            }
-            int kpSize = in.readInt();
-            if (kpSize > 0) {
-                keypoints = new ArrayList<>(kpSize);
-                for (int i = 0; i < kpSize; i++) {
-                    Keypoint kp = new Keypoint();
-                    kp.readExternal(in);
-                    keypoints.add(kp);
-                }
-            } else {
-                keypoints = new ArrayList<>(0);
             }
             annotations = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
             others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
@@ -275,9 +227,6 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
 
         @Schema(title = "边框")
         private float[] box;
-
-        @Schema(title = "关键点列表(姿势识别)")
-        private List<Keypoint> keypoints;
 
         @Schema(title = "标注信息")
         private Map<String, Object> annotations;
