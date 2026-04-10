@@ -33,3 +33,4 @@ dev
 bootstrap-local.yml
 application-local.yml
 .java-version
+**/.DS_Store
