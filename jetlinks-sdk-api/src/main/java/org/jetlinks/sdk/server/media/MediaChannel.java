@@ -14,12 +14,16 @@ import java.util.Map;
 
 /**
  * 流媒体通道
+ *
  * @see org.jetlinks.sdk.server.commons.cmd.QueryListCommand
  * @see org.jetlinks.sdk.server.commons.cmd.QueryPagerCommand
  */
 @Getter
 @Setter
 public class MediaChannel implements Externalizable {
+
+    @Schema(description = "ID")
+    private String id;
 
     @Schema(description = "设备ID")
     private String deviceId;
@@ -39,6 +43,9 @@ public class MediaChannel implements Externalizable {
     @Schema(description = "地址")
     private String address;
 
+    @Schema(description = "通道状态")
+    private String status;
+
     @Schema(description = "其他拓展信息")
     private Map<String, Object> others;
 
@@ -50,7 +57,9 @@ public class MediaChannel implements Externalizable {
         SerializeUtils.writeNullableUTF(manufacturer, out);
         SerializeUtils.writeNullableUTF(model, out);
         SerializeUtils.writeNullableUTF(address, out);
+        SerializeUtils.writeNullableUTF(status, out);
         SerializeUtils.writeKeyValue(others, out);
+        SerializeUtils.writeNullableUTF(id, out);
     }
 
     @Override
@@ -62,5 +71,7 @@ public class MediaChannel implements Externalizable {
         model = SerializeUtils.readNullableUTF(in);
         address = SerializeUtils.readNullableUTF(in);
         others = SerializeUtils.readMap(in, Maps::newHashMapWithExpectedSize);
+        status = SerializeUtils.readNullableUTF(in);
+        id = SerializeUtils.readNullableUTF(in);
     }
 }
