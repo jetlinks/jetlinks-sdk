@@ -52,6 +52,9 @@ public class DeviceInfo extends DefaultExtendable implements Serializable, Jsona
     @Schema(title = "描述")
     private String describe;
 
+    @Schema(title = "地址")
+    private String address;
+
     @Override
     public JSONObject toJson() {
         JSONObject jsonObject = Jsonable.super.toJson();
