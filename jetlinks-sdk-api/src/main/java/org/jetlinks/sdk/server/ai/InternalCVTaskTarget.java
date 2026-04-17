@@ -28,6 +28,7 @@ public enum InternalCVTaskTarget implements TaskTarget {
     ImageRecognition,
     BarrierGateDetection,
     ClutterDetection,
+    VehicleCongestionDetection,
     CrowdDetection,
     FaceDetection,
     FireSmokeDetection,
