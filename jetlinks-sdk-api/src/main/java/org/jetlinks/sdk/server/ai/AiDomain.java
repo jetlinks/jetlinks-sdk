@@ -3,6 +3,9 @@ package org.jetlinks.sdk.server.ai;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.hswebframework.web.dict.I18nEnumDict;
+import org.jetlinks.sdk.server.ai.cv.ObjectDetectionResult;
+
+import java.util.function.Supplier;
 
 /**
  * AI领域
@@ -19,6 +22,13 @@ public enum AiDomain implements I18nEnumDict<String> {
 
     private final String text;
 
+    public Supplier<? extends AiOutput<?>> getAiOutputInstance() {
+        return ObjectDetectionResult::new;
+    }
+
+    public Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
+        return SimpleImageGenericAiOutput::new;
+    }
 
     @Override
     public String getValue() {

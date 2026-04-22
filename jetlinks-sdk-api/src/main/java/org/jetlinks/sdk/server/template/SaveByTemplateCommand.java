@@ -14,6 +14,7 @@ import org.jetlinks.core.metadata.types.ObjectType;
 import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.utils.CastUtils;
 import org.jetlinks.sdk.server.utils.ConverterUtils;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.concurrent.Queues;
@@ -90,8 +91,8 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
     }
 
 
-    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, Mono<T>> converter,
-                                                  Function<Flux<DataContext<T>>, Mono<Void>> handler) {
+    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, ? extends Publisher<T>> converter,
+                                                  Function<Flux<DataContext<T>>, ? extends Publisher<?>> handler) {
         return execute(converter, handler, Queues.SMALL_BUFFER_SIZE);
     }
 
@@ -105,37 +106,36 @@ public class SaveByTemplateCommand extends AbstractConvertCommand<Flux<SaveByTem
      * @param <T>               数据
      * @return
      */
-    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, Mono<T>> converter,
-                                                  Function<Flux<DataContext<T>>, Mono<Void>> handler,
+    public <T> Flux<SaveByTemplateResult> execute(Function<EntityTemplateInfo, ? extends Publisher<T>> converter,
+                                                  Function<Flux<DataContext<T>>, ? extends Publisher<?>> handler,
                                                   int converterParallel) {
         return Flux
             .fromIterable(getData())
-            .flatMap(info -> converter
-                .apply(info)
+            .flatMap(info -> Flux
+                .from(converter.apply(info))
                 .map(data -> DataContext.simple(info, data))
                 .onErrorResume(error -> {
                     if (isThrowError()) {
-                        return Mono.error(error);
+                        return Flux.error(error);
                     }
                     //报错转换结果
                     DataContext<T> errContext = DataContext.simple(info, null);
                     errContext.error(error);
                     log.warn("converter data by template fail", error);
-                    return Mono.just(errContext);
+                    return Flux.just(errContext);
                 }), converterParallel)
             .as(flux -> {
                 Flux<DataContext<T>> cache = flux.cache();
-                return handler
-                    //仅处理有数据的
-                    .apply(cache.filter(c -> c.getData() != null))
+                return Flux
+                    .from(handler.apply(cache.filter(c -> c.getData() != null)))
                     //报错转换结果
                     .onErrorResume(err -> {
                         if (isThrowError()) {
-                            return Mono.error(err);
+                            return Flux.error(err);
                         }
                         return cache
                             .doOnNext(d -> d.error(err))
-                            .then(Mono.empty());
+                            .thenMany(Flux.empty());
                     })
                     .thenMany(cache.map(DataContext::toResult));
             });

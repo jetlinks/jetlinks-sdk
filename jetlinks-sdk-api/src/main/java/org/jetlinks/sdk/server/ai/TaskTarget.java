@@ -19,9 +19,15 @@ public interface TaskTarget {
 
     String getDescription();
 
-    Supplier<? extends AiOutput<?>> getAiOutputInstance();
+    @Deprecated
+    default Supplier<? extends AiOutput<?>> getAiOutputInstance() {
+        return () -> null;
+    }
 
-    Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance();
+    @Deprecated
+    default Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
+        return () -> null;
+    }
 
     default Mono<AiOutputMetadata> getAiOutputMetadata() {
         return Mono.empty();

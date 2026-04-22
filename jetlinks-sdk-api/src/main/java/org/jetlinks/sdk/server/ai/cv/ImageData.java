@@ -1,5 +1,6 @@
 package org.jetlinks.sdk.server.ai.cv;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.core.utils.SerializeUtils;
 import org.jetlinks.sdk.server.file.FileData;
 
@@ -68,6 +70,21 @@ public class ImageData implements FileData, Externalizable {
         return type;
     }
 
+    public void setInternalUrl(String internalUrl) {
+        othersWriter().put("internalUrl", internalUrl);
+    }
+
+    @JsonIgnore
+    public String getInternalUrl() {
+        if (others != null) {
+            String internalUrl = (String) others.get("internalUrl");
+            if (StringUtils.isNotBlank(internalUrl)) {
+                return internalUrl;
+            }
+        }
+        return FileData.super.getInternalUrl();
+    }
+
     public ImageData withOther(String key, Object value) {
         othersWriter().put(key, value);
         return this;
@@ -103,7 +120,7 @@ public class ImageData implements FileData, Externalizable {
 
     @Override
     public ByteBuf body() {
-        return data == null? null : Unpooled.unreleasableBuffer(data);
+        return data == null ? null : Unpooled.unreleasableBuffer(data);
     }
 
     @Override
@@ -114,11 +131,7 @@ public class ImageData implements FileData, Externalizable {
     @Getter
     @AllArgsConstructor
     public enum Type {
-        original("原始图像"),
-        labeled("边框标记"),
-        segmented("语义分割"),
-        instance("实例分割"),
-        keypoint("关键点标记");
+        original("原始图像"), labeled("边框标记"), segmented("语义分割"), instance("实例分割"), keypoint("关键点标记");
 
 
         public static final Type[] ALL = values();

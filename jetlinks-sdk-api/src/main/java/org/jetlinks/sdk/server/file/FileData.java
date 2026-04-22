@@ -42,6 +42,15 @@ public interface FileData extends Externalizable {
      */
     String getUrl();
 
+    default void setInternalUrl(String internalUrl) {}
+
+    /**
+     * @return 获取服务内部文件访问地址
+     */
+    default String getInternalUrl() {
+        return getUrl();
+    }
+
     default Map<String, Object> getOthers() {
         return Collections.emptyMap();
     }
