@@ -1,11 +1,14 @@
 package org.jetlinks.sdk.server.utils;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.util.ReferenceCountUtil;
 import org.reactivestreams.Subscription;
 import reactor.core.CoreSubscriber;
 import reactor.core.publisher.*;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.context.Context;
 
 import javax.annotation.Nonnull;
@@ -19,6 +22,17 @@ import reactor.util.concurrent.Queues;
 import reactor.core.publisher.Operators;
 
 public class ByteBufUtils {
+
+
+    /**
+     * @return ByteBufAllocator
+     */
+    public static ByteBufAllocator allocator(){
+        return Schedulers.isInNonBlockingThread()
+            ? ByteBufAllocator.DEFAULT
+            : UnpooledByteBufAllocator.DEFAULT;
+    }
+
     /**
      * 对文件内容进行切割
      *
