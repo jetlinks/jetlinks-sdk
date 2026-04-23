@@ -1,6 +1,8 @@
 package org.jetlinks.sdk.server.device.cmd;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.hswebframework.web.exception.ValidationException;
+import org.hswebframework.web.i18n.LocaleUtils;
 import org.jetlinks.core.command.CommandHandler;
 import org.jetlinks.core.command.CommandMetadataResolver;
 import org.jetlinks.core.metadata.FunctionMetadata;
@@ -11,6 +13,7 @@ import reactor.core.publisher.Flux;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -28,7 +31,8 @@ public class QueryPropertyLatestCommand extends OperationByIdCommand<Flux<Device
     @Schema(name = PARAMETER_KEY_ID, title = "ID")
     @NotBlank
     public String getId() {
-        return super.getId();
+        return Optional.ofNullable(super.getId())
+                .orElseThrow(() -> new ValidationException.NoStackTrace("id", LocaleUtils.resolveMessage("validation.NotNull.deviceId")));
     }
 
     @Schema(hidden = true)
