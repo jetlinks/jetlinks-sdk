@@ -1,12 +1,12 @@
 package org.jetlinks.sdk.server.utils;
 
-import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * 聚合查询表达式解析器.
@@ -33,19 +33,21 @@ public final class AggregationExpressionParser {
 
     }
 
-    public static List<DevicePropertyAggregation> parse(String expression) {
+    public static <T> List<T> parse(String expression, AggregationMapper<T> mapper) {
+        Objects.requireNonNull(mapper, "aggregation mapper can not be null");
         if (!StringUtils.hasText(expression)) {
             return Collections.emptyList();
         }
         List<String> expressions = split(expression);
-        List<DevicePropertyAggregation> aggregations = new ArrayList<>(expressions.size());
+        List<T> aggregations = new ArrayList<>(expressions.size());
         for (String item : expressions) {
-            aggregations.add(parseColumn(item));
+            aggregations.add(parseColumn(item, mapper));
         }
         return aggregations;
     }
 
-    public static DevicePropertyAggregation parseColumn(String expression) {
+    public static <T> T parseColumn(String expression, AggregationMapper<T> mapper) {
+        Objects.requireNonNull(mapper, "aggregation mapper can not be null");
         if (!StringUtils.hasText(expression)) {
             throw new IllegalArgumentException("aggregation expression can not be blank");
         }
@@ -62,13 +64,7 @@ public final class AggregationExpressionParser {
         }
         String alias = normalizeAlias(normalized.substring(end + 1).trim());
 
-        DevicePropertyAggregation aggregation = new DevicePropertyAggregation();
-        aggregation.setAgg(agg.toLowerCase(Locale.ROOT));
-        aggregation.setProperty(property);
-        if (StringUtils.hasText(alias)) {
-            aggregation.setAlias(alias);
-        }
-        return aggregation;
+        return mapper.apply(agg.toLowerCase(Locale.ROOT), property, alias);
     }
 
     static List<String> split(String expression) {
@@ -193,5 +189,11 @@ public final class AggregationExpressionParser {
             return value.substring(1, value.length() - 1);
         }
         return value;
+    }
+
+    @FunctionalInterface
+    public interface AggregationMapper<T> {
+
+        T apply(String agg, String property, String alias);
     }
 }

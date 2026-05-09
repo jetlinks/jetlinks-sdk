@@ -147,6 +147,14 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         if (expression.startsWith("{")) {
             return Collections.singletonList(ObjectMappers.parseJson(expression, DevicePropertyAggregation.class));
         }
-        return AggregationExpressionParser.parse(expression);
+        return AggregationExpressionParser.parse(expression, (agg, property, alias) -> {
+            DevicePropertyAggregation aggregation = new DevicePropertyAggregation();
+            aggregation.setAgg(agg);
+            aggregation.setProperty(property);
+            if (StringUtils.hasText(alias)) {
+                aggregation.setAlias(alias);
+            }
+            return aggregation;
+        });
     }
 }
