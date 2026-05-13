@@ -7,7 +7,11 @@ import java.util.function.Supplier;
 public class SimpleGenericAiOutput extends AbstractSimpleGenericAiOutput<SimpleFileData, SimpleSchemaData, SimpleGenericAiOutput> {
 
     public void setSchemaData(Map<String, Object> map) {
-        setSchemaData(new SimpleSchemaData(map));
+        if (map == null) {
+            setSchemaData(new SimpleSchemaData());
+        } else {
+            setSchemaData(new SimpleSchemaData(map));
+        }
     }
 
     public Supplier<SimpleFileData> newFileDataSupplier() {
