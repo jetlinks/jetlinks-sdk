@@ -19,7 +19,6 @@ public class AiModelParseInfo {
     @Schema(description = "文件地址")
     private String fileUrl;
 
-    @NotBlank
     @Schema(description = "模型提供商")
     private String provider;
 
