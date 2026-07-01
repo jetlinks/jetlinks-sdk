@@ -193,7 +193,7 @@ public class RoiObject implements Externalizable {
             }
             StringBuilder builder = new StringBuilder();
             for (Point point : points) {
-                if (builder.length() > 0) {
+                if (!builder.isEmpty()) {
                     builder.append(';');
                 }
                 builder
