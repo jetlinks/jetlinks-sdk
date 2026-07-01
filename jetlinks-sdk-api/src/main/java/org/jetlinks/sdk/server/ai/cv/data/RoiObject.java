@@ -159,10 +159,10 @@ public class RoiObject implements Externalizable {
     public static class Point implements Externalizable {
 
         @Schema(title = "x轴坐标")
-        private float coordinateX;
+        private float x;
 
         @Schema(title = "y轴坐标")
-        private float coordinateY;
+        private float y;
 
         public static Point of(float coordinateX, float coordinateY) {
             return new Point(coordinateX, coordinateY);
@@ -197,23 +197,23 @@ public class RoiObject implements Externalizable {
                     builder.append(';');
                 }
                 builder
-                    .append(point.getCoordinateX())
+                    .append(point.getX())
                     .append(',')
-                    .append(point.getCoordinateY());
+                    .append(point.getY());
             }
             return builder.toString();
         }
 
         @Override
         public void writeExternal(ObjectOutput out) throws IOException {
-            out.writeFloat(coordinateX);
-            out.writeFloat(coordinateY);
+            out.writeFloat(x);
+            out.writeFloat(y);
         }
 
         @Override
         public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-            coordinateX = in.readFloat();
-            coordinateY = in.readFloat();
+            x = in.readFloat();
+            y = in.readFloat();
         }
     }
 }
