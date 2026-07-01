@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetlinks.core.utils.SerializeUtils;
 
 import javax.annotation.Nullable;
@@ -81,13 +82,17 @@ public class RoiObject implements Externalizable {
         @Schema(title = "ROI类型", description = "line为线段,area为区域")
         private String type;
 
-        // 线段进入方向由起点到终点顺时针旋转90度后的右侧决定。
+        // 线段方向由起点到终点顺时针旋转90度后的方向为入口。
         @Nullable
         @Schema(title = "是否进入", description = "true为进入")
         private Boolean enter;
 
         @Schema(title = "其他信息")
         private Map<String, Object> others;
+
+        public static Roi of(String points, String type, Boolean enter, Map<String, Object> others) {
+            return new Roi(Point.from(points), type, enter, others);
+        }
 
         public static Roi line(List<Point> points, boolean enter, Map<String, Object> others) {
             return new Roi(points, TYPE_LINE, enter, others);
@@ -161,6 +166,42 @@ public class RoiObject implements Externalizable {
 
         public static Point of(float coordinateX, float coordinateY) {
             return new Point(coordinateX, coordinateY);
+        }
+
+        public static List<Point> from(String points) {
+            if (StringUtils.isBlank(points)) {
+                return new ArrayList<>(0);
+            }
+            String[] pointValues = StringUtils.split(points, ';');
+            List<Point> result = new ArrayList<>(pointValues.length);
+            for (String pointValue : pointValues) {
+                String[] coordinates = StringUtils.split(pointValue, ',');
+                if (coordinates.length != 2) {
+                    throw new IllegalArgumentException("Illegal ROI point format: " + pointValue);
+                }
+                result.add(Point.of(
+                    Float.parseFloat(StringUtils.trim(coordinates[0])),
+                    Float.parseFloat(StringUtils.trim(coordinates[1]))
+                ));
+            }
+            return result;
+        }
+
+        public static String to(List<Point> points) {
+            if (CollectionUtils.isEmpty(points)) {
+                return "";
+            }
+            StringBuilder builder = new StringBuilder();
+            for (Point point : points) {
+                if (builder.length() > 0) {
+                    builder.append(';');
+                }
+                builder
+                    .append(point.getCoordinateX())
+                    .append(',')
+                    .append(point.getCoordinateY());
+            }
+            return builder.toString();
         }
 
         @Override
