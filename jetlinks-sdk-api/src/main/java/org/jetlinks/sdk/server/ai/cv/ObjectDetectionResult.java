@@ -95,6 +95,20 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
         @Schema(title = "其他信息")
         private Map<String, Object> others;
 
+        public void addAnnotation(String key, Object value) {
+            if (annotations == null) {
+                annotations = Maps.newHashMap();
+            }
+            annotations.put(key, value);
+        }
+
+        public void addOther(String key, Object value) {
+            if (others == null) {
+                others = Maps.newHashMap();
+            }
+            others.put(key, value);
+        }
+
         @Override
         public void writeExternal(ObjectOutput out) throws IOException {
             SerializeUtils.writeNullableUTF(objectId, out);
