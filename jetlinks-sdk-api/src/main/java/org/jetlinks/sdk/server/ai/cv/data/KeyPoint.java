@@ -24,13 +24,13 @@ public class KeyPoint implements Externalizable {
     private String name;
 
     @Schema(title = "x轴坐标")
-    private float coordinateX;
+    private float x;
 
     @Schema(title = "y轴坐标")
-    private float coordinateY;
+    private float y;
 
     @Schema(title = "z轴坐标")
-    private float coordinateZ;
+    private float z;
 
     @Schema(title = "置信度")
     private float score;
@@ -63,9 +63,9 @@ public class KeyPoint implements Externalizable {
         KeyPoint point = new KeyPoint();
         point.setIndex(index);
         point.setName(name);
-        point.setCoordinateX(coordinateX);
-        point.setCoordinateY(coordinateY);
-        point.setCoordinateZ(coordinateZ);
+        point.setX(coordinateX);
+        point.setY(coordinateY);
+        point.setZ(coordinateZ);
         point.setScore(score);
         point.setVisibility(visibility);
         return point;
@@ -75,9 +75,9 @@ public class KeyPoint implements Externalizable {
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(index);
         SerializeUtils.writeNullableUTF(name, out);
-        out.writeFloat(coordinateX);
-        out.writeFloat(coordinateY);
-        out.writeFloat(coordinateZ);
+        out.writeFloat(x);
+        out.writeFloat(y);
+        out.writeFloat(z);
         out.writeFloat(score);
         SerializeUtils.writeNullableUTF(visibility == null ? null : visibility.name(), out);
         SerializeUtils.writeKeyValue(others, out);
@@ -87,9 +87,9 @@ public class KeyPoint implements Externalizable {
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         index = in.readInt();
         name = SerializeUtils.readNullableUTF(in);
-        coordinateX = in.readFloat();
-        coordinateY = in.readFloat();
-        coordinateZ = in.readFloat();
+        x = in.readFloat();
+        y = in.readFloat();
+        z = in.readFloat();
         score = in.readFloat();
         String visibility = SerializeUtils.readNullableUTF(in);
         if (visibility != null) {
