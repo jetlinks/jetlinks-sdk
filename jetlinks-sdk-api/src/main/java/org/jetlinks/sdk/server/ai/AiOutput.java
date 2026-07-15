@@ -108,6 +108,7 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     /**
      * 获取为轻量数据，作用于统一存储等
      */
+    @Deprecated
     default Map<String, Object> toLightWeighMap() {
         return FastBeanCopier.copy(this, new HashMap<>());
     }
@@ -115,6 +116,7 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     /**
      * 获取为平铺数据，作用于规则订阅等
      */
+    @Deprecated
     default List<Map<String, Object>> flat() {
         return Collections.singletonList(toLightWeighMap());
     }
@@ -122,6 +124,7 @@ public interface AiOutput<Self extends AiOutput<Self>> extends HeaderSupport<Sel
     /**
      * 获取为轻量平铺数据，作用于业务存储等
      */
+    @Deprecated
     default List<Map<String, Object>> lightWeighFlat() {
         return flat();
     }

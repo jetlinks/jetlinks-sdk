@@ -26,17 +26,34 @@ public enum InternalCVTaskTarget implements TaskTarget {
      */
     ObjectDetection,
     ImageRecognition,
+    BarrierGateDetection,
+    ClutterDetection,
+    VehicleCongestionDetection,
+    CrowdDetection,
+    FaceDetection,
+    FireSmokeDetection,
+    FightDetection,
     HelmetDetection,
     WorkwearDetection,
+    SafetyBeltDetection,
     SmokingBehaviorDetection,
+    PhoneUsageDetection,
     FireDetection,
     SmokeDetection,
     IntrusionDetection,
+    LoiteringDetection,
+    CrowdGatheringDetection,
+    ClimbingDetection,
+    ChannelBlockingDetection,
     FallDetection,
     VehicleReverseDrivingDetection,
     IllegalParkingDetection,
     HumanVehicleMixingDetection,
     HumanPoseDetection,
+    PersonDetection,
+    CarDetection,
+    ElectricBicycleDetection,
+    GarbageOverflowDetection,
 
     ;
     private final String text;
@@ -59,11 +76,6 @@ public enum InternalCVTaskTarget implements TaskTarget {
 
     public String getDescription() {
         return LocaleUtils.resolveMessage(description, description);
-    }
-
-    @Override
-    public Mono<AiOutputMetadata> getAiOutputMetadata() {
-        return Mono.just(ObjectDetectionCommand.aiOutputMetadata);
     }
 
     @Override

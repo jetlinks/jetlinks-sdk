@@ -29,6 +29,7 @@ public interface TaskTarget {
         return () -> null;
     }
 
+    @Deprecated
     default Mono<AiOutputMetadata> getAiOutputMetadata() {
         return Mono.empty();
     }

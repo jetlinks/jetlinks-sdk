@@ -32,6 +32,7 @@ public class ImageData implements FileData, Externalizable {
     @Schema(description = "图片数据")
     private ByteBuf data;
 
+    @Deprecated
     @Schema(description = "图片类型")
     private Type type;
 
@@ -128,6 +129,7 @@ public class ImageData implements FileData, Externalizable {
         ReferenceCountUtil.safeRelease(data);
     }
 
+    @Deprecated
     @Getter
     @AllArgsConstructor
     public enum Type {

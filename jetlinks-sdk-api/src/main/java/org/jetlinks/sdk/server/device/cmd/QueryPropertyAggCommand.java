@@ -13,13 +13,17 @@ import org.jetlinks.core.metadata.types.StringType;
 import org.jetlinks.sdk.server.commons.AggregationRequest;
 import org.jetlinks.sdk.server.commons.cmd.OperationByIdCommand;
 import org.jetlinks.sdk.server.device.DevicePropertyAggregation;
+import org.jetlinks.sdk.server.utils.AggregationExpressionParser;
+import org.jetlinks.sdk.server.utils.ObjectMappers;
 import org.jetlinks.sdk.server.ui.field.annotation.field.select.DeviceSelector;
 import org.springframework.core.ResolvableType;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 
 import jakarta.validation.constraints.NotBlank;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -29,7 +33,11 @@ import java.util.function.Function;
  *
  * @author zhangji 2024/1/16
  */
-@Schema(title = "聚合查询设备属性")
+@Schema(
+    title = "聚合查询设备属性",
+    description = "支持按对象数组或表达式字符串传入聚合列。为便于大模型理解与生成参数，推荐优先使用表达式字符串。",
+    example = "{\"id\":\"device-1\",\"columns\":\"avg(temp) as avgTemp, max(humidity) as maxHumidity\",\"query\":{\"interval\":\"1d\",\"from\":\"now-7d\",\"to\":\"now\"}}"
+)
 public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<String, Object>>, QueryPropertyAggCommand> {
 
     private static final long serialVersionUID = 1L;
@@ -52,14 +60,27 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         .forClassWithGenerics(List.class, DevicePropertyAggregation.class)
         .getType();
 
-    @Schema(title = "聚合字段")
+    @Schema(
+        title = "聚合字段",
+        description = "支持2种格式: 1.对象数组; 2.表达式字符串,如: avg(temp) as avgTemp, max(humidity) as maxHumidity。传入字符串时会自动按表达式解析。为便于大模型理解与生成,推荐优先使用表达式字符串。",
+        example = "avg(temp) as avgTemp, max(humidity) as maxHumidity"
+    )
     @NotBlank
     public List<DevicePropertyAggregation> getColumns() {
+        Object columns = readable().get("columns");
+        if (columns instanceof String) {
+            return parseColumns((String) columns);
+        }
         return getOrNull("columns", columnsType);
     }
 
     public QueryPropertyAggCommand withColumns(List<DevicePropertyAggregation> columns) {
         writable().put("columns", columns);
+        return this;
+    }
+
+    public QueryPropertyAggCommand withColumnsExpression(String expression) {
+        writable().put("columns", expression);
         return this;
     }
 
@@ -89,7 +110,7 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
             SimplePropertyMetadata.of("id", "Id", StringType.GLOBAL),
             SimplePropertyMetadata.of(
                 "columns",
-                "聚合字段",
+                "聚合字段,支持对象数组或表达式字符串,如: avg(temp) as avgTemp, max(humidity) as maxHumidity",
                 new ArrayType()
                     .elementType(new ObjectType()
                                      .addProperty("property", "属性ID", StringType.GLOBAL)
@@ -115,4 +136,25 @@ public class QueryPropertyAggCommand extends OperationByIdCommand<Flux<Map<Strin
         return CommandMetadataResolver.resolve(QueryPropertyAggCommand.class);
     }
 
+    private List<DevicePropertyAggregation> parseColumns(String columns) {
+        if (!StringUtils.hasText(columns)) {
+            return Collections.emptyList();
+        }
+        String expression = columns.trim();
+        if (expression.startsWith("[")) {
+            return ObjectMappers.parseJsonArray(expression, DevicePropertyAggregation.class);
+        }
+        if (expression.startsWith("{")) {
+            return Collections.singletonList(ObjectMappers.parseJson(expression, DevicePropertyAggregation.class));
+        }
+        return AggregationExpressionParser.parse(expression, (agg, property, alias) -> {
+            DevicePropertyAggregation aggregation = new DevicePropertyAggregation();
+            aggregation.setAgg(agg);
+            aggregation.setProperty(property);
+            if (StringUtils.hasText(alias)) {
+                aggregation.setAlias(alias);
+            }
+            return aggregation;
+        });
+    }
 }

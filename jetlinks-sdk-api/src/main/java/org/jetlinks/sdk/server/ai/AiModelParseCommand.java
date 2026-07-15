@@ -14,8 +14,8 @@ import java.util.Map;
 @Schema(title = "解析Ai模型")
 public class AiModelParseCommand extends AbstractConvertCommand<Mono<AiModelParseInfo>, AiModelParseCommand> {
 
-    private final String FILE_URL = "fileUrl";
-    private final String OTHERS = "others";
+    private static final String FILE_URL = "fileUrl";
+    private static final String OTHERS = "others";
 
     @Schema(title = "模型文件地址")
     public String getFileUrl() {

@@ -27,7 +27,7 @@ public enum AiDomain implements I18nEnumDict<String> {
     }
 
     public Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
-        return SimpleImageGenericAiOutput::new;
+        return SimpleGenericAiOutput::new;
     }
 
     @Override
