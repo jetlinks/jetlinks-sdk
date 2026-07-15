@@ -75,6 +75,9 @@ public class MediaInfo implements Externalizable {
         if (rtc != null) {
             list.add(URI.create(rtc));
         }
+        if (hls != null) {
+            list.add(URI.create(hls));
+        }
         return list;
 
     }
@@ -87,6 +90,7 @@ public class MediaInfo implements Externalizable {
         SerializeUtils.writeNullableUTF(flv, out);
         SerializeUtils.writeNullableUTF(mp4, out);
         SerializeUtils.writeNullableUTF(rtc, out);
+        SerializeUtils.writeNullableUTF(hls, out);
     }
 
     @Override
@@ -97,5 +101,6 @@ public class MediaInfo implements Externalizable {
         flv = SerializeUtils.readNullableUTF(in);
         mp4 = SerializeUtils.readNullableUTF(in);
         rtc = SerializeUtils.readNullableUTF(in);
+        hls = SerializeUtils.readNullableUTF(in);
     }
 }
