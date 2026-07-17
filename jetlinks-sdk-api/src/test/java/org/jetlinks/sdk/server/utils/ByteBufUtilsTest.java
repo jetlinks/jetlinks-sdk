@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.springframework.util.unit.DataSize;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
 import reactor.core.CoreSubscriber;
@@ -27,6 +28,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -170,6 +172,74 @@ class ByteBufUtilsTest {
 
         // 每2个512字节输入 -> 1个1024字节输出，3个输出应当只消费6个输入
         assertEquals(6, produced.get());
+    }
+
+    @Test
+    @DisplayName("取消传播: 下游取消时原始 source 收到 cancel")
+    void testCancelPropagatesToSource() {
+        AtomicBoolean sourceCancelled = new AtomicBoolean();
+        Flux<ByteBuf> source = Flux
+            .<ByteBuf>never()
+            .doOnCancel(() -> sourceCancelled.set(true));
+
+        StepVerifier
+            .create(ByteBufUtils.balanceBuffer(source, 1024))
+            .thenCancel()
+            .verify();
+
+        assertTrue(sourceCancelled.get());
+    }
+
+    @Test
+    @DisplayName("取消释放: 内部缓存自行清理且上游预取仅 discard 一次")
+    void testCancelReleasesPrefetchedPooledBuffers() throws InterruptedException {
+        int fixed = 1024;
+        int total = 64;
+        List<ByteBuf> created = new ArrayList<>(total);
+        for (int i = 0; i < total; i++) {
+            int size = i == 0 ? fixed + fixed / 2 : fixed;
+            ByteBuf parent = PooledByteBufAllocator.DEFAULT.directBuffer(size).writeZero(size);
+            created.add(parent.retainedSlice(parent.readerIndex(), parent.readableBytes()));
+            parent.release();
+        }
+
+        CountDownLatch sourceCancelled = new CountDownLatch(1);
+        CountDownLatch discarded = new CountDownLatch(total - 1);
+        AtomicInteger discardCount = new AtomicInteger();
+        Scheduler scheduler = Schedulers.newSingle("byte-buf-cancel-test");
+        try {
+            Flux<ByteBuf> source = Flux
+                .fromIterable(created)
+                .concatWith(Flux.never())
+                .doOnCancel(sourceCancelled::countDown)
+                .publishOn(scheduler, total);
+
+            Flux<ByteBuf> balanced = ByteBufUtils
+                .balanceBuffer(source, fixed)
+                .doOnNext(ByteBuf::release)
+                .doOnDiscard(ByteBuf.class, buffer -> {
+                    buffer.release();
+                    discardCount.incrementAndGet();
+                    discarded.countDown();
+                });
+
+            StepVerifier
+                .create(balanced, 0)
+                .thenRequest(1)
+                .expectNextCount(1)
+                .thenCancel()
+                .verify();
+
+            assertTrue(sourceCancelled.await(5, TimeUnit.SECONDS));
+            assertTrue(discarded.await(5, TimeUnit.SECONDS));
+            assertEquals(total - 1, discardCount.get());
+            created.forEach(buffer -> assertEquals(0, buffer.refCnt()));
+        } finally {
+            scheduler.dispose();
+            created.stream()
+                   .filter(buffer -> buffer.refCnt() > 0)
+                   .forEach(ByteBuf::release);
+        }
     }
 
     @Test

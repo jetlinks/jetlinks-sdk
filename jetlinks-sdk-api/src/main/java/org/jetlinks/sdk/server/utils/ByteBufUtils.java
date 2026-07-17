@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import reactor.util.concurrent.Queues;
 import reactor.core.publisher.Operators;
@@ -90,7 +91,7 @@ public class ByteBufUtils {
      *
      * @param buffer      数据流
      * @param fixedLength 每个byteBuf数据长度
-     * @return 新的数据流
+     * @return 新的数据流。下游负责释放已接收的 ByteBuf；取消订阅时会取消上游并释放尚未下发的缓存。
      */
     public static Flux<ByteBuf> balanceBuffer(Flux<ByteBuf> buffer, int fixedLength) {
 
@@ -120,6 +121,8 @@ public class ByteBufUtils {
             .newUpdater(ByteBufBalancerSubscriber.class, "wip");
         static final AtomicLongFieldUpdater<ByteBufBalancerSubscriber> REQUESTED = AtomicLongFieldUpdater
             .newUpdater(ByteBufBalancerSubscriber.class, "requested");
+        static final AtomicReferenceFieldUpdater<ByteBufBalancerSubscriber, Subscription> SUBSCRIPTION = AtomicReferenceFieldUpdater
+            .newUpdater(ByteBufBalancerSubscriber.class, Subscription.class, "s");
 
         private final int fixedLength;
 
@@ -132,7 +135,7 @@ public class ByteBufUtils {
         private Throwable error;
         private volatile boolean cancelled;
 
-        private Subscription s;
+        private volatile Subscription s;
 
         private final Queue<ByteBuf> queue = Queues.<ByteBuf>unboundedMultiproducer().get();
 
@@ -153,11 +156,9 @@ public class ByteBufUtils {
 
         @Override
         public void onSubscribe(@Nonnull Subscription subscription) {
-            if (this.s != null) {
-                subscription.cancel();
+            if (!Operators.setOnce(SUBSCRIPTION, this, subscription)) {
                 return;
             }
-            this.s = subscription;
             actual.onSubscribe(this);
             //subscription.request(1);
         }
@@ -197,6 +198,8 @@ public class ByteBufUtils {
         @Override
         public void cancel() {
             cancelled = true;
+            // 先原子终止上游，避免并发 drain 在取消后继续向原始数据流请求数据。
+            Operators.terminate(SUBSCRIPTION, this);
             drain();
         }
 
