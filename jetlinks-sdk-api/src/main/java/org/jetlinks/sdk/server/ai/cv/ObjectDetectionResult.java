@@ -72,11 +72,19 @@ public class ObjectDetectionResult extends AiCommandResult<ObjectDetectionResult
     @Getter
     @Setter
     public static class DetectedObject implements Externalizable {
+
+        /**
+         * 附属检测对象标注键。
+         * <p>
+         * 对应值类型为 {@code List<DetectedObject>}，仅表示当前对象的直接子对象。
+         */
+        public static final String PARTS_ANNOTATIONS_KEY = "parts";
         /**
          * 识别出的对象ID,为空说明没有识别出对象
          *
          * @see ComputerVisionObject#getId()
          */
+        @Deprecated
         @Schema(title = "对象ID")
         private String objectId;
 
