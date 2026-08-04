@@ -15,6 +15,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.function.Supplier;
 
+/**
+ * @deprecated 后续使用为动态注入为准，不以内置为准
+ */
 @Getter
 public enum InternalCVTaskTarget implements TaskTarget {
 
@@ -54,6 +57,8 @@ public enum InternalCVTaskTarget implements TaskTarget {
     CarDetection,
     ElectricBicycleDetection,
     GarbageOverflowDetection,
+    HumanFlowDetection,
+    DisputeDetection,
 
     ;
     private final String text;
