@@ -4,15 +4,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetlinks.core.utils.SerializeUtils;
 
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.util.Map;
+import java.io.*;
 
 @Getter
 @Setter
 public class FileInfo implements Externalizable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String id;
