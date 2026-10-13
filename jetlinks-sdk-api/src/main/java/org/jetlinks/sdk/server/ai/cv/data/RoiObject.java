@@ -82,7 +82,7 @@ public class RoiObject implements Externalizable {
         @Schema(title = "ROI类型", description = "line为线段,area为区域")
         private String type;
 
-        // 线段方向由起点到终点顺时针旋转90度后的方向为入口。
+        // 线段方向由起点到终点顺时针旋转90度后的方向为内侧
         @Nullable
         @Schema(title = "是否进入", description = "true为进入")
         private Boolean enter;
