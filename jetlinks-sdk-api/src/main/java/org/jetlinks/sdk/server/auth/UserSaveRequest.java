@@ -3,6 +3,7 @@ package org.jetlinks.sdk.server.auth;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import org.hswebframework.ezorm.core.DefaultExtendable;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -14,7 +15,8 @@ import java.util.Set;
  */
 @Getter
 @Setter
-public class UserSaveRequest implements Serializable {
+@Schema(title = "用户维护请求")
+public class UserSaveRequest extends DefaultExtendable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "用户信息")

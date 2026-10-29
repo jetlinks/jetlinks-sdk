@@ -22,6 +22,7 @@ class BasicAuthCommandsTest {
         user.setTelephone("123");
         user.setExtension("tenantId", "tenant");
         request.setUser(user);
+        request.setExtension("source", "test-source");
         request.setRoleIdList(Set.of("role"));
         request.setBusinessApplicationIdList(Set.of("application"));
         CreateUserCommand original = new CreateUserCommand().setRequest(request);
@@ -29,6 +30,7 @@ class BasicAuthCommandsTest {
             ObjectMappers.JSON_MAPPER.writeValueAsBytes(original.readable()), Map.class);
         CreateUserCommand decoded = new CreateUserCommand().with(wire);
         assertEquals("CreateUser", decoded.getCommandId());
+        assertEquals("test-source", decoded.getRequest().getExtension("source"));
         assertEquals("test-only-password", decoded.getRequest().getUser().getPassword());
         assertEquals("tenant", decoded.getRequest().getUser().getExtension("tenantId"));
         assertEquals(Set.of("role"), decoded.getRequest().getRoleIdList());
@@ -54,6 +56,9 @@ class BasicAuthCommandsTest {
         BindDimensionUsersCommand decoded = new BindDimensionUsersCommand().with(wire);
         assertEquals("BindDimensionUsers", decoded.getCommandId());
         DimensionUserBinding actual = decoded.getBindings().get(0);
+        assertEquals("user", actual.getUserId());
+        assertEquals("organization", actual.getDimensionTypeId());
+        assertEquals("Manager", actual.getRelationName());
         assertEquals("org", actual.getDimensionId());
         assertEquals("manager", actual.getRelation());
         assertArrayEquals(binding.getFeatures(), actual.getFeatures());
