@@ -11,6 +11,9 @@ public interface AuthCommandSupportTypes {
     // 用户
     String user = "user";
 
+    // 角色
+    String role = "role";
+
     // 组织
     String organization = "organization";
 
