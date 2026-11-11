@@ -1,9 +1,5 @@
 package org.jetlinks.sdk.server.ai;
 
-import reactor.core.publisher.Mono;
-
-import java.util.function.Supplier;
-
 /**
  * AI 任务目标
  *
@@ -18,20 +14,5 @@ public interface TaskTarget {
     String getText();
 
     String getDescription();
-
-    @Deprecated
-    default Supplier<? extends AiOutput<?>> getAiOutputInstance() {
-        return () -> null;
-    }
-
-    @Deprecated
-    default Supplier<? extends AiOutput<?>> getSimpleAiOutputInstance() {
-        return () -> null;
-    }
-
-    @Deprecated
-    default Mono<AiOutputMetadata> getAiOutputMetadata() {
-        return Mono.empty();
-    }
 
 }
